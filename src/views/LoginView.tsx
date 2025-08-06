@@ -247,8 +247,22 @@ const LoginView = () => {
               </Typography>
               {googleUser && (
                 <>
-                  {googleUser.photoURL && (
-                    <img src={googleUser.photoURL} alt="User" style={{ width: 80, height: 80, borderRadius: "50%", marginBottom: 16 }} />
+                  {googleUser.photoURL ? (
+                    <img
+                      src={googleUser.photoURL}
+                      alt="User"
+                      style={{ width: 100, height: 100, borderRadius: "50%", marginBottom: 16, objectFit: "cover", background: "#eee" }}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
+                      alt="User"
+                      style={{ width: 100, height: 100, borderRadius: "50%", marginBottom: 16, objectFit: "cover", background: "#eee" }}
+                    />
                   )}
                   <Typography variant="subtitle1">{googleUser.displayName}</Typography>
                   <Typography variant="body2">{googleUser.email}</Typography>
