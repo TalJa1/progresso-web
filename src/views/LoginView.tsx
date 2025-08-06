@@ -116,7 +116,7 @@ const LoginView = () => {
           width: "100%",
           height: "100%",
           zIndex: 1,
-          bgcolor: "rgba(217, 217, 217, 0.4)",
+          bgcolor: "rgba(230, 230, 230, 0.4)",
         }}
       />
       <Box
