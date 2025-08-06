@@ -243,7 +243,7 @@ const LoginView = () => {
           >
             <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%", textAlign: "center" }}>
               <Typography variant="h5" gutterBottom>
-                Welcome!
+                Welcome to Progresso!
               </Typography>
               {googleUser && (
                 <>
