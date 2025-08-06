@@ -103,7 +103,7 @@ const LoginView = () => {
           height: "100%",
           zIndex: 0,
           backgroundImage:
-            'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754450545/paper_wallpaper_jorami.jpg")',
+            'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -116,7 +116,7 @@ const LoginView = () => {
           width: "100%",
           height: "100%",
           zIndex: 1,
-          bgcolor: "rgba(252, 252, 252, 0.4)",
+          bgcolor: "rgba(217, 217, 217, 0.4)",
         }}
       />
       <Box
