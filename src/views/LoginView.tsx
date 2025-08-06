@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   TextField,
   Button,
@@ -40,6 +41,7 @@ const LoginView = () => {
     photoURL?: string;
     uid?: string;
   } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +70,7 @@ const LoginView = () => {
         setGoogleUser(userData);
         setError("");
         localStorage.setItem("googleUser", JSON.stringify(userData));
+        setTimeout(() => setShowSuccess(true), 400); // delay for animation
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -92,6 +95,10 @@ const LoginView = () => {
       sx={{
         position: "relative",
         overflow: "hidden",
+        width: "100vw",
+        height: "100vh",
+        minHeight: "100vh",
+        minWidth: "100vw",
       }}
     >
       <Box
@@ -99,8 +106,8 @@ const LoginView = () => {
           position: "absolute",
           top: 0,
           left: 0,
-          width: "100%",
-          height: "100%",
+          width: "100vw",
+          height: "100vh",
           zIndex: 0,
           backgroundImage:
             'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
@@ -113,91 +120,147 @@ const LoginView = () => {
           position: "absolute",
           top: 0,
           left: 0,
-          width: "100%",
-          height: "100%",
+          width: "100vw",
+          height: "100vh",
           zIndex: 1,
           bgcolor: "rgba(230, 230, 230, 0.4)",
         }}
       />
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 2,
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%" }}>
-          <React.Fragment>
-            <Typography variant="h5" align="center" gutterBottom>
-              Login
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-              sx={{ mb: 2 }}
-            >
-              <IconButton
-                color="primary"
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                aria-label="Login with Google"
-              >
-                <GoogleIcon fontSize="large" />
-              </IconButton>
-              <IconButton
-                color="inherit"
-                disabled
-                aria-label="Login with Apple"
-              >
-                <AppleIcon fontSize="large" />
-              </IconButton>
-              <IconButton color="inherit" disabled aria-label="Login with X">
-                <XIcon fontSize="large" />
-              </IconButton>
-            </Stack>
-            <Box
-              component="form"
-              onSubmit={handleLogin}
-              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-            >
-              <TextField
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                fullWidth
-              />
-              {error && (
-                <Typography color="error" variant="body2" align="center">
-                  {error}
+      <AnimatePresence>
+        {!showSuccess && (
+          <motion.div
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ y: showSuccess ? 400 : 0, opacity: showSuccess ? 0 : 1 }}
+            exit={{ y: 400, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 80, damping: 20 }}
+            style={{
+              position: "absolute",
+              zIndex: 2,
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              minHeight: "100vh",
+              minWidth: "100vw",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden"
+            }}
+          >
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%" }}>
+              <React.Fragment>
+                <Typography variant="h5" align="center" gutterBottom>
+                  Login
                 </Typography>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="center"
+                  sx={{ mb: 2 }}
+                >
+                  <IconButton
+                    color="primary"
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    aria-label="Login with Google"
+                  >
+                    <GoogleIcon fontSize="large" />
+                  </IconButton>
+                  <IconButton
+                    color="inherit"
+                    disabled
+                    aria-label="Login with Apple"
+                  >
+                    <AppleIcon fontSize="large" />
+                  </IconButton>
+                  <IconButton color="inherit" disabled aria-label="Login with X">
+                    <XIcon fontSize="large" />
+                  </IconButton>
+                </Stack>
+                <Box
+                  component="form"
+                  onSubmit={handleLogin}
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    fullWidth
+                  />
+                  <TextField
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    fullWidth
+                  />
+                  {error && (
+                    <Typography color="error" variant="body2" align="center">
+                      {error}
+                    </Typography>
+                  )}
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    disabled={loading}
+                  >
+                    {loading ? "Logging in..." : "Login"}
+                  </Button>
+                </Box>
+              </React.Fragment>
+            </Paper>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ y: -400, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -400, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 80, damping: 20 }}
+            style={{
+              position: "absolute",
+              zIndex: 3,
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              minHeight: "100vh",
+              minWidth: "100vw",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden"
+            }}
+          >
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%", textAlign: "center" }}>
+              <Typography variant="h5" gutterBottom>
+                Welcome!
+              </Typography>
+              {googleUser && (
+                <>
+                  {googleUser.photoURL && (
+                    <img src={googleUser.photoURL} alt="User" style={{ width: 80, height: 80, borderRadius: "50%", marginBottom: 16 }} />
+                  )}
+                  <Typography variant="subtitle1">{googleUser.displayName}</Typography>
+                  <Typography variant="body2">{googleUser.email}</Typography>
+                </>
               )}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                disabled={loading}
-              >
-                {loading ? "Logging in..." : "Login"}
-              </Button>
-            </Box>
-          </React.Fragment>
-        </Paper>
-      </Box>
+              <Typography variant="body2" sx={{ mt: 2 }}>
+                You have successfully logged in with Google.
+              </Typography>
+            </Paper>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Box>
   );
 };
