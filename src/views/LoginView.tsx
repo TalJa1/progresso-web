@@ -15,7 +15,8 @@ import {
 import googleLogo from "../assets/google-logo.png";
 import AppleIcon from "@mui/icons-material/Apple";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import logo from "../assets/progresso-logo.png"
+import logo from "../assets/progresso-logo.png";
+import { getUserByEmail } from "../apis/users/usersAPI";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdrn7V_YfgJYa_hzYRAqYSIC3M1uPcy-E",
@@ -43,6 +44,7 @@ const LoginView = () => {
     uid?: string;
   } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isExistingUser, setIsExistingUser] = useState<boolean | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +73,19 @@ const LoginView = () => {
         setGoogleUser(userData);
         setError("");
         localStorage.setItem("googleUser", JSON.stringify(userData));
+        // Check if user exists in DB
+        if (userData.email) {
+          try {
+            const dbUser = await getUserByEmail(userData.email);
+            if (dbUser) {
+              setIsExistingUser(true);
+            } else {
+              setIsExistingUser(false);
+            }
+          } catch {
+            setIsExistingUser(false);
+          }
+        }
         setTimeout(() => setShowSuccess(true), 400); // delay for animation
       }
     } catch (err) {
@@ -146,25 +161,66 @@ const LoginView = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              overflow: "hidden"
+              overflow: "hidden",
             }}
           >
-            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%", borderRadius: 4, boxShadow: 3, bgcolor: "rgba(255,255,255,0.3)" }}>
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 4,
+                maxWidth: 400,
+                width: "100%",
+                borderRadius: 4,
+                boxShadow: 3,
+                bgcolor: "rgba(255,255,255,0.3)",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
                 <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                   <img
                     src={logo}
                     alt="Progresso Logo"
-                    style={{ width: 56, height: 56, marginBottom: 8, borderRadius: 16, background: "#f6f6f6", boxShadow: "0 2px 8px #eee" }}
+                    style={{
+                      width: 56,
+                      height: 56,
+                      marginBottom: 8,
+                      borderRadius: 16,
+                      background: "#f6f6f6",
+                      boxShadow: "0 2px 8px #eee",
+                    }}
                   />
                 </Box>
-                <Typography variant="h6" align="center" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ fontWeight: 700, mb: 0.5 }}
+                >
                   Sign in with email
                 </Typography>
-                <Typography variant="body2" align="center" sx={{ color: "grey.600", mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  align="center"
+                  sx={{ color: "grey.600", mb: 2 }}
+                >
                   Unlock your potential. Learn, create, and grow with Progresso
                 </Typography>
-                <Box component="form" onSubmit={handleLogin} sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 1.5 }}>
+                <Box
+                  component="form"
+                  onSubmit={handleLogin}
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1.5,
+                  }}
+                >
                   <TextField
                     label="Email"
                     type="email"
@@ -173,7 +229,9 @@ const LoginView = () => {
                     required
                     fullWidth
                     size="small"
-                    InputProps={{ sx: { borderRadius: 2, bgcolor: "grey.100" } }}
+                    InputProps={{
+                      sx: { borderRadius: 2, bgcolor: "grey.100" },
+                    }}
                   />
                   <TextField
                     label="Password"
@@ -183,15 +241,27 @@ const LoginView = () => {
                     required
                     fullWidth
                     size="small"
-                    InputProps={{ sx: { borderRadius: 2, bgcolor: "grey.100" } }}
+                    InputProps={{
+                      sx: { borderRadius: 2, bgcolor: "grey.100" },
+                    }}
                   />
-                  <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-                    <Typography variant="caption" sx={{ color: "primary.main", cursor: "pointer" }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "primary.main", cursor: "pointer" }}
+                    >
                       Forgot password?
                     </Typography>
                   </Box>
                   {error && (
-                    <Typography color="error" variant="body2" align="center" sx={{ mb: 1 }}>
+                    <Typography
+                      color="error"
+                      variant="body2"
+                      align="center"
+                      sx={{ mb: 1 }}
+                    >
                       {error}
                     </Typography>
                   )}
@@ -200,28 +270,59 @@ const LoginView = () => {
                     variant="contained"
                     color="primary"
                     fullWidth
-                    sx={{ borderRadius: 2, fontWeight: 700, fontSize: 16, py: 1.2, boxShadow: 1, mb: 1 }}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: 700,
+                      fontSize: 16,
+                      py: 1.2,
+                      boxShadow: 1,
+                      mb: 1,
+                    }}
                     disabled={loading}
                   >
                     {loading ? "Logging in..." : "Get Started"}
                   </Button>
                 </Box>
-                <Box sx={{ width: "100%", display: "flex", alignItems: "center", my: 2 }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    my: 2,
+                  }}
+                >
                   <Box sx={{ flex: 1, height: 1, bgcolor: "grey.300" }} />
-                  <Typography variant="caption" sx={{ mx: 1, color: "grey.500" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ mx: 1, color: "grey.500" }}
+                  >
                     Or sign in with
                   </Typography>
                   <Box sx={{ flex: 1, height: 1, bgcolor: "grey.300" }} />
                 </Box>
-                <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="center"
+                  sx={{ mb: 1 }}
+                >
                   <IconButton
                     color="primary"
                     onClick={handleGoogleLogin}
                     disabled={loading}
                     aria-label="Login with Google"
-                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1, p: 1 }}
+                    sx={{
+                      bgcolor: "grey.100",
+                      borderRadius: 2,
+                      boxShadow: 1,
+                      p: 1,
+                    }}
                   >
-                    <img src={googleLogo} alt="Google" style={{ width: 24, height: 24 }} />
+                    <img
+                      src={googleLogo}
+                      alt="Google"
+                      style={{ width: 24, height: 24 }}
+                    />
                   </IconButton>
                   <IconButton
                     color="primary"
@@ -230,7 +331,14 @@ const LoginView = () => {
                     sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
                   >
                     {/* You can use Facebook icon from MUI if available */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F3"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.326 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.405 24 24 23.408 24 22.674V1.326C24 .592 23.405 0 22.675 0"/></svg>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="#1877F3"
+                    >
+                      <path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.326 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.405 24 24 23.408 24 22.674V1.326C24 .592 23.405 0 22.675 0" />
+                    </svg>
                   </IconButton>
                   <IconButton
                     color="primary"
@@ -265,12 +373,17 @@ const LoginView = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              overflow: "hidden"
+              overflow: "hidden",
             }}
           >
-            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%", textAlign: "center" }}>
+            <Paper
+              elevation={3}
+              sx={{ p: 4, maxWidth: 400, width: "100%", textAlign: "center" }}
+            >
               <Typography variant="h5" gutterBottom>
-                Welcome to Progresso!
+                {isExistingUser === true
+                  ? "Welcome back!"
+                  : "Welcome to Progresso!"}
               </Typography>
               {googleUser && (
                 <>
@@ -278,20 +391,37 @@ const LoginView = () => {
                     <img
                       src={googleUser.photoURL}
                       alt="User"
-                      style={{ width: 100, height: 100, borderRadius: "50%", marginBottom: 16, objectFit: "cover", background: "#eee" }}
+                      style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: "50%",
+                        marginBottom: 16,
+                        objectFit: "cover",
+                        background: "#eee",
+                      }}
                       referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
+                        (e.target as HTMLImageElement).src =
+                          "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
                       }}
                     />
                   ) : (
                     <img
                       src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
                       alt="User"
-                      style={{ width: 100, height: 100, borderRadius: "50%", marginBottom: 16, objectFit: "cover", background: "#eee" }}
+                      style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: "50%",
+                        marginBottom: 16,
+                        objectFit: "cover",
+                        background: "#eee",
+                      }}
                     />
                   )}
-                  <Typography variant="subtitle1">{googleUser.displayName}</Typography>
+                  <Typography variant="subtitle1">
+                    {googleUser.displayName}
+                  </Typography>
                   <Typography variant="body2">{googleUser.email}</Typography>
                 </>
               )}
