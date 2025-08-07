@@ -10,3 +10,8 @@ export const getUserByEmail = async (email: string): Promise<UserModel> => {
   const response = await apiClient.get<UserModel>(`/users/by-email/${email}`);
   return response.data;
 };
+
+export const createUser = async (user: UserModel): Promise<UserModel> => {
+  const response = await apiClient.post<UserModel>('/users', user);
+  return response.data;
+};
