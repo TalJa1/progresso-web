@@ -378,56 +378,102 @@ const LoginView = () => {
           >
             <Paper
               elevation={3}
-              sx={{ p: 4, maxWidth: 400, width: "100%", textAlign: "center" }}
+              sx={{
+                p: 4,
+                maxWidth: 400,
+                width: "100%",
+                borderRadius: 4,
+                boxShadow: 3,
+                bgcolor: "rgba(255,255,255,0.3)",
+              }}
             >
-              <Typography variant="h5" gutterBottom>
-                {isExistingUser === true
-                  ? "Welcome back!"
-                  : "Welcome to Progresso!"}
-              </Typography>
-              {googleUser && (
-                <>
-                  {googleUser.photoURL ? (
-                    <img
-                      src={googleUser.photoURL}
-                      alt="User"
-                      style={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: "50%",
-                        marginBottom: 16,
-                        objectFit: "cover",
-                        background: "#eee",
-                      }}
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
-                      alt="User"
-                      style={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: "50%",
-                        marginBottom: 16,
-                        objectFit: "cover",
-                        background: "#eee",
-                      }}
-                    />
-                  )}
-                  <Typography variant="subtitle1">
-                    {googleUser.displayName}
-                  </Typography>
-                  <Typography variant="body2">{googleUser.email}</Typography>
-                </>
-              )}
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                You have successfully logged in with Google.
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  {isExistingUser === true
+                    ? "Welcome back!"
+                    : "Welcome to Progresso!"}
+                </Typography>
+                {googleUser && (
+                  <>
+                    {googleUser.photoURL ? (
+                      <img
+                        src={googleUser.photoURL}
+                        alt="User"
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: "50%",
+                          marginBottom: 16,
+                          objectFit: "cover",
+                          background: "#eee",
+                        }}
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
+                        alt="User"
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: "50%",
+                          marginBottom: 16,
+                          objectFit: "cover",
+                          background: "#eee",
+                        }}
+                      />
+                    )}
+                    <Typography variant="subtitle1">
+                      {googleUser.displayName}
+                    </Typography>
+                    <Typography variant="body2">{googleUser.email}</Typography>
+                  </>
+                )}
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  You have successfully logged in with Google.
+                </Typography>
+                <IconButton
+                  color="primary"
+                  onClick={() => {
+                    console.log("Next button clicked");
+                  }}
+                  sx={{
+                    mt: 1,
+                    bgcolor: "grey.100",
+                    borderRadius: 2,
+                    boxShadow: 1,
+                    display: "flex",
+                    alignSelf: "flex-end",
+                    paddingInline: 5,
+                  }}
+                  aria-label="Next"
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="M12 5l7 7-7 7" />
+                  </svg>
+                </IconButton>
+              </Box>
             </Paper>
           </motion.div>
         )}
