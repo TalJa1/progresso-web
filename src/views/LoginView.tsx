@@ -17,6 +17,7 @@ import AppleIcon from "@mui/icons-material/Apple";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import logo from "../assets/progresso-logo.png";
 import { getUserByEmail } from "../apis/users/usersAPI";
+import WelcomeNewUser from "../components/login/WelcomeNewUser";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdrn7V_YfgJYa_hzYRAqYSIC3M1uPcy-E",
@@ -45,6 +46,7 @@ const LoginView = () => {
   } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isExistingUser, setIsExistingUser] = useState<boolean | null>(null);
+  const [showWelcomeNewUser, setShowWelcomeNewUser] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -355,127 +357,256 @@ const LoginView = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {showSuccess && (
-          <motion.div
-            initial={{ y: -400, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -400, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 80, damping: 20 }}
-            style={{
-              position: "absolute",
-              zIndex: 3,
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              minHeight: "100vh",
-              minWidth: "100vw",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            <Paper
-              elevation={3}
-              sx={{
-                p: 4,
-                maxWidth: 400,
-                width: "100%",
-                borderRadius: 4,
-                boxShadow: 3,
-                bgcolor: "rgba(255,255,255,0.3)",
+        {showSuccess && !showWelcomeNewUser && (
+          isExistingUser === false ? (
+            <motion.div
+              initial={{ y: -400, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -400, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 80, damping: 20 }}
+              style={{
+                position: "absolute",
+                zIndex: 3,
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                minHeight: "100vh",
+                minWidth: "100vw",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
               }}
             >
-              <Box
+              <Paper
+                elevation={3}
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 2,
+                  p: 4,
+                  maxWidth: 400,
+                  width: "100%",
+                  borderRadius: 4,
+                  boxShadow: 3,
+                  bgcolor: "rgba(255,255,255,0.3)",
                 }}
               >
-                <Typography variant="h5" gutterBottom>
-                  {isExistingUser === true
-                    ? "Welcome back!"
-                    : "Welcome to Progresso!"}
-                </Typography>
-                {googleUser && (
-                  <>
-                    {googleUser.photoURL ? (
-                      <img
-                        src={googleUser.photoURL}
-                        alt="User"
-                        style={{
-                          width: 100,
-                          height: 100,
-                          borderRadius: "50%",
-                          marginBottom: 16,
-                          objectFit: "cover",
-                          background: "#eee",
-                        }}
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
-                        alt="User"
-                        style={{
-                          width: 100,
-                          height: 100,
-                          borderRadius: "50%",
-                          marginBottom: 16,
-                          objectFit: "cover",
-                          background: "#eee",
-                        }}
-                      />
-                    )}
-                    <Typography variant="subtitle1">
-                      {googleUser.displayName}
-                    </Typography>
-                    <Typography variant="body2">{googleUser.email}</Typography>
-                  </>
-                )}
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  You have successfully logged in with Google.
-                </Typography>
-                <IconButton
-                  color="primary"
-                  onClick={() => {
-                    console.log("Next button clicked");
-                  }}
+                <Box
                   sx={{
-                    mt: 1,
-                    bgcolor: "grey.100",
-                    borderRadius: 2,
-                    boxShadow: 1,
                     display: "flex",
-                    alignSelf: "flex-end",
-                    paddingInline: 5,
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2,
                   }}
-                  aria-label="Next"
                 >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <Typography variant="h5" gutterBottom>
+                    Welcome to Progresso!
+                  </Typography>
+                  {googleUser && (
+                    <>
+                      {googleUser.photoURL ? (
+                        <img
+                          src={googleUser.photoURL}
+                          alt="User"
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: "50%",
+                            marginBottom: 16,
+                            objectFit: "cover",
+                            background: "#eee",
+                          }}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
+                          alt="User"
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: "50%",
+                            marginBottom: 16,
+                            objectFit: "cover",
+                            background: "#eee",
+                          }}
+                        />
+                      )}
+                      <Typography variant="subtitle1">
+                        {googleUser.displayName}
+                      </Typography>
+                      <Typography variant="body2">{googleUser.email}</Typography>
+                    </>
+                  )}
+                  <Typography variant="body2" sx={{ mt: 2 }}>
+                    You have successfully logged in with Google.
+                  </Typography>
+                  <IconButton
+                    color="primary"
+                    onClick={() => setShowWelcomeNewUser(true)}
+                    sx={{
+                      mt: 1,
+                      bgcolor: "grey.100",
+                      borderRadius: 2,
+                      boxShadow: 1,
+                      display: "flex",
+                      alignSelf: "flex-end",
+                      paddingInline: 5,
+                    }}
+                    aria-label="Next"
                   >
-                    <path d="M5 12h14" />
-                    <path d="M12 5l7 7-7 7" />
-                  </svg>
-                </IconButton>
-              </Box>
-            </Paper>
-          </motion.div>
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="M12 5l7 7-7 7" />
+                    </svg>
+                  </IconButton>
+                </Box>
+              </Paper>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ y: -400, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -400, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 80, damping: 20 }}
+              style={{
+                position: "absolute",
+                zIndex: 3,
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                minHeight: "100vh",
+                minWidth: "100vw",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 4,
+                  maxWidth: 400,
+                  width: "100%",
+                  borderRadius: 4,
+                  boxShadow: 3,
+                  bgcolor: "rgba(255,255,255,0.3)",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Typography variant="h5" gutterBottom>
+                    Welcome back!
+                  </Typography>
+                  {googleUser && (
+                    <>
+                      {googleUser.photoURL ? (
+                        <img
+                          src={googleUser.photoURL}
+                          alt="User"
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: "50%",
+                            marginBottom: 16,
+                            objectFit: "cover",
+                            background: "#eee",
+                          }}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100";
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src="https://ui-avatars.com/api/?name=User&background=eee&color=555&size=100"
+                          alt="User"
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: "50%",
+                            marginBottom: 16,
+                            objectFit: "cover",
+                            background: "#eee",
+                          }}
+                        />
+                      )}
+                      <Typography variant="subtitle1">
+                        {googleUser.displayName}
+                      </Typography>
+                      <Typography variant="body2">{googleUser.email}</Typography>
+                    </>
+                  )}
+                  <Typography variant="body2" sx={{ mt: 2 }}>
+                    You have successfully logged in with Google.
+                  </Typography>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      // Handle next action, e.g., redirect to dashboard
+                      console.log("Next button clicked");
+                    }}
+                    sx={{
+                      mt: 1,
+                      bgcolor: "grey.100",
+                      borderRadius: 2,
+                      boxShadow: 1,
+                      display: "flex",
+                      alignSelf: "flex-end",
+                      paddingInline: 5,
+                    }}
+                    aria-label="Next"
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="M12 5l7 7-7 7" />
+                    </svg>
+                  </IconButton>
+                </Box>
+              </Paper>
+            </motion.div>
+          )
+        )}
+        {showWelcomeNewUser && (
+          <WelcomeNewUser
+            displayName={googleUser?.displayName}
+            email={googleUser?.email}
+            photoURL={googleUser?.photoURL}
+            onNext={() => {
+              // Handle next action, e.g., redirect to dashboard
+              console.log("Next button clicked");
+            }}
+          />
         )}
       </AnimatePresence>
     </Box>
