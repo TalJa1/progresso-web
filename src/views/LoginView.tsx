@@ -15,6 +15,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import AppleIcon from "@mui/icons-material/Apple";
 import XIcon from "@mui/icons-material/X";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import logo from "../assets/progresso-logo.png"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdrn7V_YfgJYa_hzYRAqYSIC3M1uPcy-E",
@@ -148,41 +149,22 @@ const LoginView = () => {
               overflow: "hidden"
             }}
           >
-            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%" }}>
-              <React.Fragment>
-                <Typography variant="h5" align="center" gutterBottom>
-                  Login
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%", borderRadius: 4, boxShadow: 3, bgcolor: "rgba(255,255,255,0.3)" }}>
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                  <img
+                    src={logo}
+                    alt="Progresso Logo"
+                    style={{ width: 56, height: 56, marginBottom: 8, borderRadius: 16, background: "#f6f6f6", boxShadow: "0 2px 8px #eee" }}
+                  />
+                </Box>
+                <Typography variant="h6" align="center" sx={{ fontWeight: 700, mb: 0.5 }}>
+                  Sign in with email
                 </Typography>
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  justifyContent="center"
-                  sx={{ mb: 2 }}
-                >
-                  <IconButton
-                    color="primary"
-                    onClick={handleGoogleLogin}
-                    disabled={loading}
-                    aria-label="Login with Google"
-                  >
-                    <GoogleIcon fontSize="large" />
-                  </IconButton>
-                  <IconButton
-                    color="inherit"
-                    disabled
-                    aria-label="Login with Apple"
-                  >
-                    <AppleIcon fontSize="large" />
-                  </IconButton>
-                  <IconButton color="inherit" disabled aria-label="Login with X">
-                    <XIcon fontSize="large" />
-                  </IconButton>
-                </Stack>
-                <Box
-                  component="form"
-                  onSubmit={handleLogin}
-                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                >
+                <Typography variant="body2" align="center" sx={{ color: "grey.600", mb: 2 }}>
+                  Unlock your potential. Learn, create, and grow with Progresso
+                </Typography>
+                <Box component="form" onSubmit={handleLogin} sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 1.5 }}>
                   <TextField
                     label="Email"
                     type="email"
@@ -190,6 +172,8 @@ const LoginView = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     fullWidth
+                    size="small"
+                    InputProps={{ sx: { borderRadius: 2, bgcolor: "grey.100" } }}
                   />
                   <TextField
                     label="Password"
@@ -198,9 +182,16 @@ const LoginView = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     fullWidth
+                    size="small"
+                    InputProps={{ sx: { borderRadius: 2, bgcolor: "grey.100" } }}
                   />
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+                    <Typography variant="caption" sx={{ color: "primary.main", cursor: "pointer" }}>
+                      Forgot password?
+                    </Typography>
+                  </Box>
                   {error && (
-                    <Typography color="error" variant="body2" align="center">
+                    <Typography color="error" variant="body2" align="center" sx={{ mb: 1 }}>
                       {error}
                     </Typography>
                   )}
@@ -209,12 +200,48 @@ const LoginView = () => {
                     variant="contained"
                     color="primary"
                     fullWidth
+                    sx={{ borderRadius: 2, fontWeight: 700, fontSize: 16, py: 1.2, boxShadow: 1, mb: 1 }}
                     disabled={loading}
                   >
-                    {loading ? "Logging in..." : "Login"}
+                    {loading ? "Logging in..." : "Get Started"}
                   </Button>
                 </Box>
-              </React.Fragment>
+                <Box sx={{ width: "100%", display: "flex", alignItems: "center", my: 2 }}>
+                  <Box sx={{ flex: 1, height: 1, bgcolor: "grey.300" }} />
+                  <Typography variant="caption" sx={{ mx: 1, color: "grey.500" }}>
+                    Or sign in with
+                  </Typography>
+                  <Box sx={{ flex: 1, height: 1, bgcolor: "grey.300" }} />
+                </Box>
+                <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 1 }}>
+                  <IconButton
+                    color="primary"
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    aria-label="Login with Google"
+                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
+                  >
+                    <GoogleIcon fontSize="medium" />
+                  </IconButton>
+                  <IconButton
+                    color="primary"
+                    disabled
+                    aria-label="Login with Facebook"
+                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
+                  >
+                    {/* You can use Facebook icon from MUI if available */}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F3"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.326 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.405 24 24 23.408 24 22.674V1.326C24 .592 23.405 0 22.675 0"/></svg>
+                  </IconButton>
+                  <IconButton
+                    color="primary"
+                    disabled
+                    aria-label="Login with Apple"
+                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
+                  >
+                    <AppleIcon fontSize="medium" />
+                  </IconButton>
+                </Stack>
+              </Box>
             </Paper>
           </motion.div>
         )}
