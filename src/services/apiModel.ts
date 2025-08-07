@@ -14,3 +14,11 @@ export interface UserModelCreate {
   class_: string;
   school: string;
 }
+
+export interface LessonModel {
+  content: string
+  id: number
+  video_url: string
+  topic_id: number
+  title: string
+}
