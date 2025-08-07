@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Paper, Box, Typography, IconButton, TextField, Snackbar, Alert } from "@mui/material";
+import { Paper, Box, Typography, IconButton, TextField, Snackbar, Alert, CircularProgress } from "@mui/material";
 import { createUser } from '../../apis/users/usersAPI';
 import type { UserModelCreate } from "../../services/apiModel";
 
@@ -170,22 +170,27 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
                 display: "flex",
                 alignSelf: "flex-end",
                 paddingInline: 5,
+                position: 'relative',
               }}
               aria-label="Next"
             >
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="M12 5l7 7-7 7" />
-              </svg>
+              {loading ? (
+                <CircularProgress size={28} sx={{ color: 'primary.main' }} />
+              ) : (
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5l7 7-7 7" />
+                </svg>
+              )}
             </IconButton>
           </Box>
         </Paper>
