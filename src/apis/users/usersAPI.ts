@@ -1,5 +1,5 @@
 import apiClient from '../../apis/apiClient';
-import { type UserModel } from '../../services/apiModel';
+import { type UserModel, type UserModelCreate } from '../../services/apiModel';
 
 export const getAllUsers = async (): Promise<UserModel[]> => {
   const response = await apiClient.get<UserModel[]>('/users');
@@ -11,7 +11,7 @@ export const getUserByEmail = async (email: string): Promise<UserModel> => {
   return response.data;
 };
 
-export const createUser = async (user: UserModel): Promise<UserModel> => {
+export const createUser = async (user: UserModelCreate): Promise<UserModel> => {
   const response = await apiClient.post<UserModel>('/users', user);
   return response.data;
 };
