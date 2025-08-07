@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Paper, Box, Typography, IconButton, TextField, Snackbar, Alert, CircularProgress } from "@mui/material";
 import { createUser } from '../../apis/users/usersAPI';
 import type { UserModelCreate } from "../../services/apiModel";
+import { useNavigate } from 'react-router-dom';
 
 interface WelcomeNewUserProps {
   displayName?: string;
@@ -19,6 +20,9 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMsg, setSnackbarMsg] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
+  const [pendingRedirect, setPendingRedirect] = React.useState(false);
+
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (school.trim().length > 0) {
@@ -44,14 +48,21 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
       setSnackbarMsg('User created successfully!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
-      if (onNext) onNext();
+      setPendingRedirect(true);
+      setTimeout(() => {
+        setPendingRedirect(false);
+        navigate('/home');
+        if (onNext) onNext();
+      }, 3000);
     } catch (err) {
       setSnackbarMsg('Failed to create user.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
+      setLoading(false);
+      setPendingRedirect(false);
       console.error('Failed to create user:', err);
     }
-    setLoading(false);
+    if (!pendingRedirect) setLoading(false);
   };
 
   return (
@@ -161,7 +172,7 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
             <IconButton
               color="primary"
               onClick={handleCreateUser}
-              disabled={loading || !school.trim() || !className.trim()}
+              disabled={loading || pendingRedirect || !school.trim() || !className.trim()}
               sx={{
                 mt: 1,
                 bgcolor: "grey.100",
@@ -174,7 +185,7 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
               }}
               aria-label="Next"
             >
-              {loading ? (
+              {(loading || pendingRedirect) ? (
                 <CircularProgress size={28} sx={{ color: 'primary.main' }} />
               ) : (
                 <svg

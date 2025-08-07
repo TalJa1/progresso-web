@@ -18,6 +18,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import logo from "../assets/progresso-logo.png";
 import { getUserByEmail } from "../apis/users/usersAPI";
 import WelcomeNewUser from "../components/login/WelcomeNewUser";
+import { useNavigate } from 'react-router-dom';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdrn7V_YfgJYa_hzYRAqYSIC3M1uPcy-E",
@@ -47,6 +48,7 @@ const LoginView = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isExistingUser, setIsExistingUser] = useState<boolean | null>(null);
   const [showWelcomeNewUser, setShowWelcomeNewUser] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -562,10 +564,7 @@ const LoginView = () => {
                   </Typography>
                   <IconButton
                     color="primary"
-                    onClick={() => {
-                      // Handle next action, e.g., redirect to dashboard
-                      console.log("Next button clicked");
-                    }}
+                    onClick={() => navigate('/home')}
                     sx={{
                       mt: 1,
                       bgcolor: "grey.100",
