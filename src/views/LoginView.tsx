@@ -11,9 +11,9 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google";
+// import GoogleIcon from "@mui/icons-material/Google";
+import googleLogo from "../assets/google-logo.png";
 import AppleIcon from "@mui/icons-material/Apple";
-import XIcon from "@mui/icons-material/X";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import logo from "../assets/progresso-logo.png"
 
@@ -219,9 +219,9 @@ const LoginView = () => {
                     onClick={handleGoogleLogin}
                     disabled={loading}
                     aria-label="Login with Google"
-                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
+                    sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1, p: 1 }}
                   >
-                    <GoogleIcon fontSize="medium" />
+                    <img src={googleLogo} alt="Google" style={{ width: 24, height: 24 }} />
                   </IconButton>
                   <IconButton
                     color="primary"
