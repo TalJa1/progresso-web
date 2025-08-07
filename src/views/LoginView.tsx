@@ -332,7 +332,6 @@ const LoginView = () => {
                     aria-label="Login with Facebook"
                     sx={{ bgcolor: "grey.100", borderRadius: 2, boxShadow: 1 }}
                   >
-                    {/* You can use Facebook icon from MUI if available */}
                     <svg
                       width="24"
                       height="24"
