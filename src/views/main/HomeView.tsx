@@ -146,8 +146,8 @@ const HomeView = () => {
                   <Avatar
                     variant="rounded"
                     sx={{
-                      width: 120,
-                      height: 80,
+                      width: "100%",
+                      height: 100,
                       mb: 2,
                       bgcolor: "#e53935",
                       fontSize: 32,
@@ -165,9 +165,7 @@ const HomeView = () => {
                     variant="body2"
                     sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
                   >
-                    {lesson.content.length > 60
-                      ? lesson.content.slice(0, 60) + "..."
-                      : lesson.content}
+                    {lesson.short_describe.length > 0 && lesson.short_describe}
                   </Typography>
                   <Box
                     sx={{

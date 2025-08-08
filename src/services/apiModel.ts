@@ -16,9 +16,10 @@ export interface UserModelCreate {
 }
 
 export interface LessonModel {
-  content: string
-  id: number
-  video_url: string
-  topic_id: number
-  title: string
+  content: string;
+  id: number;
+  video_url: string;
+  topic_id: number;
+  title: string;
+  short_describe: string;
 }
