@@ -175,7 +175,7 @@ const ProfileView = () => {
             width: "100%",
           }}
         >
-          Work Experience
+          Self Description
         </Typography>
         <Box
           sx={{
@@ -197,7 +197,7 @@ const ProfileView = () => {
               width: "100%",
             }}
           >
-            Self Description
+            This is some description of {user?.full_name} about himself / herself
           </Typography>
           {editDesc ? (
             <TextField
