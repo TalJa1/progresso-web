@@ -86,8 +86,8 @@ const HorizontalNavigationBar = () => {
     >
       <Box
         sx={{
-          width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1200px" },
-          maxWidth: 1200,
+          width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1400px" },
+          maxWidth: 1400,
           borderRadius: 8,
           boxShadow: "0 4px 24px 0 rgba(0,0,0,0.3)",
           bgcolor: "#fff",

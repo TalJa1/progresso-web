@@ -75,8 +75,8 @@ const HomeView = () => {
       <HorizontalNavigationBar />
       <Box
         sx={{
-          width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1200px" },
-          maxWidth: 1200,
+          width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1300px" },
+          maxWidth: 1300,
           mx: "auto",
           mt: 4,
           mb: 4,
