@@ -6,7 +6,6 @@ import {
   Button,
   Avatar,
   CircularProgress,
-  Container,
 } from "@mui/material";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getAllLessons } from "../../apis/lessons/lessonAPI";
@@ -50,18 +49,18 @@ const HomeView = () => {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "#fafafa" }}>
+    <Box sx={{ bgcolor: '#fafafa', minHeight: '100%' }}>
       <HorizontalNavigationBar />
-      <Container
-        maxWidth="md"
-        sx={{
-          mt: 4,
-          mb: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
+      <Box sx={{
+        width: { xs: '98%', sm: '90%', md: '80%', lg: '70%', xl: '1200px' },
+        maxWidth: 1200,
+        mx: 'auto',
+        mt: 4,
+        mb: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+      }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             Hi{" "}
@@ -90,7 +89,7 @@ const HomeView = () => {
             display: "flex",
             gap: 3,
             flexWrap: "wrap",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             width: "100%",
           }}
         >
@@ -177,7 +176,7 @@ const HomeView = () => {
             ))
           )}
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };
