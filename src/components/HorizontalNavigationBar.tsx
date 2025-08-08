@@ -193,16 +193,36 @@ const HorizontalNavigationBar = () => {
               >
                 {isMobile && (
                   <>
-                    <MenuItem onClick={() => { handleMenuClose(); navigate("/home"); }}>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/home");
+                      }}
+                    >
                       <HomeIcon sx={{ mr: 1 }} /> Home
                     </MenuItem>
-                    <MenuItem onClick={() => { handleMenuClose(); navigate("/exams"); }}>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/exams");
+                      }}
+                    >
                       <SchoolIcon sx={{ mr: 1 }} /> Exams
                     </MenuItem>
-                    <MenuItem onClick={() => { handleMenuClose(); navigate("/submissions"); }}>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/submissions");
+                      }}
+                    >
                       <WorkIcon sx={{ mr: 1 }} /> Submissions
                     </MenuItem>
-                    <MenuItem onClick={() => { handleMenuClose(); navigate("/schedule"); }}>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/schedule");
+                      }}
+                    >
                       <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
                     </MenuItem>
                     <Divider />
@@ -210,10 +230,21 @@ const HorizontalNavigationBar = () => {
                     <Divider />
                   </>
                 )}
-                <MenuItem onClick={handleMenuClose}>
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    navigate("/profile");
+                  }}
+                >
                   <PersonIcon sx={{ mr: 1 }} /> Profile
                 </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    localStorage.removeItem("googleUser");
+                    navigate("/");
+                  }}
+                >
                   <LogoutIcon sx={{ mr: 1 }} /> Logout
                 </MenuItem>
               </Menu>
