@@ -3,18 +3,10 @@ import { useEffect, useState } from "react";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import type { UserModel } from "../../services/apiModel";
 import { Box } from "@mui/material";
-import {
-  Typography,
-  Button,
-  Avatar,
-  CircularProgress,
-  Card,
-  CardContent,
-} from "@mui/material";
+import { Typography, Button, Avatar, CircularProgress } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import EditIcon from "@mui/icons-material/Edit";
 import SchoolIcon from "@mui/icons-material/School";
-import WorkIcon from "@mui/icons-material/Work";
 
 const ProfileView = () => {
   const [user, setUser] = useState<UserModel | null>(null);
@@ -38,13 +30,6 @@ const ProfileView = () => {
   // Placeholder values for demo
   const profileCompletion = 100;
   const resumeUrl = "#";
-  const workExp = {
-    title: "Software Engineer, Information Technology and Services",
-    company: "American Study",
-    years: 2,
-    designation: "Student",
-    industry: "Information Technology and Services",
-  };
   const education = {
     degree: "Student",
     school: `${user?.school} - ${user?.class_ || ""}`,
@@ -184,84 +169,22 @@ const ProfileView = () => {
             mb: 3,
           }}
         >
-          <Box
+          <Typography
+            variant="h6"
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              maxWidth: 900,
+              fontWeight: 700,
+              mt: 3,
+              mb: 2,
+              textAlign: "left",
+              width: "100%",
             }}
           >
-            <WorkIcon sx={{ color: "#e88c2b", fontSize: 32 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              {workExp.title}
-            </Typography>
-          </Box>
-          <Typography variant="body2" sx={{ color: "grey.700", ml: 5 }}>
-            {workExp.company}
+            Self Description
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-            <Card
-              sx={{
-                minWidth: 180,
-                bgcolor: "#fafafa",
-                boxShadow: 0,
-                border: "1px solid #eee",
-              }}
-            >
-              <CardContent
-                sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}
-              >
-                <WorkIcon sx={{ color: "#e88c2b" }} />
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                    Total Experience
-                  </Typography>
-                  <Typography variant="body2">{workExp.years} Years</Typography>
-                </Box>
-              </CardContent>
-            </Card>
-            <Card
-              sx={{
-                minWidth: 180,
-                bgcolor: "#fafafa",
-                boxShadow: 0,
-                border: "1px solid #eee",
-              }}
-            >
-              <CardContent
-                sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}
-              >
-                <WorkIcon sx={{ color: "#e88c2b" }} />
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                    Current Designation
-                  </Typography>
-                  <Typography variant="body2">{workExp.designation}</Typography>
-                </Box>
-              </CardContent>
-            </Card>
-            <Card
-              sx={{
-                minWidth: 220,
-                bgcolor: "#fafafa",
-                boxShadow: 0,
-                border: "1px solid #eee",
-              }}
-            >
-              <CardContent
-                sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}
-              >
-                <WorkIcon sx={{ color: "#e88c2b" }} />
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                    Current Industry
-                  </Typography>
-                  <Typography variant="body2">{workExp.industry}</Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
+          <Typography variant="body1" sx={{ color: "grey.800", mb: 2 }}>
+            {user?.self_description || "No description provided."}
+          </Typography>
+
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
             <Button
               variant="outlined"
