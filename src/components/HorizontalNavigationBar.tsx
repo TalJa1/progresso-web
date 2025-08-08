@@ -92,9 +92,24 @@ const HorizontalNavigationBar = () => {
           <IconButton>
             <NotificationsIcon />
           </IconButton>
-          <Avatar sx={{ bgcolor: "#f5c6c6", color: "#fff", fontWeight: 700 }}>
-            CT
-          </Avatar>
+          {(() => {
+            const googleUser = localStorage.getItem("googleUser");
+            if (googleUser) {
+              try {
+                const parsed = JSON.parse(googleUser);
+                return (
+                  <Avatar src={parsed.photoURL} alt={parsed.name} sx={{ width: 40, height: 40 }} />
+                );
+              } catch {
+                return (
+                  <Avatar sx={{ bgcolor: "#f5c6c6", color: "#fff", fontWeight: 700 }}>A</Avatar>
+                );
+              }
+            }
+            return (
+              <Avatar sx={{ bgcolor: "#f5c6c6", color: "#fff", fontWeight: 700 }}>A</Avatar>
+            );
+          })()}
         </Box>
       </Toolbar>
     </AppBar>

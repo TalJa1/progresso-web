@@ -63,13 +63,6 @@ const HomeView = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          {user?.photoURL && (
-            <Avatar
-              src={user.photoURL}
-              alt={user.displayName}
-              sx={{ width: 48, height: 48 }}
-            />
-          )}
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             Hi{" "}
             <span style={{ fontWeight: 900 }}>
