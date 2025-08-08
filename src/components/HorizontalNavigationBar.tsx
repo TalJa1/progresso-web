@@ -11,6 +11,8 @@ import {
   Divider,
   useMediaQuery,
 } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import SchoolIcon from "@mui/icons-material/School";
@@ -159,7 +161,6 @@ const HorizontalNavigationBar = () => {
               )}
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* UTC only visible on desktop */}
               {!isMobile && (
                 <Button
                   variant="outlined"
@@ -177,31 +178,37 @@ const HorizontalNavigationBar = () => {
                 <NotificationsIcon />
               </IconButton>
               {avatarEl}
-              {/* Dropdown menu for mobile */}
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
                 keepMounted
               >
+                {isMobile && (
+                  <>
+                    <MenuItem onClick={handleMenuClose}>
+                      <HomeIcon sx={{ mr: 1 }} /> Home
+                    </MenuItem>
+                    <MenuItem onClick={handleMenuClose}>
+                      <SchoolIcon sx={{ mr: 1 }} /> Exams
+                    </MenuItem>
+                    <MenuItem onClick={handleMenuClose}>
+                      <WorkIcon sx={{ mr: 1 }} /> Submissions
+                    </MenuItem>
+                    <MenuItem onClick={handleMenuClose}>
+                      <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleMenuClose}>UTC+07:00</MenuItem>
+                    <Divider />
+                  </>
+                )}
                 <MenuItem onClick={handleMenuClose}>
-                  <HomeIcon sx={{ mr: 1 }} />
-                  Home
+                  <PersonIcon sx={{ mr: 1 }} /> Profile
                 </MenuItem>
                 <MenuItem onClick={handleMenuClose}>
-                  <SchoolIcon sx={{ mr: 1 }} />
-                  Exams
+                  <LogoutIcon sx={{ mr: 1 }} /> Logout
                 </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                  <WorkIcon sx={{ mr: 1 }} />
-                  Submissions
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                  <CalendarTodayIcon sx={{ mr: 1 }} />
-                  Schedule
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={handleMenuClose}>UTC+07:00</MenuItem>
               </Menu>
             </Box>
           </Toolbar>
