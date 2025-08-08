@@ -176,6 +176,72 @@ const HomeView = () => {
             ))
           )}
         </Box>
+          <Typography variant="h6" sx={{ fontWeight: 700, mt: 5, mb: 2 }}>
+            Upcoming Events
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'stretch', width: '100%' }}>
+            <Paper elevation={0} sx={{ p: 2, borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)', background: 'linear-gradient(135deg, #eaffea 80%, #f6fff6 100%)', minWidth: 320, maxWidth: 340, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <Typography variant="caption" sx={{ color: 'grey.700', mb: 1, display: 'block' }}>Daily Doubt Resolution</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>DDRV 1 - 8th Aug</Typography>
+              <Typography variant="body2" sx={{ color: 'grey.800', mb: 1 }}>
+                Masters in Data Science -Liverpool John Moores University Intl
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span role="img" aria-label="calendar">🗓️</span> Aug 08, 2025
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 700 }}>•</Typography>
+                <Typography variant="body2">10:45 PM - 11:30 PM</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }} />
+              <Button variant="contained" disabled fullWidth sx={{ bgcolor: 'grey.300', color: 'grey.600', fontWeight: 700, borderRadius: 2, fontSize: 16, py: 1.2, boxShadow: 0, alignSelf: 'flex-end' }}>
+                Join Now
+              </Button>
+            </Paper>
+            <Paper elevation={0} sx={{ p: 2, borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)', background: 'linear-gradient(135deg, #eaffea 80%, #f6fff6 100%)', minWidth: 320, maxWidth: 340, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <Typography variant="caption" sx={{ color: 'grey.700', mb: 1, display: 'block' }}>Daily Doubt Resolution</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>DDR 1 - 9th July</Typography>
+              <Typography variant="body2" sx={{ color: 'grey.800', mb: 1 }}>
+                Masters in Data Science -Liverpool John Moores University Intl
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span role="img" aria-label="calendar">🗓️</span> Aug 09, 2025
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 700 }}>•</Typography>
+                <Typography variant="body2">04:00 PM - 05:00 PM</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }} />
+              <Button variant="contained" disabled fullWidth sx={{ bgcolor: 'grey.300', color: 'grey.600', fontWeight: 700, borderRadius: 2, fontSize: 16, py: 1.2, boxShadow: 0, alignSelf: 'flex-end' }}>
+                Join Now
+              </Button>
+            </Paper>
+            <Paper elevation={0} sx={{ p: 2, borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)', background: 'linear-gradient(135deg, #e6eaff 80%, #f6f6ff 100%)', minWidth: 320, maxWidth: 340, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="caption" sx={{ bgcolor: '#e6eaff', color: 'primary.main', px: 1, py: 0.5, borderRadius: 1, fontWeight: 700, display: 'inline-block' }}>Lecture</Typography>
+              </Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Working with Text Data with IIITB Prof.</Typography>
+              <Typography variant="body2" sx={{ color: 'grey.800', mb: 1 }}>
+                Masters in Data Science -Liverpool John Moores University Intl
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span role="img" aria-label="calendar">🗓️</span> Aug 10, 2025
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 700 }}>•</Typography>
+                <Typography variant="body2">10:30 AM - 12:30 PM</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }} />
+              <Button variant="contained" disabled fullWidth sx={{ bgcolor: 'grey.300', color: 'grey.600', fontWeight: 700, borderRadius: 2, fontSize: 16, py: 1.2, boxShadow: 0, alignSelf: 'flex-end' }}>
+                Join Now
+              </Button>
+            </Paper>
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+              <Button variant="text" sx={{ fontWeight: 700, color: 'primary.main', fontSize: 16, textTransform: 'none', px: 2 }} endIcon={<span style={{ fontSize: 20 }}>➔</span>}>
+                View All
+              </Button>
+            </Box>
+          </Box>
       </Box>
     </Box>
   );
