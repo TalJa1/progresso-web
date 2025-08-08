@@ -11,6 +11,7 @@ import {
   Divider,
   useMediaQuery,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
@@ -23,6 +24,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 const HorizontalNavigationBar = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const isCompactTabs = useMediaQuery("(max-width:1320px)");
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -122,6 +124,7 @@ const HorizontalNavigationBar = () => {
                       fontWeight: 700,
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
+                    onClick={() => navigate("/home")}
                   >
                     {!isCompactTabs ? "Home" : null}
                   </Button>
@@ -133,6 +136,7 @@ const HorizontalNavigationBar = () => {
                       fontWeight: 700,
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
+                    onClick={() => navigate("/exams")}
                   >
                     {!isCompactTabs ? "Exams" : null}
                   </Button>
@@ -144,6 +148,7 @@ const HorizontalNavigationBar = () => {
                       fontWeight: 700,
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
+                    onClick={() => navigate("/submissions")}
                   >
                     {!isCompactTabs ? "Submissions" : null}
                   </Button>
@@ -155,6 +160,7 @@ const HorizontalNavigationBar = () => {
                       fontWeight: 700,
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
+                    onClick={() => navigate("/schedule")}
                   >
                     {!isCompactTabs ? "Schedule" : null}
                   </Button>
@@ -187,16 +193,16 @@ const HorizontalNavigationBar = () => {
               >
                 {isMobile && (
                   <>
-                    <MenuItem onClick={handleMenuClose}>
+                    <MenuItem onClick={() => { handleMenuClose(); navigate("/home"); }}>
                       <HomeIcon sx={{ mr: 1 }} /> Home
                     </MenuItem>
-                    <MenuItem onClick={handleMenuClose}>
+                    <MenuItem onClick={() => { handleMenuClose(); navigate("/exams"); }}>
                       <SchoolIcon sx={{ mr: 1 }} /> Exams
                     </MenuItem>
-                    <MenuItem onClick={handleMenuClose}>
+                    <MenuItem onClick={() => { handleMenuClose(); navigate("/submissions"); }}>
                       <WorkIcon sx={{ mr: 1 }} /> Submissions
                     </MenuItem>
-                    <MenuItem onClick={handleMenuClose}>
+                    <MenuItem onClick={() => { handleMenuClose(); navigate("/schedule"); }}>
                       <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
                     </MenuItem>
                     <Divider />
