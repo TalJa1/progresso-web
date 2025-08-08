@@ -6,13 +6,15 @@ import {
   Button,
   Avatar,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getAllLessons } from "../../apis/lessons/lessonAPI";
 import type { LessonModel } from "../../services/apiModel";
 
 const HomeView = () => {
-  // Helper for dynamic event dates
   const today = new Date();
   const pad = (n: number) => n.toString().padStart(2, "0");
   const months = [
@@ -36,6 +38,8 @@ const HomeView = () => {
   };
   const [lessons, setLessons] = useState<LessonModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [skip, setSkip] = useState(0);
+  const limit = 3;
   const [user, setUser] = useState<{
     displayName: "";
     email: "";
@@ -59,8 +63,9 @@ const HomeView = () => {
       }
     }
     const fetchLessons = async () => {
+      setLoading(true);
       try {
-        const data = await getAllLessons();
+        const data = await getAllLessons(skip, limit);
         setLessons(data);
       } catch {
         setLessons([]);
@@ -68,7 +73,7 @@ const HomeView = () => {
       setLoading(false);
     };
     fetchLessons();
-  }, []);
+  }, [skip]);
 
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
@@ -102,12 +107,28 @@ const HomeView = () => {
         >
           Let's start your learning journey
         </Typography>
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 700, mb: 2, textAlign: "center" }}
-        >
-          My Lessons
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", width: "100%", mb: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, textAlign: "left", flex: 1 }}
+          >
+            My Lessons
+          </Typography>
+          <IconButton
+            onClick={() => setSkip(Math.max(0, skip - limit))}
+            disabled={skip === 0 || loading}
+            sx={{ ml: 1 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => setSkip(skip + limit)}
+            disabled={lessons.length < limit || loading}
+            sx={{ ml: 1 }}
+          >
+            <ArrowForwardIcon />
+          </IconButton>
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -140,6 +161,8 @@ const HomeView = () => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
+                    justifyContent: 'space-between',
+                    height: "100%",
                     gap: 1,
                   }}
                 >
@@ -191,7 +214,7 @@ const HomeView = () => {
                       boxShadow: 1,
                     }}
                   >
-                    {lesson.video_url ? "Continue" : "Get Started"}
+                    Learn
                   </Button>
                 </Box>
               </Paper>
