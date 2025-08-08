@@ -50,7 +50,7 @@ const HomeView = () => {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#fafafa" }}>
       <HorizontalNavigationBar />
       <Container
         maxWidth="md"
