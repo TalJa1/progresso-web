@@ -5,6 +5,7 @@ export interface UserModel {
   id: number;
   full_name: string;
   school: string;
+  self_description: string;
 }
 
 export interface UserModelCreate {
