@@ -14,6 +14,7 @@ export interface UserModelCreate {
   avatar_url: string;
   class_: string;
   school: string;
+  self_description: string;
 }
 
 export interface LessonModel {

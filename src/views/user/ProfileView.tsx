@@ -1,14 +1,26 @@
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { useEffect, useState } from "react";
 import { getUserByEmail } from "../../apis/users/usersAPI";
+import { updateUser } from "../../apis/users/usersAPI";
 import type { UserModel } from "../../services/apiModel";
 import { Box } from "@mui/material";
 import { Typography, Button, Avatar, CircularProgress } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import EditIcon from "@mui/icons-material/Edit";
 import SchoolIcon from "@mui/icons-material/School";
 
 const ProfileView = () => {
+  const [editDesc, setEditDesc] = useState(false);
+  const [descValue, setDescValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
   const [user, setUser] = useState<UserModel | null>(null);
   useEffect(() => {
     const googleUser = localStorage.getItem("googleUser");
@@ -26,6 +38,12 @@ const ProfileView = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setDescValue(user.self_description || "");
+    }
+  }, [user]);
 
   // Placeholder values for demo
   const profileCompletion = 100;
@@ -181,21 +199,83 @@ const ProfileView = () => {
           >
             Self Description
           </Typography>
-          <Typography variant="body1" sx={{ color: "grey.800", mb: 2 }}>
-            {user?.self_description || "No description provided."}
-          </Typography>
-
+          {editDesc ? (
+            <TextField
+              fullWidth
+              multiline
+              minRows={3}
+              value={descValue}
+              onChange={(e) => setDescValue(e.target.value)}
+              disabled={loading}
+              sx={{ mb: 2 }}
+              placeholder="Enter your self description..."
+            />
+          ) : (
+            <Typography variant="body1" sx={{ color: "grey.800", mb: 2 }}>
+              {user?.self_description || "No description provided."}
+            </Typography>
+          )}
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<EditIcon />}
-              sx={{ fontWeight: 700, borderRadius: 2 }}
-            >
-              Edit
-            </Button>
+            {editDesc ? (
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ fontWeight: 700, borderRadius: 2, minWidth: 100 }}
+                disabled={loading}
+                onClick={async () => {
+                  if (!user) return;
+                  setLoading(true);
+                  try {
+                    await updateUser(user.id, {
+                      email: user.email,
+                      full_name: user.full_name,
+                      avatar_url: user.avatar_url,
+                      class_: user.class_,
+                      school: user.school,
+                      self_description: descValue,
+                    });
+                    setSnackbar({
+                      open: true,
+                      message: "Updated successfully!",
+                      severity: "success",
+                    });
+                    setUser({ ...user, self_description: descValue });
+                    setEditDesc(false);
+                  } catch {
+                    setSnackbar({
+                      open: true,
+                      message: "Update failed!",
+                      severity: "error",
+                    });
+                  }
+                  setLoading(false);
+                }}
+              >
+                {loading ? "Applying..." : "Apply"}
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<EditIcon />}
+                sx={{ fontWeight: 700, borderRadius: 2 }}
+                onClick={() => setEditDesc(true)}
+              >
+                Edit
+              </Button>
+            )}
           </Box>
         </Box>
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        >
+          <MuiAlert elevation={6} variant="filled" severity={snackbar.severity}>
+            {snackbar.message}
+          </MuiAlert>
+        </Snackbar>
         <Typography
           variant="h6"
           sx={{
