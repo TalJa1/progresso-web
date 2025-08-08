@@ -19,7 +19,7 @@ const HorizontalNavigationBar = () => {
   if (googleUser) {
     try {
       const parsed = JSON.parse(googleUser);
-      avatarEl = <Avatar src={parsed.imageUrl} alt={parsed.name} sx={{ width: 40, height: 40 }} />;
+      avatarEl = <Avatar src={parsed.photoURL} alt={parsed.name} sx={{ width: 40, height: 40 }} />;
     } catch {
       avatarEl = <Avatar sx={{ bgcolor: "#f5c6c6", color: "#fff", fontWeight: 700 }}>CT</Avatar>;
     }
