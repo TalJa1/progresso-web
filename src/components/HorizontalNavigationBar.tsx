@@ -22,6 +22,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 
 const HorizontalNavigationBar = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
+  const isCompactTabs = useMediaQuery("(max-width:1320px)");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -122,7 +123,7 @@ const HorizontalNavigationBar = () => {
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
                   >
-                    Home
+                    {!isCompactTabs ? "Home" : null}
                   </Button>
                   <Button
                     startIcon={<SchoolIcon />}
@@ -133,7 +134,7 @@ const HorizontalNavigationBar = () => {
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
                   >
-                    Exams
+                    {!isCompactTabs ? "Exams" : null}
                   </Button>
                   <Button
                     startIcon={<WorkIcon />}
@@ -144,7 +145,7 @@ const HorizontalNavigationBar = () => {
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
                   >
-                    Submissions
+                    {!isCompactTabs ? "Submissions" : null}
                   </Button>
                   <Button
                     startIcon={<CalendarTodayIcon />}
@@ -155,7 +156,7 @@ const HorizontalNavigationBar = () => {
                       display: { xs: "none", sm: "none", md: "inline-flex" },
                     }}
                   >
-                    Schedule
+                    {!isCompactTabs ? "Schedule" : null}
                   </Button>
                 </>
               )}
