@@ -37,7 +37,6 @@ const ProfileView = () => {
 
   // Placeholder values for demo
   const profileCompletion = 100;
-  const jobTitle = "Student";
   const resumeUrl = "#";
   const workExp = {
     title: "Software Engineer, Information Technology and Services",
@@ -137,12 +136,7 @@ const ProfileView = () => {
             <Typography variant="h5" sx={{ fontWeight: 900 }}>
               {user?.full_name || "User"}
             </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{ color: "grey.700", fontWeight: 500 }}
-            >
-              {jobTitle}
-            </Typography>
+
             <Typography variant="body1" sx={{ color: "grey.700", mt: 1 }}>
               {user?.email}
             </Typography>
