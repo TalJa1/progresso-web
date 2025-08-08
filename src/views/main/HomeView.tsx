@@ -200,9 +200,34 @@ const HomeView = () => {
             ))
           )}
         </Box>
-        <Typography variant="h6" sx={{ fontWeight: 700, mt: 5, mb: 2 }}>
-          Upcoming Events
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            mt: 5,
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            Upcoming Events
+          </Typography>
+          <Button
+            disabled
+            variant="text"
+            sx={{
+              fontWeight: 700,
+              color: "primary.main",
+              fontSize: 16,
+              textTransform: "none",
+              px: 2,
+            }}
+            endIcon={<span style={{ fontSize: 20 }}>➔</span>}
+          >
+            View All
+          </Button>
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -212,7 +237,6 @@ const HomeView = () => {
             width: "100%",
           }}
         >
-          {/* Dynamic event cards */}
           <Paper
             elevation={0}
             sx={{
@@ -415,21 +439,6 @@ const HomeView = () => {
               Join Now
             </Button>
           </Paper>
-          <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-            <Button
-              variant="text"
-              sx={{
-                fontWeight: 700,
-                color: "primary.main",
-                fontSize: 16,
-                textTransform: "none",
-                px: 2,
-              }}
-              endIcon={<span style={{ fontSize: 20 }}>➔</span>}
-            >
-              View All
-            </Button>
-          </Box>
         </Box>
       </Box>
     </Box>
