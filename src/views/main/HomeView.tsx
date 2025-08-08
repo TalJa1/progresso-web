@@ -36,9 +36,9 @@ const HomeView = () => {
     d.setDate(today.getDate() + offset);
     return `${months[d.getMonth()]} ${pad(d.getDate())}, ${d.getFullYear()}`;
   };
-  const [lessons, setLessons] = useState<LessonModel[]>([]);
+  const [allLessons, setAllLessons] = useState<LessonModel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [skip, setSkip] = useState(0);
+  const [page, setPage] = useState(0);
   const limit = 3;
   const [user, setUser] = useState<{
     displayName: "";
@@ -65,15 +65,15 @@ const HomeView = () => {
     const fetchLessons = async () => {
       setLoading(true);
       try {
-        const data = await getAllLessons(skip, limit);
-        setLessons(data);
+        const data = await getAllLessons();
+        setAllLessons(data);
       } catch {
-        setLessons([]);
+        setAllLessons([]);
       }
       setLoading(false);
     };
     fetchLessons();
-  }, [skip]);
+  }, []);
 
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
@@ -115,15 +115,15 @@ const HomeView = () => {
             My Lessons
           </Typography>
           <IconButton
-            onClick={() => setSkip(Math.max(0, skip - limit))}
-            disabled={skip === 0 || loading}
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0 || loading}
             sx={{ ml: 1 }}
           >
             <ArrowBackIcon />
           </IconButton>
           <IconButton
-            onClick={() => setSkip(skip + limit)}
-            disabled={lessons.length < limit || loading}
+            onClick={() => setPage(page + 1)}
+            disabled={loading || (page + 1) * limit >= allLessons.length}
             sx={{ ml: 1 }}
           >
             <ArrowForwardIcon />
@@ -140,85 +140,87 @@ const HomeView = () => {
         >
           {loading ? (
             <CircularProgress />
-          ) : lessons.length === 0 ? (
+          ) : allLessons.length === 0 ? (
             <Typography>No lessons found.</Typography>
           ) : (
-            lessons.map((lesson) => (
-              <Paper
-                key={lesson.id}
-                elevation={3}
-                sx={{
-                  p: 2,
-                  maxWidth: 320,
-                  width: "100%",
-                  borderRadius: 4,
-                  boxShadow: 3,
-                  mb: 2,
-                }}
-              >
-                <Box
+            allLessons
+              .slice(page * limit, page * limit + limit)
+              .map((lesson) => (
+                <Paper
+                  key={lesson.id}
+                  elevation={3}
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: 'space-between',
-                    height: "100%",
-                    gap: 1,
+                    p: 2,
+                    maxWidth: 320,
+                    width: "100%",
+                    borderRadius: 4,
+                    boxShadow: 3,
+                    mb: 2,
                   }}
                 >
-                  <Avatar
-                    variant="rounded"
-                    sx={{
-                      width: "100%",
-                      height: 100,
-                      mb: 2,
-                      bgcolor: "#e53935",
-                      fontSize: 32,
-                    }}
-                  >
-                    {lesson.title[0]}
-                  </Avatar>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
-                  >
-                    {lesson.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
-                  >
-                    {lesson.short_describe.length > 0 && lesson.short_describe}
-                  </Typography>
                   <Box
                     sx={{
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
-                      gap: 2,
-                      mb: 1,
+                      justifyContent: 'space-between',
+                      height: "100%",
+                      gap: 1,
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: "grey.600" }}>
-                      Topic ID: {lesson.topic_id}
+                    <Avatar
+                      variant="rounded"
+                      sx={{
+                        width: "100%",
+                        height: 100,
+                        mb: 2,
+                        bgcolor: "#e53935",
+                        fontSize: 32,
+                      }}
+                    >
+                      {lesson.title[0]}
+                    </Avatar>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
+                    >
+                      {lesson.title}
                     </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
+                    >
+                      {lesson.short_describe.length > 0 && lesson.short_describe}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mb: 1,
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ color: "grey.600" }}>
+                        Topic ID: {lesson.topic_id}
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 16,
+                        py: 1.2,
+                        boxShadow: 1,
+                      }}
+                    >
+                      Learn
+                    </Button>
                   </Box>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{
-                      borderRadius: 2,
-                      fontWeight: 700,
-                      fontSize: 16,
-                      py: 1.2,
-                      boxShadow: 1,
-                    }}
-                  >
-                    Learn
-                  </Button>
-                </Box>
-              </Paper>
-            ))
+                </Paper>
+              ))
           )}
         </Box>
         <Box
