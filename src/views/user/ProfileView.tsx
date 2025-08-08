@@ -273,7 +273,6 @@ const ProfileView = () => {
             </Button>
           </Box>
         </Box>
-        {/* Education Section */}
         <Typography
           variant="h6"
           sx={{
@@ -315,16 +314,6 @@ const ProfileView = () => {
           <Typography variant="body2" sx={{ color: "grey.700", ml: 5 }}>
             {education.years}
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<EditIcon />}
-              sx={{ fontWeight: 700, borderRadius: 2 }}
-            >
-              Edit
-            </Button>
-          </Box>
         </Box>
       </Box>
     </Box>
