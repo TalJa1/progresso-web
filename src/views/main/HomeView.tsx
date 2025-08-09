@@ -46,6 +46,8 @@ const HomeView = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const limit = 3;
+  const [mockPage, setMockPage] = useState(0);
+  const mockLimit = 3;
   const [user, setUser] = useState<{
     displayName: "";
     email: "";
@@ -279,64 +281,6 @@ const HomeView = () => {
                 </Paper>
               ))
           )}
-        </Box>
-
-        <Box sx={{ width: "100%", mt: 4, mb: 4 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-            Mock Tests
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              gap: 3,
-              flexWrap: "wrap",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {mocktestData.map((mock) => (
-              <Paper
-                key={mock.url}
-                elevation={3}
-                sx={{
-                  p: 2,
-                  maxWidth: 320,
-                  width: "100%",
-                  borderRadius: 4,
-                  boxShadow: 3,
-                  mb: 2,
-                  minHeight: 120,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
-                >
-                  {mock.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
-                >
-                  {mock.describe}
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  href={mock.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ mt: 1, borderRadius: 2 }}
-                >
-                  Open PDF
-                </Button>
-              </Paper>
-            ))}
-          </Box>
         </Box>
 
         <Box
@@ -578,6 +522,96 @@ const HomeView = () => {
               Join Now
             </Button>
           </Paper>
+        </Box>
+
+        <Box sx={{ width: "100%", mt: 6, mb: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+              Mock Tests
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <IconButton
+                onClick={() => setMockPage(Math.max(0, mockPage - 1))}
+                disabled={mockPage === 0}
+                sx={{ ml: 1 }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setMockPage(mockPage + 1)}
+                disabled={(mockPage + 1) * mockLimit >= mocktestData.length}
+                sx={{ ml: 1 }}
+              >
+                <ArrowForwardIcon />
+              </IconButton>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+              flexWrap: "wrap",
+              justifyContent: "flex-start",
+              width: "100%",
+            }}
+          >
+            {mocktestData
+              .slice(mockPage * mockLimit, mockPage * mockLimit + mockLimit)
+              .map((mock) => (
+                <Paper
+                  key={mock.url}
+                  elevation={3}
+                  sx={{
+                    p: 2,
+                    maxWidth: 320,
+                    width: "100%",
+                    borderRadius: 4,
+                    boxShadow: 3,
+                    mb: 2,
+                    minHeight: 120,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
+                  >
+                    {mock.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
+                  >
+                    {mock.describe}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    href={mock.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ mt: 1, borderRadius: 2 }}
+                  >
+                    Open PDF
+                  </Button>
+                </Paper>
+              ))}
+          </Box>
         </Box>
       </Box>
     </Box>
