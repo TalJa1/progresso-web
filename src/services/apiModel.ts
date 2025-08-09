@@ -25,3 +25,9 @@ export interface LessonModel {
   title: string;
   short_describe: string;
 }
+
+export interface TopicModel {
+  id: number
+  name: string
+  description: string
+}

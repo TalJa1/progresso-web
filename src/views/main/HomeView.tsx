@@ -12,9 +12,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getAllLessons } from "../../apis/lessons/lessonAPI";
-import type { LessonModel } from "../../services/apiModel";
+import { getAllTopics } from "../../apis/topics/topicAPI";
+import type { LessonModel, TopicModel } from "../../services/apiModel";
 
 const HomeView = () => {
+  const [topics, setTopics] = useState<TopicModel[]>([]);
   const today = new Date();
   const pad = (n: number) => n.toString().padStart(2, "0");
   const months = [
@@ -62,17 +64,22 @@ const HomeView = () => {
         setUser(null);
       }
     }
-    const fetchLessons = async () => {
+    const fetchLessonsAndTopics = async () => {
       setLoading(true);
       try {
-        const data = await getAllLessons();
-        setAllLessons(data);
+        const [lessonsData, topicsData] = await Promise.all([
+          getAllLessons(),
+          getAllTopics(),
+        ]);
+        setAllLessons(lessonsData);
+        setTopics(topicsData);
       } catch {
         setAllLessons([]);
+        setTopics([]);
       }
       setLoading(false);
     };
-    fetchLessons();
+    fetchLessonsAndTopics();
   }, []);
 
   return (
@@ -107,7 +114,9 @@ const HomeView = () => {
         >
           Let's start your learning journey
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", width: "100%", mb: 2 }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", width: "100%", mb: 2 }}
+        >
           <Typography
             variant="h6"
             sx={{ fontWeight: 700, textAlign: "left", flex: 1 }}
@@ -163,7 +172,7 @@ const HomeView = () => {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: 'space-between',
+                      justifyContent: "space-between",
                       height: "100%",
                       gap: 1,
                     }}
@@ -190,7 +199,8 @@ const HomeView = () => {
                       variant="body2"
                       sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
                     >
-                      {lesson.short_describe.length > 0 && lesson.short_describe}
+                      {lesson.short_describe.length > 0 &&
+                        lesson.short_describe}
                     </Typography>
                     <Box
                       sx={{
@@ -201,7 +211,18 @@ const HomeView = () => {
                       }}
                     >
                       <Typography variant="caption" sx={{ color: "grey.600" }}>
-                        Topic ID: {lesson.topic_id}
+                        {(() => {
+                          const topic = topics.find(
+                            (t) => t.id === lesson.topic_id
+                          );
+                          return topic
+                            ? (
+                              <span style={{ fontWeight: 700, color: "black" }}>
+                                Topic Category: {topic.name}
+                              </span>
+                            )
+                            : `Topic ID: ${lesson.topic_id}`;
+                        })()}
                       </Typography>
                     </Box>
                     <Button
