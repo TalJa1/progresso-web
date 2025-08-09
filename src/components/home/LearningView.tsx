@@ -1,11 +1,19 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Drawer,
+  Card,
+  CardContent,
+  IconButton,
+} from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getLessonById } from "../../apis/lessons/lessonAPI";
 import type { LessonModel } from "../../services/apiModel";
 import MenuIcon from "@mui/icons-material/Menu";
+import SchoolIcon from "@mui/icons-material/School";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DescriptionIcon from "@mui/icons-material/Description";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -14,6 +22,8 @@ const LearningView = () => {
   const { id } = useParams();
   const [lesson, setLesson] = useState<LessonModel | null>(null);
   const [loading, setLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [allLessons, setAllLessons] = useState<LessonModel[]>([]);
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -31,9 +41,53 @@ const LearningView = () => {
     fetchLesson();
   }, [id]);
 
+  useEffect(() => {
+    // Fetch all lessons for drawer
+    const fetchAllLessons = async () => {
+      try {
+        const lessons = await import("../../apis/lessons/lessonAPI").then((m) =>
+          m.getAllLessons()
+        );
+        setAllLessons(lessons);
+      } catch {
+        setAllLessons([]);
+      }
+    };
+    fetchAllLessons();
+  }, []);
+
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
       <HorizontalNavigationBar />
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Box sx={{ width: 320, p: 2, bgcolor: "#f5f5f5", height: "100%" }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+            All Lessons
+          </Typography>
+          {allLessons.map((l) => (
+            <Card
+              key={l.id}
+              sx={{
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+                boxShadow: 2,
+              }}
+            >
+              <SchoolIcon sx={{ color: "#1976d2", fontSize: 32, m: 2 }} />
+              <CardContent sx={{ flex: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                  {l.title}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      </Drawer>
       <Box
         sx={{
           width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1300px" },
@@ -63,12 +117,9 @@ const LearningView = () => {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <MenuIcon sx={{ color: "#fff", fontSize: 28, mr: 1 }} />
-                <span
-                  style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}
-                >
-                  Study Plan
-                </span>
+                <IconButton onClick={() => setDrawerOpen(true)}>
+                  <MenuIcon sx={{ color: "#fff", fontSize: 28, mr: 1 }} />
+                </IconButton>
               </Box>
               {/* Center: Lesson Title */}
               <Box
