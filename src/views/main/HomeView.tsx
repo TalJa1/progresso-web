@@ -14,8 +14,11 @@ import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getAllLessons } from "../../apis/lessons/lessonAPI";
 import { getAllTopics } from "../../apis/topics/topicAPI";
 import type { LessonModel, TopicModel } from "../../services/apiModel";
+import { useNavigate } from "react-router-dom";
 
 const HomeView = () => {
+  const navigate = useNavigate();
+  const [completedLessons, setCompletedLessons] = useState<number[]>([]);
   const [topics, setTopics] = useState<TopicModel[]>([]);
   const today = new Date();
   const pad = (n: number) => n.toString().padStart(2, "0");
@@ -73,9 +76,34 @@ const HomeView = () => {
         ]);
         setAllLessons(lessonsData);
         setTopics(topicsData);
+        let userId = null;
+        const googleUser = localStorage.getItem("googleUser");
+        if (googleUser) {
+          try {
+            const parsed = JSON.parse(googleUser);
+            userId = parsed.id || parsed.uid;
+          } catch {
+            console.log("Error parsing Google user");
+          }
+        }
+        if (userId) {
+          try {
+            const { getLessonsCompletedByUser } = await import(
+              "../../apis/lessons/lessonCompletedAPI"
+            );
+            const completed = await getLessonsCompletedByUser(userId);
+            type CompletedLesson = { lesson_id: number };
+            setCompletedLessons(
+              completed.map((c: CompletedLesson) => c.lesson_id)
+            );
+          } catch {
+            setCompletedLessons([]);
+          }
+        }
       } catch {
         setAllLessons([]);
         setTopics([]);
+        setCompletedLessons([]);
       }
       setLoading(false);
     };
@@ -215,19 +243,23 @@ const HomeView = () => {
                           const topic = topics.find(
                             (t) => t.id === lesson.topic_id
                           );
-                          return topic
-                            ? (
-                              <span style={{ fontWeight: 700, color: "black" }}>
-                                Topic Category: {topic.name}
-                              </span>
-                            )
-                            : `Topic ID: ${lesson.topic_id}`;
+                          return topic ? (
+                            <span style={{ fontWeight: 700, color: "black" }}>
+                              Topic Category: {topic.name}
+                            </span>
+                          ) : (
+                            `Topic ID: ${lesson.topic_id}`
+                          );
                         })()}
                       </Typography>
                     </Box>
                     <Button
                       variant="contained"
-                      color="primary"
+                      color={
+                        completedLessons.includes(lesson.id)
+                          ? "success"
+                          : "primary"
+                      }
                       fullWidth
                       sx={{
                         borderRadius: 2,
@@ -236,8 +268,11 @@ const HomeView = () => {
                         py: 1.2,
                         boxShadow: 1,
                       }}
+                      onClick={() => navigate(`/learning/${lesson.id}`)}
                     >
-                      Learn
+                      {completedLessons.includes(lesson.id)
+                        ? "Learn Again"
+                        : "Learn"}
                     </Button>
                   </Box>
                 </Paper>
