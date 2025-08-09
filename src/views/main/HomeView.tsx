@@ -15,6 +15,7 @@ import { getAllLessons } from "../../apis/lessons/lessonAPI";
 import { getAllTopics } from "../../apis/topics/topicAPI";
 import type { LessonModel, TopicModel } from "../../services/apiModel";
 import { useNavigate } from "react-router-dom";
+import { mocktestData } from "../../services/mocktest";
 
 const HomeView = () => {
   const navigate = useNavigate();
@@ -279,6 +280,65 @@ const HomeView = () => {
               ))
           )}
         </Box>
+
+        <Box sx={{ width: "100%", mt: 4, mb: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+            Mock Tests
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+              flexWrap: "wrap",
+              justifyContent: "flex-start",
+              width: "100%",
+            }}
+          >
+            {mocktestData.map((mock) => (
+              <Paper
+                key={mock.url}
+                elevation={3}
+                sx={{
+                  p: 2,
+                  maxWidth: 320,
+                  width: "100%",
+                  borderRadius: 4,
+                  boxShadow: 3,
+                  mb: 2,
+                  minHeight: 120,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
+                >
+                  {mock.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
+                >
+                  {mock.describe}
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  href={mock.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ mt: 1, borderRadius: 2 }}
+                >
+                  Open PDF
+                </Button>
+              </Paper>
+            ))}
+          </Box>
+        </Box>
+
         <Box
           sx={{
             display: "flex",
