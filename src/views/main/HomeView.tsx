@@ -580,35 +580,167 @@ const HomeView = () => {
                     borderRadius: 4,
                     boxShadow: 3,
                     mb: 2,
-                    minHeight: 120,
+                    minHeight: 320,
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                    background: "#fff",
                   }}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, textAlign: "center", mb: 1 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      mb: 1,
+                    }}
                   >
+                    <Box
+                      sx={{
+                        bgcolor: "#1976d2",
+                        color: "#fff",
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 13,
+                        mr: 1,
+                      }}
+                    >
+                      {mock.title}
+                    </Box>
+                    <Box
+                      sx={{
+                        bgcolor: "#eaffea",
+                        color: "#388e3c",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 13,
+                      }}
+                    >
+                      Free
+                    </Box>
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
                     {mock.title}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "grey.700", textAlign: "center", mb: 1 }}
-                  >
+                  <Typography variant="body2" sx={{ color: "grey.700", mb: 1 }}>
                     {mock.describe}
                   </Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    href={mock.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{ mt: 1, borderRadius: 2 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                    }}
                   >
-                    Open PDF
-                  </Button>
+                    <Box
+                      sx={{
+                        bgcolor: "#e3f2fd",
+                        color: "#1976d2",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      Grade 9 → 10
+                    </Box>
+                    <Box
+                      sx={{
+                        bgcolor: "#eaffea",
+                        color: "#388e3c",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      Duration 90 min
+                    </Box>
+                    <Box
+                      sx={{
+                        bgcolor: "#fff8e1",
+                        color: "#fbc02d",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 2,
+                        fontWeight: 700,
+                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      Medium
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      href={mock.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{ borderRadius: 2, fontWeight: 700 }}
+                    >
+                      OPEN PDF
+                    </Button>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                      width: "100%",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        border: "2px solid #e0e0e0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mr: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "#bdbdbd", fontWeight: 700 }}
+                      >
+                        0%
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" sx={{ color: "#757575" }}>
+                      done
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ color: "#bdbdbd" }}>
+                      Last updated
+                      <br />
+                      Aug 2025
+                    </Typography>
+                  </Box>
                 </Paper>
               ))}
           </Box>
