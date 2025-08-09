@@ -31,3 +31,9 @@ export interface TopicModel {
   name: string
   description: string
 }
+
+export interface LessonCompletionCreateModel {
+  user_id: number
+  lesson_id: number
+  completed_at: string
+}
