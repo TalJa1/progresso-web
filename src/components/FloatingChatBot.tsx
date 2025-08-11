@@ -72,7 +72,7 @@ const FloatingChatBot = () => {
             position: "fixed",
             bottom: 100,
             right: 32,
-            width: 340,
+            width: 500,
             borderRadius: 4,
             p: 0,
             zIndex: 10000,
