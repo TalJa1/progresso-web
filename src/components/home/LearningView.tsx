@@ -10,6 +10,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DescriptionIcon from "@mui/icons-material/Description";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import FloatingChatBot from "../FloatingChatBot";
 
 const LearningView = () => {
   const { id } = useParams();
@@ -218,6 +219,7 @@ const LearningView = () => {
           <Typography>Lesson not found.</Typography>
         )}
       </Box>
+      <FloatingChatBot />
     </Box>
   );
 };
