@@ -13,9 +13,18 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getAllLessons } from "../../apis/lessons/lessonAPI";
 import { getAllTopics } from "../../apis/topics/topicAPI";
-import type { LessonModel, TopicModel } from "../../services/apiModel";
+import type {
+  LessonModel,
+  TopicModel,
+  UserModel,
+} from "../../services/apiModel";
 import { useNavigate } from "react-router-dom";
 import { mocktestData } from "../../services/mocktest";
+import {
+  createLessonCompleted,
+  getLessonsCompletedByUser,
+} from "../../apis/lessons/lessonCompletedAPI";
+import { getUserByEmail } from "../../apis/users/usersAPI";
 
 const HomeView = () => {
   const navigate = useNavigate();
@@ -54,6 +63,7 @@ const HomeView = () => {
     photoURL: "";
     uid: "";
   } | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const googleUser = localStorage.getItem("googleUser");
@@ -66,8 +76,18 @@ const HomeView = () => {
           photoURL: parsed.photoURL || "",
           uid: parsed.uid || "",
         });
+        // Fetch userId from DB and store globally
+        (async () => {
+          try {
+            const dbUser: UserModel = await getUserByEmail(parsed.email);
+            setUserId(dbUser.id);
+          } catch {
+            setUserId(null);
+          }
+        })();
       } catch {
         setUser(null);
+        setUserId(null);
       }
     }
     const fetchLessonsAndTopics = async () => {
@@ -79,21 +99,8 @@ const HomeView = () => {
         ]);
         setAllLessons(lessonsData);
         setTopics(topicsData);
-        let userId = null;
-        const googleUser = localStorage.getItem("googleUser");
-        if (googleUser) {
-          try {
-            const parsed = JSON.parse(googleUser);
-            userId = parsed.id || parsed.uid;
-          } catch {
-            console.log("Error parsing Google user");
-          }
-        }
         if (userId) {
           try {
-            const { getLessonsCompletedByUser } = await import(
-              "../../apis/lessons/lessonCompletedAPI"
-            );
             const completed = await getLessonsCompletedByUser(userId);
             type CompletedLesson = { lesson_id: number };
             setCompletedLessons(
@@ -111,7 +118,7 @@ const HomeView = () => {
       setLoading(false);
     };
     fetchLessonsAndTopics();
-  }, []);
+  }, [userId]);
 
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
@@ -271,7 +278,22 @@ const HomeView = () => {
                         py: 1.2,
                         boxShadow: 1,
                       }}
-                      onClick={() => navigate(`/learning/${lesson.id}`)}
+                      onClick={async () => {
+                        if (!completedLessons.includes(lesson.id)) {
+                          try {
+                            if (userId) {
+                              await createLessonCompleted({
+                                user_id: userId,
+                                lesson_id: lesson.id,
+                                completed_at: new Date().toISOString(),
+                              });
+                            }
+                          } catch {
+                            console.log("Error marking lesson as completed");
+                          }
+                        }
+                        navigate(`/learning/${lesson.id}`);
+                      }}
                     >
                       {completedLessons.includes(lesson.id)
                         ? "Learn Again"

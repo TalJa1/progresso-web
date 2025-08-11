@@ -1,11 +1,5 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
-import {
-  Box,
-  Typography,
-  Drawer,
-  Card,
-  IconButton,
-} from "@mui/material";
+import { Box, Typography, Drawer, Card, IconButton } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -211,11 +205,13 @@ const LearningView = () => {
             <Box
               sx={{ width: "100%", maxWidth: 600, mb: 2, alignSelf: "center" }}
             >
-              <video
-                src={lesson.video_url}
-                controls
-                style={{ width: "100%", borderRadius: 8, background: "#000" }}
-              />
+              {lesson.video_url && (
+                <video
+                  src={lesson.video_url}
+                  controls
+                  style={{ width: "100%", borderRadius: 8, background: "#000" }}
+                />
+              )}
             </Box>
           </>
         ) : (
