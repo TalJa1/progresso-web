@@ -580,7 +580,6 @@ const HomeView = () => {
                     borderRadius: 4,
                     boxShadow: 3,
                     mb: 2,
-                    minHeight: 320,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
@@ -706,7 +705,7 @@ const HomeView = () => {
                       width: "100%",
                     }}
                   >
-                    <Box
+                    {/* <Box
                       sx={{
                         width: 32,
                         height: 32,
@@ -727,7 +726,7 @@ const HomeView = () => {
                     </Box>
                     <Typography variant="caption" sx={{ color: "#757575" }}>
                       done
-                    </Typography>
+                    </Typography> */}
                   </Box>
                   <Box
                     sx={{
