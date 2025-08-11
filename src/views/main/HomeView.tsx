@@ -25,6 +25,7 @@ import {
   getLessonsCompletedByUser,
 } from "../../apis/lessons/lessonCompletedAPI";
 import { getUserByEmail } from "../../apis/users/usersAPI";
+import FloatingChatBot from "../../components/FloatingChatBot";
 
 const HomeView = () => {
   const navigate = useNavigate();
@@ -304,7 +305,6 @@ const HomeView = () => {
               ))
           )}
         </Box>
-
         <Box
           sx={{
             display: "flex",
@@ -768,6 +768,8 @@ const HomeView = () => {
           </Box>
         </Box>
       </Box>
+      {/* Ensure FloatingChatBot is rendered outside main content for visibility */}
+      <FloatingChatBot />
     </Box>
   );
 };
