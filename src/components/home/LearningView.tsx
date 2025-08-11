@@ -76,6 +76,13 @@ const LearningView = () => {
                 display: "flex",
                 alignItems: "center",
                 boxShadow: 2,
+                cursor: "pointer",
+                transition: "box-shadow 0.2s",
+                "&:hover": { boxShadow: 6, bgcolor: "#e3f2fd" },
+              }}
+              onClick={() => {
+                setDrawerOpen(false);
+                window.location.href = `/learning/${l.id}`;
               }}
             >
               <SchoolIcon sx={{ color: "#1976d2", fontSize: 32, m: 2 }} />
@@ -121,7 +128,6 @@ const LearningView = () => {
                   <MenuIcon sx={{ color: "#fff", fontSize: 28, mr: 1 }} />
                 </IconButton>
               </Box>
-              {/* Center: Lesson Title */}
               <Box
                 sx={{
                   color: "#fff",
