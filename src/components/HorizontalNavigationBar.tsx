@@ -191,45 +191,49 @@ const HorizontalNavigationBar = () => {
                 onClose={handleMenuClose}
                 keepMounted
               >
-                {isMobile && (
-                  <>
-                    <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate("/home");
-                      }}
-                    >
-                      <HomeIcon sx={{ mr: 1 }} /> Home
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate("/exams");
-                      }}
-                    >
-                      <SchoolIcon sx={{ mr: 1 }} /> Exams
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate("/submissions");
-                      }}
-                    >
-                      <WorkIcon sx={{ mr: 1 }} /> Submissions
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate("/schedule");
-                      }}
-                    >
-                      <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem onClick={handleMenuClose}>UTC+07:00</MenuItem>
-                    <Divider />
-                  </>
-                )}
+                {isMobile && [
+                  <MenuItem
+                    key="home"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/home");
+                    }}
+                  >
+                    <HomeIcon sx={{ mr: 1 }} /> Home
+                  </MenuItem>,
+                  <MenuItem
+                    key="exams"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/exams");
+                    }}
+                  >
+                    <SchoolIcon sx={{ mr: 1 }} /> Exams
+                  </MenuItem>,
+                  <MenuItem
+                    key="submissions"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/submissions");
+                    }}
+                  >
+                    <WorkIcon sx={{ mr: 1 }} /> Submissions
+                  </MenuItem>,
+                  <MenuItem
+                    key="schedule"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/schedule");
+                    }}
+                  >
+                    <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
+                  </MenuItem>,
+                  <Divider key="div1" />,
+                  <MenuItem key="utc" onClick={handleMenuClose}>
+                    UTC+07:00
+                  </MenuItem>,
+                  <Divider key="div2" />,
+                ]}
                 <MenuItem
                   onClick={() => {
                     handleMenuClose();
