@@ -17,10 +17,12 @@ import SmartToyIcon from "@mui/icons-material/SmartToy";
 
 const FloatingChatBot = () => {
   const [open, setOpen] = useState(false);
+  const googleUser = JSON.parse(localStorage.getItem("googleUser") || "{}");
+  const userName = googleUser?.displayName || "there";
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hey Chau Tan Tai 👋\n\nI just spawned into existence, and you’re one of the first humans I get to chat with! I’m here to help, but if I blunder, think of it as my AI growing pains—let’s improve together!\n\nWhat can I assist you with? For e.g. you may ask",
+      text: `Hey ${userName} 👋\n\nI just spawned into existence, and you’re one of the first humans I get to chat with! I’m here to help, but if I blunder, think of it as my AI growing pains—let’s improve together!\n\nWhat can I assist you with? For e.g. you may ask`,
     },
   ]);
   const [input, setInput] = useState("");
