@@ -4,7 +4,6 @@ import {
   Typography,
   Drawer,
   Card,
-  CardContent,
   IconButton,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
@@ -73,24 +72,82 @@ const LearningView = () => {
               key={l.id}
               sx={{
                 mb: 2,
-                display: "flex",
-                alignItems: "center",
                 boxShadow: 2,
                 cursor: "pointer",
                 transition: "box-shadow 0.2s",
-                "&:hover": { boxShadow: 6, bgcolor: "#e3f2fd" },
+                "&:hover": { boxShadow: 6, bgcolor: "#f5faff" },
+                borderRadius: 3,
+                p: 2,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 120,
               }}
               onClick={() => {
                 setDrawerOpen(false);
                 window.location.href = `/learning/${l.id}`;
               }}
             >
-              <SchoolIcon sx={{ color: "#1976d2", fontSize: 32, m: 2 }} />
-              <CardContent sx={{ flex: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  {l.title}
-                </Typography>
-              </CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                <Box
+                  sx={{
+                    bgcolor: "#1976d2",
+                    borderRadius: 2,
+                    p: 1,
+                    mr: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <SchoolIcon sx={{ color: "#fff", fontSize: 32 }} />
+                </Box>
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                    {l.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "grey.700", fontWeight: 500 }}
+                  >
+                    {"Math"} &bull; Grade 9
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}
+              >
+                <Box
+                  sx={{
+                    bgcolor: "#e3f2fd",
+                    color: "#1976d2",
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    fontSize: 13,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <SchoolIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                  25 min
+                </Box>
+                <Box
+                  sx={{
+                    bgcolor: "#fff8e1",
+                    color: "#fbc02d",
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    fontSize: 13,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  Medium
+                </Box>
+              </Box>
             </Card>
           ))}
         </Box>
