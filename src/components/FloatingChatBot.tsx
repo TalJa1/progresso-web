@@ -190,10 +190,8 @@ const FloatingChatBot = () => {
             {messages.length === 1 && (
               <Box mt={2} display="flex" flexDirection="column" gap={1}>
                 {[
-                  "I have a doubt related to this page",
-                  "I have a non-academic doubt",
-                  "Simplify this topic for me",
-                  "Let's Chat",
+                  "I have a doubt",
+                  "Can you help me with something?"
                 ].map((preset) => (
                   <Button
                     key={preset}
