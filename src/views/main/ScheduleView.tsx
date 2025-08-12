@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import {
   Box,
@@ -21,13 +21,16 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { ScheduleIcon } from "../../services/scheduleCreateIcon";
+import { getUserByEmail } from "../../apis/users/usersAPI";
+import { getSchedulesByUser } from "../../apis/schedules/scheduleApi";
+import type { ScheduleModel } from "../../services/apiModel";
 
 const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event"];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
-
 
 const ScheduleView = () => {
   const today = new Date();
@@ -46,6 +49,45 @@ const ScheduleView = () => {
     start_time: "",
     event_date: "",
   });
+  const [userId, setUserId] = useState<number | null>(null);
+  const [scheduleCountByDate, setScheduleCountByDate] = useState<{
+    [date: string]: number;
+  }>({});
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const googleUser = localStorage.getItem("googleUser");
+      if (googleUser) {
+        try {
+          const parsed = JSON.parse(googleUser);
+          if (parsed.email) {
+            const user = await getUserByEmail(parsed.email);
+            setUserId(user.id);
+          }
+        } catch {
+          console.log("Failed to parse user data");
+        }
+      }
+    };
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      if (userId) {
+        const data = await getSchedulesByUser(userId);
+        // Count schedules per date
+        const count: { [date: string]: number } = {};
+        data.forEach((item: ScheduleModel) => {
+          if (item.event_date) {
+            count[item.event_date] = (count[item.event_date] || 0) + 1;
+          }
+        });
+        setScheduleCountByDate(count);
+      }
+    };
+    fetchSchedules();
+  }, [userId]);
 
   // Build calendar grid
   const calendarCells: (number | null)[] = [];
@@ -168,6 +210,13 @@ const ScheduleView = () => {
                 viewYear === today.getFullYear() &&
                 viewMonth === today.getMonth() &&
                 day === today.getDate();
+              const dateStr = day
+                ? `${viewYear}-${String(viewMonth + 1).padStart(
+                    2,
+                    "0"
+                  )}-${String(day).padStart(2, "0")}`
+                : "";
+              const iconCount = scheduleCountByDate[dateStr] || 0;
               return (
                 <Box
                   key={wi + "-" + di}
@@ -196,6 +245,35 @@ const ScheduleView = () => {
                   >
                     {day || ""}
                   </Typography>
+                  {/* Render icons for schedules on this date */}
+                  {iconCount > 0 && (
+                    <Box
+                      sx={{
+                        mt: 0.5,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 0.25,
+                      }}
+                    >
+                      {Array.from({ length: iconCount }).map((_, idx) => {
+                        const icon = ScheduleIcon[idx % ScheduleIcon.length];
+                        return (
+                          <Box key={idx} sx={{ display: "inline-block" }}>
+                            <img
+                              src={icon.url}
+                              alt="schedule"
+                              style={{
+                                width: 14,
+                                height: 14,
+                                borderRadius: 3,
+                                boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                              }}
+                            />
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
                 </Box>
               );
             })
@@ -294,7 +372,10 @@ const ScheduleView = () => {
                   onChange={(value) => {
                     if (value) {
                       const hours = String(value.getHours()).padStart(2, "0");
-                      const minutes = String(value.getMinutes()).padStart(2, "0");
+                      const minutes = String(value.getMinutes()).padStart(
+                        2,
+                        "0"
+                      );
                       setForm({ ...form, start_time: `${hours}:${minutes}` });
                     }
                   }}

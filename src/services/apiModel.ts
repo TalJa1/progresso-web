@@ -49,7 +49,6 @@ export interface ScheduleCreateModel {
 
 export interface ScheduleIconModel {
   url: string;
-  color: string;
 }
 
 export interface ScheduleModel {
