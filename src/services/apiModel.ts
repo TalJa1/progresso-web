@@ -27,15 +27,15 @@ export interface LessonModel {
 }
 
 export interface TopicModel {
-  id: number
-  name: string
-  description: string
+  id: number;
+  name: string;
+  description: string;
 }
 
 export interface LessonCompletionCreateModel {
-  user_id: number
-  lesson_id: number
-  completed_at: string
+  user_id: number;
+  lesson_id: number;
+  completed_at: string;
 }
 
 export interface ScheduleCreateModel {
@@ -45,4 +45,9 @@ export interface ScheduleCreateModel {
   type: string;
   event_date: string;
   start_time: string;
+}
+
+export interface ScheduleIconModel {
+  url: string;
+  color: string;
 }

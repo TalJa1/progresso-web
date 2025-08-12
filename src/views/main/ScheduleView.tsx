@@ -12,18 +12,22 @@ import {
   InputAdornment,
   MenuItem,
 } from "@mui/material";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DescriptionIcon from "@mui/icons-material/Description";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event"];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
+
 
 const ScheduleView = () => {
   const today = new Date();
@@ -279,24 +283,37 @@ const ScheduleView = () => {
                 }}
                 sx={{ flex: 1 }}
               />
-              <TextField
-                label="Start time"
-                type="time"
-                fullWidth
-                margin="normal"
-                value={form.start_time}
-                onChange={(e) =>
-                  setForm({ ...form, start_time: e.target.value })
-                }
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AccessTimeIcon sx={{ color: "#888" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ flex: 1 }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <TimePicker
+                  label="Start time"
+                  value={
+                    form.start_time
+                      ? new Date(`2000-01-01T${form.start_time}`)
+                      : null
+                  }
+                  onChange={(value) => {
+                    if (value) {
+                      const hours = String(value.getHours()).padStart(2, "0");
+                      const minutes = String(value.getMinutes()).padStart(2, "0");
+                      setForm({ ...form, start_time: `${hours}:${minutes}` });
+                    }
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      margin: "normal",
+                      InputProps: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AccessTimeIcon sx={{ color: "#1976d2" }} />
+                          </InputAdornment>
+                        ),
+                      },
+                      sx: { flex: 1 },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
             </Box>
             <Box mt={3} display="flex" justifyContent="flex-end">
               <Button
