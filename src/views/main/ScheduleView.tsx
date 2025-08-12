@@ -249,17 +249,22 @@ const ScheduleView = () => {
                   {iconCount > 0 && (
                     <Box
                       sx={{
-                        mt: 0.5,
+                        position: "absolute",
+                        right: 2,
+                        bottom: 2,
                         display: "flex",
-                        flexWrap: "wrap",
-                        gap: 0.25,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 0.5,
+                        zIndex: 2,
                       }}
                     >
-                      {Array.from({ length: iconCount }).map((_, idx) => {
-                        const icon = ScheduleIcon[idx % ScheduleIcon.length];
-                        return (
-                          <Box key={idx} sx={{ display: "inline-block" }}>
+                      {iconCount <= 3 ? (
+                        Array.from({ length: iconCount }).map((_, idx) => {
+                          const icon = ScheduleIcon[idx % ScheduleIcon.length];
+                          return (
                             <img
+                              key={idx}
                               src={icon.url}
                               alt="schedule"
                               style={{
@@ -269,9 +274,45 @@ const ScheduleView = () => {
                                 boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
                               }}
                             />
+                          );
+                        })
+                      ) : (
+                        <>
+                          <img
+                            src={
+                              ScheduleIcon[
+                                (iconCount - 1) % ScheduleIcon.length
+                              ].url
+                            }
+                            alt="schedule"
+                            style={{
+                              width: 14,
+                              height: 14,
+                              borderRadius: 3,
+                              boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              ml: 0.5,
+                              px: 0.5,
+                              minWidth: 16,
+                              height: 16,
+                              bgcolor: "#eee",
+                              borderRadius: 8,
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "#444",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                            }}
+                          >
+                            {iconCount}
                           </Box>
-                        );
-                      })}
+                        </>
+                      )}
                     </Box>
                   )}
                 </Box>
