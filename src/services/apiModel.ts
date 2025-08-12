@@ -37,3 +37,12 @@ export interface LessonCompletionCreateModel {
   lesson_id: number
   completed_at: string
 }
+
+export interface ScheduleCreateModel {
+  user_id: number;
+  title: string;
+  description: string;
+  type: string;
+  event_date: string;
+  start_time: string;
+}
