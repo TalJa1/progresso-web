@@ -51,3 +51,13 @@ export interface ScheduleIconModel {
   url: string;
   color: string;
 }
+
+export interface ScheduleModel {
+  description: string;
+  id: number;
+  type: string;
+  start_time: string;
+  user_id: number;
+  title: string;
+  event_date: string;
+}
