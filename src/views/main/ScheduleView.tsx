@@ -154,7 +154,6 @@ const ScheduleView = () => {
     setInfoDate(null);
   };
   const handleCreateSubmit = () => {
-    // TODO: Call createSchedule API here
     handleCreateClose();
   };
 
