@@ -13,6 +13,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -41,7 +42,8 @@ const ScheduleView = () => {
 
   // Dialog state
   const [createOpen, setCreateOpen] = useState(false);
-  const [createDate, setCreateDate] = useState<string | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [infoDate, setInfoDate] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -49,6 +51,9 @@ const ScheduleView = () => {
     start_time: "",
     event_date: "",
   });
+  const [eventsByDate, setEventsByDate] = useState<{
+    [date: string]: ScheduleModel[];
+  }>({});
   const [userId, setUserId] = useState<number | null>(null);
   const [scheduleCountByDate, setScheduleCountByDate] = useState<{
     [date: string]: number;
@@ -76,14 +81,18 @@ const ScheduleView = () => {
     const fetchSchedules = async () => {
       if (userId) {
         const data = await getSchedulesByUser(userId);
-        // Count schedules per date
+        // Count schedules per date and group events
         const count: { [date: string]: number } = {};
+        const events: { [date: string]: ScheduleModel[] } = {};
         data.forEach((item: ScheduleModel) => {
           if (item.event_date) {
             count[item.event_date] = (count[item.event_date] || 0) + 1;
+            if (!events[item.event_date]) events[item.event_date] = [];
+            events[item.event_date].push(item);
           }
         });
         setScheduleCountByDate(count);
+        setEventsByDate(events);
       }
     };
     fetchSchedules();
@@ -128,18 +137,25 @@ const ScheduleView = () => {
       2,
       "0"
     )}-${String(day).padStart(2, "0")}`;
+    setInfoDate(dateStr);
+    setInfoOpen(true);
+  };
+  const handleCreateOpen = () => {
     setForm({
       title: "",
       description: "",
       type: "",
       start_time: "",
-      event_date: dateStr,
+      event_date: "",
     });
     setCreateOpen(true);
   };
   const handleCreateClose = () => {
     setCreateOpen(false);
-    setCreateDate(null);
+  };
+  const handleInfoClose = () => {
+    setInfoOpen(false);
+    setInfoDate(null);
   };
   const handleCreateSubmit = () => {
     // TODO: Call createSchedule API here
@@ -162,20 +178,78 @@ const ScheduleView = () => {
         }}
       >
         {/* Render here */}
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <IconButton onClick={handlePrevMonth}>
-            <ArrowBackIosNewIcon />
-          </IconButton>
-          <Typography variant="h5" fontWeight={700} sx={{ mx: 2 }}>
-            {new Date(viewYear, viewMonth).toLocaleString("default", {
-              month: "long",
-            })}{" "}
-            {viewYear}
-          </Typography>
-          <IconButton onClick={handleNextMonth}>
-            <ArrowForwardIosIcon />
-          </IconButton>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 2,
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton onClick={handlePrevMonth}>
+              <ArrowBackIosNewIcon />
+            </IconButton>
+            <Typography variant="h5" fontWeight={700} sx={{ mx: 2 }}>
+              {new Date(viewYear, viewMonth).toLocaleString("default", {
+                month: "long",
+              })}{" "}
+              {viewYear}
+            </Typography>
+            <IconButton onClick={handleNextMonth}>
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateOpen}
+            sx={{ fontWeight: 700 }}
+          >
+            + Create New Event
+          </Button>
         </Box>
+        {/* Info Dialog for date events */}
+        <Dialog
+          open={infoOpen}
+          onClose={handleInfoClose}
+          PaperProps={{ sx: { borderRadius: 4, minWidth: 340, p: 0 } }}
+        >
+          <DialogTitle
+            sx={{ fontWeight: 700, fontSize: 20, textAlign: "center", pt: 3 }}
+          >
+            Events on {infoDate}
+          </DialogTitle>
+          <DialogContent sx={{ pt: 1, pb: 3 }}>
+            {infoDate &&
+            eventsByDate[infoDate] &&
+            eventsByDate[infoDate].length > 0 ? (
+              eventsByDate[infoDate].map((event, idx) => (
+                <Box
+                  key={idx}
+                  sx={{
+                    mb: 2,
+                    p: 2,
+                    border: "1px solid #eee",
+                    borderRadius: 2,
+                    bgcolor: "#fafbfc",
+                  }}
+                >
+                  <Typography fontWeight={700}>{event.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {event.type} | {event.start_time}
+                  </Typography>
+                  <Typography variant="body2">{event.description}</Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography color="text.secondary">
+                No events for this date.
+              </Typography>
+            )}
+          </DialogContent>
+        </Dialog>
         <Box
           sx={{
             display: "grid",
@@ -387,21 +461,6 @@ const ScheduleView = () => {
               ))}
             </TextField>
             <Box sx={{ display: "flex", gap: 2, alignItems: "center", mt: 1 }}>
-              <TextField
-                label="Date"
-                fullWidth
-                margin="normal"
-                value={form.event_date}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CalendarTodayIcon sx={{ color: "#888" }} />
-                    </InputAdornment>
-                  ),
-                  readOnly: true,
-                }}
-                sx={{ flex: 1 }}
-              />
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <TimePicker
                   label="Start time"
@@ -435,6 +494,36 @@ const ScheduleView = () => {
                     },
                   }}
                 />
+                <Box sx={{ flex: 1 }}>
+                  <DatePicker
+                    label="Date"
+                    value={form.event_date ? new Date(form.event_date) : null}
+                    onChange={(date: Date | null) => {
+                      if (date && !isNaN(date.getTime())) {
+                        const yyyy = date.getFullYear();
+                        const mm = String(date.getMonth() + 1).padStart(2, "0");
+                        const dd = String(date.getDate()).padStart(2, "0");
+                        setForm({ ...form, event_date: `${yyyy}-${mm}-${dd}` });
+                      } else {
+                        setForm({ ...form, event_date: "" });
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        margin: "normal",
+                        InputProps: {
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AccessTimeIcon sx={{ color: "#1976d2" }} />
+                            </InputAdornment>
+                          ),
+                        },
+                        sx: { flex: 1 },
+                      },
+                    }}
+                  />
+                </Box>
               </LocalizationProvider>
             </Box>
             <Box mt={3} display="flex" justifyContent="flex-end">
