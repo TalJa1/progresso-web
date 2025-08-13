@@ -203,7 +203,7 @@ const ScheduleView = () => {
             onClick={handleCreateOpen}
             sx={{ fontWeight: 700 }}
           >
-            + Create New Event
+            Add Event
           </Button>
         </Box>
         {/* Info Dialog for date events */}
