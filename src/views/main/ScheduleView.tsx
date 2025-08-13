@@ -81,7 +81,6 @@ const ScheduleView = () => {
     const fetchSchedules = async () => {
       if (userId) {
         const data = await getSchedulesByUser(userId);
-        // Count schedules per date and group events
         const count: { [date: string]: number } = {};
         const events: { [date: string]: ScheduleModel[] } = {};
         data.forEach((item: ScheduleModel) => {
@@ -98,7 +97,6 @@ const ScheduleView = () => {
     fetchSchedules();
   }, [userId]);
 
-  // Build calendar grid
   const calendarCells: (number | null)[] = [];
   for (let i = 0; i < firstDayOfWeek; i++) {
     calendarCells.push(null); // Empty cells before 1st
@@ -106,13 +104,11 @@ const ScheduleView = () => {
   for (let d = 1; d <= daysInMonth; d++) {
     calendarCells.push(d);
   }
-  // 7 columns per week
   const weeks: (number | null)[][] = [];
   for (let i = 0; i < calendarCells.length; i += 7) {
     weeks.push(calendarCells.slice(i, i + 7));
   }
 
-  // Month navigation
   const handlePrevMonth = () => {
     if (viewMonth === 0) {
       setViewMonth(11);
