@@ -1,6 +1,10 @@
 import apiClient from "./apiClient";
 
 export const chatWithGemini = async (message: string) => {
-  const response = await apiClient.post("/gemini-chat", { message });
+  const response = await apiClient.post(
+    "/gemini-chat",
+    { message },
+    { timeout: 600000 }
+  );
   return response.data;
 };

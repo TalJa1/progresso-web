@@ -34,11 +34,15 @@ const FloatingChatBot = () => {
     setLoading(true);
     try {
       const res = await chatWithGemini(input);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: res.reply || "No response." },
-      ]);
-    } catch {
+      let reply = "No response.";
+      if (res) {
+        if (typeof res === "string") reply = res;
+        else if (res.reply) reply = res.reply;
+        else if (res.message) reply = res.message;
+      }
+      setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+    } catch (err) {
+      console.error("Chat API error:", err);
       setMessages((prev) => [
         ...prev,
         { sender: "bot", text: "Sorry, something went wrong." },
@@ -189,26 +193,25 @@ const FloatingChatBot = () => {
             {/* Quick buttons */}
             {messages.length === 1 && (
               <Box mt={2} display="flex" flexDirection="column" gap={1}>
-                {[
-                  "I have a doubt",
-                  "Can you help me with something?"
-                ].map((preset) => (
-                  <Button
-                    key={preset}
-                    variant="outlined"
-                    color="primary"
-                    sx={{
-                      borderRadius: 3,
-                      textTransform: "none",
-                      fontWeight: 500,
-                      fontSize: 15,
-                      mb: 0.5,
-                    }}
-                    onClick={() => setInput(preset)}
-                  >
-                    {preset}
-                  </Button>
-                ))}
+                {["I have a doubt", "Can you help me with something?"].map(
+                  (preset) => (
+                    <Button
+                      key={preset}
+                      variant="outlined"
+                      color="primary"
+                      sx={{
+                        borderRadius: 3,
+                        textTransform: "none",
+                        fontWeight: 500,
+                        fontSize: 15,
+                        mb: 0.5,
+                      }}
+                      onClick={() => setInput(preset)}
+                    >
+                      {preset}
+                    </Button>
+                  )
+                )}
               </Box>
             )}
           </Box>
