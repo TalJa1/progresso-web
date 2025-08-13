@@ -24,7 +24,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { ScheduleIcon } from "../../services/scheduleCreateIcon";
 import { getUserByEmail } from "../../apis/users/usersAPI";
-import { getSchedulesByUser } from "../../apis/schedules/scheduleApi";
+import { getSchedulesByUser, createSchedule } from "../../apis/schedules/scheduleApi";
 import type { ScheduleModel } from "../../services/apiModel";
 
 const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event"];
@@ -153,8 +153,33 @@ const ScheduleView = () => {
     setInfoOpen(false);
     setInfoDate(null);
   };
-  const handleCreateSubmit = () => {
-    handleCreateClose();
+  const handleCreateSubmit = async () => {
+    if (!userId) return;
+    try {
+      await createSchedule({
+        user_id: userId,
+        title: form.title,
+        description: form.description,
+        type: form.type,
+        event_date: form.event_date,
+        start_time: form.start_time,
+      });
+      handleCreateClose();
+      const data = await getSchedulesByUser(userId);
+      const count: { [date: string]: number } = {};
+      const events: { [date: string]: ScheduleModel[] } = {};
+      data.forEach((item: ScheduleModel) => {
+        if (item.event_date) {
+          count[item.event_date] = (count[item.event_date] || 0) + 1;
+          if (!events[item.event_date]) events[item.event_date] = [];
+          events[item.event_date].push(item);
+        }
+      });
+      setScheduleCountByDate(count);
+      setEventsByDate(events);
+    } catch {
+      alert('Failed to create schedule. Please try again later.');
+    }
   };
 
   return (
