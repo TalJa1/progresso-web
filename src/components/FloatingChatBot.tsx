@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { chatWithGemini } from "../apis/aichatApi";
 import {
   Box,
@@ -78,7 +79,7 @@ const FloatingChatBot = () => {
             position: "fixed",
             bottom: 100,
             right: 32,
-            width: 500,
+            width: 600,
             borderRadius: 4,
             p: 0,
             zIndex: 10000,
@@ -93,7 +94,7 @@ const FloatingChatBot = () => {
               bgcolor: "#e1333b",
               color: "#fff",
               p: 2,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 18,
               display: "flex",
               alignItems: "center",
@@ -162,13 +163,17 @@ const FloatingChatBot = () => {
                         bgcolor: "#fff",
                         borderRadius: 2,
                         p: 1.5,
-                        maxWidth: 220,
+                        width: "fit-content",
+                        maxWidth: "80%",
                         fontSize: 15,
                         color: "#333",
                         boxShadow: 1,
+                        wordBreak: "break-word",
+                        whiteSpace: "pre-wrap",
+                        overflowWrap: "break-word",
                       }}
                     >
-                      {msg.text}
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </Paper>
                   </Box>
                 ) : (
