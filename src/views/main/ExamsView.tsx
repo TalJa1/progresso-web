@@ -45,7 +45,7 @@ const ExamsView = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <h2>Exams View</h2>
+          <h2>Progresso Exams</h2>
         </Box>
         {loading ? (
           <Box
