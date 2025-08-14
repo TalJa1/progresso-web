@@ -67,3 +67,11 @@ export interface QuizletModel {
   id: number
   question: string
 }
+
+export interface ExamModel {
+  name: string
+  year: number
+  province: string
+  topic_id: number
+  id: number
+}
