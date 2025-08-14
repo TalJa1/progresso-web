@@ -1,5 +1,5 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
-import { Box, Typography, Drawer, Card, IconButton } from "@mui/material";
+import { Box, Typography, Drawer, Card, IconButton, Button } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -36,7 +36,6 @@ const LearningView = () => {
   }, [id]);
 
   useEffect(() => {
-    // Fetch all lessons for drawer
     const fetchAllLessons = async () => {
       try {
         const lessons = await import("../../apis/lessons/lessonAPI").then((m) =>
@@ -213,6 +212,11 @@ const LearningView = () => {
                   style={{ width: "100%", borderRadius: 8, background: "#000" }}
                 />
               )}
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1, alignItems: "center", width: "100%" }}>
+              <Button variant="contained" color="primary">
+                Test knowledge
+              </Button>
             </Box>
           </>
         ) : (

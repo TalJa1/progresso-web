@@ -60,3 +60,10 @@ export interface ScheduleModel {
   title: string;
   event_date: string;
 }
+
+export interface QuizletModel {
+  answer: string
+  lesson_id: number
+  id: number
+  question: string
+}
