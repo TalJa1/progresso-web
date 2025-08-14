@@ -73,5 +73,9 @@ export interface ExamModel {
   year: number
   province: string
   topic_id: number
+  rating: number
+  student_attempt: number
+  correct_attempt: number
+  added_on: string
   id: number
 }

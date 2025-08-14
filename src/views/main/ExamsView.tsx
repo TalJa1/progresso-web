@@ -205,31 +205,28 @@ const ExamsView = () => {
                         ml: 0.5,
                       }}
                     >
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <span key={i} style={{ fontSize: 18, marginRight: 1 }}>
-                          ★
-                        </span>
-                      ))}
-                      <span style={{ color: "#d1d5db", fontSize: 18 }}>★</span>
+                      <span style={{ fontSize: 18, marginRight: 1 }}>
+                        {exam.rating} ★
+                      </span>
                     </Box>
                   </Box>
                   <Typography
                     variant="body2"
                     sx={{ color: "#222", fontSize: 15 }}
                   >
-                    Student Attempted: 245
+                    Student Attempted: {exam.student_attempt || 0}
                   </Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: "#222", fontSize: 15 }}
                   >
-                    Correct Attempt: 65%
+                    Correct Attempt: {exam.correct_attempt || 0}%
                   </Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: "#222", fontSize: 15 }}
                   >
-                    Added on: 11/12/2019
+                    Added on: {exam.added_on || ""}
                   </Typography>
                 </Box>
                 {/* Action Row */}
@@ -257,7 +254,7 @@ const ExamsView = () => {
                     }}
                     onClick={() => handleTakeExam(exam)}
                   >
-                    View Details
+                    Take Exam
                   </Button>
                 </Box>
               </Box>
