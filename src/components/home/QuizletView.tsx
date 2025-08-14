@@ -19,21 +19,13 @@ const QuizletView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
-  const getOptions = (currentQuizlet: QuizletModel) => {
-    const options = ["Enhancement survey", "Eagerly", "Relate to", "Approved"];
-    if (!options.includes(currentQuizlet.answer)) {
-      options[Math.floor(Math.random() * 4)] = currentQuizlet.answer;
-    }
-    return options;
-  };
+  const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
     const fetchQuizlets = async () => {
       setLoading(true);
       setError(null);
-      setSelectedOption(null);
+      setShowAnswer(false);
       try {
         if (lessonId) {
           const data = await getQuizletByLessonId(Number(lessonId));
@@ -52,11 +44,11 @@ const QuizletView = () => {
 
   const handleNext = () => {
     setCurrentIdx((idx) => Math.min(quizlets.length - 1, idx + 1));
-    setSelectedOption(null);
+    setShowAnswer(false);
   };
   const handleBack = () => {
     setCurrentIdx((idx) => Math.max(0, idx - 1));
-    setSelectedOption(null);
+    setShowAnswer(false);
   };
 
   return (
@@ -72,7 +64,7 @@ const QuizletView = () => {
               color: "#000000ff",
             }}
           >
-            Lesson Title
+            Lesson Quizlet
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 1.5, mb: 4, flexWrap: "wrap" }}>
@@ -180,6 +172,10 @@ const QuizletView = () => {
             mb: 3,
             bgcolor: "#374151",
             border: "1px solid #4b5563",
+            minHeight: 320,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           {loading ? (
@@ -207,81 +203,64 @@ const QuizletView = () => {
                 variant="body1"
                 sx={{
                   color: "#9ca3af",
-                  mb: 4,
+                  mb: 2,
                   fontSize: "16px",
                 }}
               >
-                Answer the question
+                Answer these questions to test your knowledge
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#fff",
+                  fontWeight: 700,
+                  mb: 4,
+                  fontSize: { xs: 22, sm: 28, md: 32 },
+                  minHeight: 60,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                }}
+              >
+                {quizlets[currentIdx].question}
               </Typography>
 
-              {/* Multiple Choice Options */}
-              <Box
-                sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}
-              >
-                {getOptions(quizlets[currentIdx]).map((option, index) => (
+              {!showAnswer ? (
+                <Box sx={{ textAlign: "center", mb: 3 }}>
                   <Button
-                    key={index}
-                    variant="outlined"
+                    variant="text"
                     sx={{
-                      justifyContent: "flex-start",
-                      borderRadius: 2,
+                      color: "#6366f1",
                       fontWeight: 600,
-                      fontSize: 16,
-                      px: 3,
-                      py: 2.5,
-                      borderColor:
-                        selectedOption === index ? "#3b4fff" : "#4b5563",
-                      bgcolor: selectedOption === index ? "#1e1b4b" : "#2d3748",
-                      color: "#ffffff",
-                      boxShadow:
-                        selectedOption === index
-                          ? "0 0 0 2px rgba(59, 79, 255, 0.3)"
-                          : "none",
+                      fontSize: "16px",
                       textTransform: "none",
-                      textAlign: "left",
-                      "&:hover": {
-                        bgcolor: "#374151",
-                        borderColor: "#6b7280",
-                      },
+                      borderRadius: 2,
                     }}
-                    onClick={() => setSelectedOption(index)}
+                    onClick={() => setShowAnswer(true)}
                   >
-                    <Box
-                      sx={{
-                        minWidth: 32,
-                        height: 32,
-                        borderRadius: "50%",
-                        bgcolor: "#4b5563",
-                        color: "#ffffff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: 700,
-                        mr: 3,
-                        fontSize: "14px",
-                      }}
-                    >
-                      {index + 1}
-                    </Box>
-                    {option}
+                    Do you know?
                   </Button>
-                ))}
-              </Box>
-
-              {/* Bottom text */}
-              <Box sx={{ textAlign: "center", mb: 3 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#6366f1",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
-                >
-                  Do you know?
-                </Typography>
-              </Box>
+                </Box>
+              ) : (
+                <Box sx={{ textAlign: "center", mb: 3 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#22d3ee",
+                      fontWeight: 600,
+                      fontSize: "20px",
+                      border: "1px solid #22d3ee",
+                      borderRadius: 2,
+                      p: 2,
+                      display: "inline-block",
+                      bgcolor: "#1e293b",
+                    }}
+                  >
+                    {quizlets[currentIdx].answer}
+                  </Typography>
+                </Box>
+              )}
 
               {/* Navigation */}
               <Box
