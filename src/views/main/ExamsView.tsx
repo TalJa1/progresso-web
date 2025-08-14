@@ -1,6 +1,17 @@
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
-import { Box, Typography, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAllExams } from "../../apis/lessons/examAPI";
 import type { ExamModel } from "../../services/apiModel";
 
@@ -8,6 +19,9 @@ const ExamsView = () => {
   const [exams, setExams] = useState<ExamModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedExam, setSelectedExam] = useState<ExamModel | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchExams = async () => {
@@ -25,8 +39,21 @@ const ExamsView = () => {
   }, []);
 
   const handleTakeExam = (exam: ExamModel) => {
-    // TODO: Implement exam taking logic or navigation
-    alert(`Take exam: ${exam.name}`);
+    setSelectedExam(exam);
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    setSelectedExam(null);
+  };
+
+  const handleDialogConfirm = () => {
+    if (selectedExam) {
+      navigate(`/exam-process/${selectedExam.id}`);
+    }
+    setOpenDialog(false);
+    setSelectedExam(null);
   };
 
   return (
@@ -262,6 +289,28 @@ const ExamsView = () => {
           </Box>
         )}
       </Box>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>Take Exam</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to take the exam "{selectedExam?.name}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDialogConfirm}
+            color="primary"
+            variant="contained"
+          >
+            Yes, Start
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
