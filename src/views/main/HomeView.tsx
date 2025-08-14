@@ -7,8 +7,6 @@ import {
   Avatar,
   CircularProgress,
   IconButton,
-  Dialog,
-  Slide,
 } from "@mui/material";
 import QuizIcon from "@mui/icons-material/Quiz";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -68,10 +66,6 @@ const HomeView = () => {
     uid: "";
   } | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [quizDialogOpen, setQuizDialogOpen] = useState(false);
-  const [quizDialogLesson, setQuizDialogLesson] = useState<LessonModel | null>(
-    null
-  );
 
   useEffect(() => {
     const googleUser = localStorage.getItem("googleUser");
@@ -305,10 +299,7 @@ const HomeView = () => {
                             bgcolor: "#e3f2fd",
                             "&:hover": { bgcolor: "#bbdefb" },
                           }}
-                          onClick={() => {
-                            setQuizDialogLesson(lesson);
-                            setQuizDialogOpen(true);
-                          }}
+                          onClick={() => navigate(`/quizlet/${lesson.id}`)}
                         >
                           <QuizIcon />
                         </IconButton>
@@ -348,87 +339,7 @@ const HomeView = () => {
                         Learn
                       </Button>
                     )}
-                    {/* Quiz Dialog Animation */}
-                    <Dialog
-                      open={quizDialogOpen}
-                      onClose={() => setQuizDialogOpen(false)}
-                      TransitionComponent={(props) => (
-                        <Slide direction="up" {...props} />
-                      )}
-                      PaperProps={{
-                        sx: {
-                          borderRadius: 4,
-                          minWidth: 340,
-                          maxWidth: 400,
-                          mx: "auto",
-                          mb: 0,
-                          position: "fixed",
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          transform: "translateY(0%)",
-                          animation: quizDialogOpen
-                            ? "moveUpCenter 0.5s cubic-bezier(0.4,0,0.2,1)"
-                            : "none",
-                        },
-                      }}
-                      keepMounted
-                    >
-                      <Box
-                        sx={{
-                          p: 3,
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}
-                      >
-                        <QuizIcon
-                          color="primary"
-                          sx={{ fontSize: 48, mb: 1 }}
-                        />
-                        <Typography
-                          variant="h6"
-                          sx={{ fontWeight: 700, mb: 1, textAlign: "center" }}
-                        >
-                          {quizDialogLesson?.title || "Quiz"}
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{ mb: 2, textAlign: "center" }}
-                        >
-                          Ready to test your knowledge for this lesson?
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          sx={{
-                            borderRadius: 2,
-                            fontWeight: 700,
-                            fontSize: 16,
-                            py: 1,
-                            px: 4,
-                            mb: 1,
-                          }}
-                          onClick={() => {
-                            setQuizDialogOpen(false);
-                            if (quizDialogLesson) {
-                              navigate(`/exam/${quizDialogLesson.id}`);
-                            }
-                          }}
-                        >
-                          Start Quiz
-                        </Button>
-                        <Button
-                          variant="text"
-                          color="secondary"
-                          sx={{ mt: 1, fontWeight: 700 }}
-                          onClick={() => setQuizDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
-                    </Dialog>
-                    {/* Animation keyframes for dialog */}
+
                     <style>{`
         @keyframes moveUpCenter {
           0% { transform: translateY(100%); opacity: 0; }
