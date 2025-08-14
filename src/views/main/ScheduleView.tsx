@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import {
   Box,
@@ -22,9 +23,16 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import EventIcon from "@mui/icons-material/Event";
+import GroupsIcon from "@mui/icons-material/Groups";
+import InfoIcon from "@mui/icons-material/Info";
 import { ScheduleIcon } from "../../services/scheduleCreateIcon";
 import { getUserByEmail } from "../../apis/users/usersAPI";
-import { getSchedulesByUser, createSchedule } from "../../apis/schedules/scheduleApi";
+import {
+  getSchedulesByUser,
+  createSchedule,
+} from "../../apis/schedules/scheduleApi";
 import type { ScheduleModel } from "../../services/apiModel";
 
 const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event"];
@@ -51,6 +59,24 @@ const ScheduleView = () => {
     start_time: "",
     event_date: "",
   });
+
+  // Animation direction for dialog
+  const [dialogDirection, setDialogDirection] = useState<
+    "left" | "right" | "top" | "bottom"
+  >("left");
+  useEffect(() => {
+    if (infoOpen) {
+      const directions = ["left", "right", "top", "bottom"];
+      // Pick a random direction each time dialog opens
+      setDialogDirection(
+        directions[Math.floor(Math.random() * directions.length)] as
+          | "left"
+          | "right"
+          | "top"
+          | "bottom"
+      );
+    }
+  }, [infoOpen]);
   const [eventsByDate, setEventsByDate] = useState<{
     [date: string]: ScheduleModel[];
   }>({});
@@ -99,7 +125,7 @@ const ScheduleView = () => {
 
   const calendarCells: (number | null)[] = [];
   for (let i = 0; i < firstDayOfWeek; i++) {
-    calendarCells.push(null); // Empty cells before 1st
+    calendarCells.push(null);
   }
   for (let d = 1; d <= daysInMonth; d++) {
     calendarCells.push(d);
@@ -126,7 +152,6 @@ const ScheduleView = () => {
     }
   };
 
-  // Handle create event dialog
   const handleDateClick = (day: number | null) => {
     if (!day) return;
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(
@@ -178,7 +203,7 @@ const ScheduleView = () => {
       setScheduleCountByDate(count);
       setEventsByDate(events);
     } catch {
-      alert('Failed to create schedule. Please try again later.');
+      alert("Failed to create schedule. Please try again later.");
     }
   };
 
@@ -234,7 +259,26 @@ const ScheduleView = () => {
         <Dialog
           open={infoOpen}
           onClose={handleInfoClose}
-          PaperProps={{ sx: { borderRadius: 4, minWidth: 340, p: 0 } }}
+          PaperProps={{
+            sx: { borderRadius: 4, minWidth: 340, p: 0, overflow: "visible" },
+            component: motion.div,
+            initial: (() => {
+              switch (dialogDirection) {
+                case "left":
+                  return { x: -100, opacity: 0 };
+                case "right":
+                  return { x: 100, opacity: 0 };
+                case "top":
+                  return { y: -100, opacity: 0 };
+                case "bottom":
+                  return { y: 100, opacity: 0 };
+                default:
+                  return { opacity: 0 };
+              }
+            })(),
+            animate: { x: 0, y: 0, opacity: 1 },
+            transition: { type: "spring", stiffness: 200, damping: 40 },
+          }}
         >
           <DialogTitle
             sx={{ fontWeight: 700, fontSize: 20, textAlign: "center", pt: 3 }}
@@ -245,24 +289,76 @@ const ScheduleView = () => {
             {infoDate &&
             eventsByDate[infoDate] &&
             eventsByDate[infoDate].length > 0 ? (
-              eventsByDate[infoDate].map((event, idx) => (
-                <Box
-                  key={idx}
-                  sx={{
-                    mb: 2,
-                    p: 2,
-                    border: "1px solid #eee",
-                    borderRadius: 2,
-                    bgcolor: "#fafbfc",
-                  }}
-                >
-                  <Typography fontWeight={700}>{event.title}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {event.type} | {event.start_time}
-                  </Typography>
-                  <Typography variant="body2">{event.description}</Typography>
-                </Box>
-              ))
+              eventsByDate[infoDate].map((event, idx) => {
+                // Icon and color mapping per event type
+                let icon = null;
+                let cardColor = "#f5f7ff";
+                let titleColor = "#222";
+                switch (event.type) {
+                  case "Homework":
+                    icon = (
+                      <MenuBookIcon sx={{ fontSize: 32, color: "#1976d2" }} />
+                    );
+                    cardColor = "#f5f7ff";
+                    titleColor = "#1976d2";
+                    break;
+                  case "Exam":
+                    icon = (
+                      <EventIcon sx={{ fontSize: 32, color: "#ff9800" }} />
+                    );
+                    cardColor = "#fff7ed";
+                    titleColor = "#ff9800";
+                    break;
+                  case "Meeting":
+                    icon = (
+                      <GroupsIcon sx={{ fontSize: 32, color: "#43a047" }} />
+                    );
+                    cardColor = "#f3f9f4";
+                    titleColor = "#43a047";
+                    break;
+                  default:
+                    icon = <InfoIcon sx={{ fontSize: 32, color: "#90a4ae" }} />;
+                    cardColor = "#f5f5f5";
+                    titleColor = "#222";
+                }
+                return (
+                  <Box
+                    key={idx}
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      borderRadius: 3,
+                      bgcolor: cardColor,
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      boxShadow: "0 2px 8px 0 rgba(60,72,100,0.06)",
+                    }}
+                  >
+                    <Box sx={{ mt: 0.5 }}>{icon}</Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        fontWeight={700}
+                        fontSize={18}
+                        color={titleColor}
+                        sx={{ mb: 0.5 }}
+                      >
+                        {event.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 500, mb: 0.5 }}
+                      >
+                        {event.type} | {event.start_time}
+                      </Typography>
+                      <Typography variant="body2" color="#444">
+                        {event.description}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })
             ) : (
               <Typography color="text.secondary">
                 No events for this date.
@@ -414,11 +510,16 @@ const ScheduleView = () => {
             })
           )}
         </Box>
-        {/* Create Schedule Dialog */}
         <Dialog
           open={createOpen}
           onClose={handleCreateClose}
-          PaperProps={{ sx: { borderRadius: 4, minWidth: 340, p: 0 } }}
+          PaperProps={{
+            sx: { borderRadius: 4, minWidth: 340, p: 0 },
+            component: motion.div,
+            initial: { y: 100, opacity: 0 },
+            animate: { y: 0, opacity: 1 },
+            transition: { type: "spring", stiffness: 200, damping: 40 },
+          }}
         >
           <DialogTitle
             sx={{ fontWeight: 700, fontSize: 22, textAlign: "center", pt: 3 }}
@@ -551,7 +652,13 @@ const ScheduleView = () => {
                 variant="contained"
                 sx={{ minWidth: 100, fontWeight: 700 }}
                 onClick={handleCreateSubmit}
-                disabled={!form.title}
+                disabled={
+                  !form.title ||
+                  !form.description ||
+                  !form.type ||
+                  !form.start_time ||
+                  !form.event_date
+                }
               >
                 Create
               </Button>
