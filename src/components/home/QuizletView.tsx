@@ -11,35 +11,43 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import { getQuizletByLessonId } from "../../apis/lessons/lessonQuizletAPI";
-import type { QuizletModel } from "../../services/apiModel";
+import { getLessonById } from "../../apis/lessons/lessonAPI";
+import type { QuizletModel, LessonModel } from "../../services/apiModel";
 
 const QuizletView = () => {
   const { lessonId } = useParams();
   const [quizlets, setQuizlets] = useState<QuizletModel[]>([]);
+  const [lesson, setLesson] = useState<LessonModel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
-    const fetchQuizlets = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       setShowAnswer(false);
       try {
         if (lessonId) {
-          const data = await getQuizletByLessonId(Number(lessonId));
-          setQuizlets(data);
+          const [quizletData, lessonData] = await Promise.all([
+            getQuizletByLessonId(Number(lessonId)),
+            getLessonById(Number(lessonId)),
+          ]);
+          setQuizlets(quizletData);
+          setLesson(lessonData);
         } else {
           setQuizlets([]);
+          setLesson(null);
         }
       } catch {
-        setError("Failed to load quiz questions.");
+        setError("Failed to load quiz or lesson data.");
         setQuizlets([]);
+        setLesson(null);
       }
       setLoading(false);
     };
-    fetchQuizlets();
+    fetchData();
   }, [lessonId]);
 
   const handleNext = () => {
@@ -64,7 +72,7 @@ const QuizletView = () => {
               color: "#000000ff",
             }}
           >
-            Lesson Quizlet
+            {lesson?.title} quizlet
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 1.5, mb: 4, flexWrap: "wrap" }}>
