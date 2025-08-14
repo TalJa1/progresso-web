@@ -79,3 +79,16 @@ export interface ExamModel {
   added_on: string
   id: number
 }
+
+export interface QuestionModel {
+  id: number
+  content: string
+  type: string
+  answers: AnswerModel[]
+}
+
+export interface AnswerModel {
+  id: number
+  content: string
+  is_correct: boolean
+}
