@@ -11,6 +11,9 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import { motion } from "framer-motion";
 
 const ExamProcessView = () => {
   const { examId } = useParams<{ examId: string }>();
@@ -64,14 +67,27 @@ const ExamProcessView = () => {
     questions.forEach((q) => {
       const answers = q.answers || [];
       if (q.type === "multiple") {
-        const correctIds = answers.filter((a) => a.is_correct).map((a) => a.id.toString());
+        const correctIds = answers
+          .filter((a) => a.is_correct)
+          .map((a) => a.id.toString());
         const numCorrect = correctIds.length;
         if (numCorrect === 0) return;
-        const selectedArr: string[] = Array.isArray(q.selected) ? q.selected : q.selected ? [q.selected as string] : [];
-        const correctSelectedCount = selectedArr.filter((id) => correctIds.includes(id)).length;
+        const selectedArr: string[] = Array.isArray(q.selected)
+          ? q.selected
+          : q.selected
+          ? [q.selected as string]
+          : [];
+        const correctSelectedCount = selectedArr.filter((id) =>
+          correctIds.includes(id)
+        ).length;
         total += correctSelectedCount / numCorrect;
       } else {
-        const selected = typeof q.selected === "string" ? q.selected : Array.isArray(q.selected) && q.selected.length ? q.selected[0] : "";
+        const selected =
+          typeof q.selected === "string"
+            ? q.selected
+            : Array.isArray(q.selected) && q.selected.length
+            ? q.selected[0]
+            : "";
         if (answers.some((a) => a.is_correct && a.id.toString() === selected)) {
           total += 1;
         }
@@ -112,6 +128,38 @@ const ExamProcessView = () => {
         height: "100vh",
       }}
     >
+      {/* Animated fixed score box (top-right) */}
+      {submitted && (
+        <motion.div
+          initial={{ x: 200, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 100 }}
+          style={{ position: "fixed", top: 24, right: 24, zIndex: 1400 }}
+        >
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Your Score
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 900, color: "#7c3aed" }}>
+              {score}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#9ca3af" }}>
+              / {questions.length}
+            </Typography>
+          </Box>
+        </motion.div>
+      )}
       <Box
         sx={{
           flexDirection: "row",
@@ -348,9 +396,29 @@ const ExamProcessView = () => {
                                     ? "1.5px solid #a78bfa"
                                     : "1.5px solid #e5e7eb",
                                 width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
                               }}
                             >
-                              {ans.content}
+                              <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                {ans.content}
+                              </Box>
+                              {submitted &&
+                              Array.isArray(questions[currentIdx].selected) &&
+                              questions[currentIdx].selected.includes(
+                                ans.id.toString()
+                              ) ? (
+                                ans.is_correct ? (
+                                  <CheckCircleOutlineIcon
+                                    sx={{ color: "#16a34a", ml: 2 }}
+                                  />
+                                ) : (
+                                  <CancelOutlinedIcon
+                                    sx={{ color: "#ef4444", ml: 2 }}
+                                  />
+                                )
+                              ) : null}
                             </Box>
                           }
                           sx={{
@@ -410,9 +478,27 @@ const ExamProcessView = () => {
                                     ? "1.5px solid #a78bfa"
                                     : "1.5px solid #e5e7eb",
                                 width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
                               }}
                             >
-                              {ans.content}
+                              <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                {ans.content}
+                              </Box>
+                              {submitted &&
+                              questions[currentIdx].selected ===
+                                ans.id.toString() ? (
+                                ans.is_correct ? (
+                                  <CheckCircleOutlineIcon
+                                    sx={{ color: "#16a34a", ml: 2 }}
+                                  />
+                                ) : (
+                                  <CancelOutlinedIcon
+                                    sx={{ color: "#ef4444", ml: 2 }}
+                                  />
+                                )
+                              ) : null}
                             </Box>
                           }
                           sx={{
@@ -520,13 +606,6 @@ const ExamProcessView = () => {
                 >
                   Finish
                 </Button>
-                {submitted && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      Score: {score} / {questions.length}
-                    </Typography>
-                  </Box>
-                )}
               </Box>
             </>
           )}
