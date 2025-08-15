@@ -16,6 +16,10 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContentText from "@mui/material/DialogContentText";
+import { chatWithGemini } from "../../apis/aichatApi";
+import ReactMarkdown from "react-markdown";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -53,6 +57,10 @@ const ExamProcessView = () => {
   const [questionCorrect, setQuestionCorrect] = useState<
     Record<number, boolean>
   >({});
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -107,7 +115,6 @@ const ExamProcessView = () => {
           correctIds.includes(id)
         ).length;
         total += correctSelectedCount / numCorrect;
-        // fully correct if selected exactly matches correctIds (no extras) and lengths equal
         const allCorrectSelected =
           selectedArr.length === correctIds.length &&
           correctIds.every((cid) => selectedArr.includes(cid));
@@ -139,7 +146,6 @@ const ExamProcessView = () => {
     }
   }, [timeLeft, submitted, computeScore]);
 
-  // close confirm dialog and clear timer when submitted
   useEffect(() => {
     if (submitted) {
       setShowConfirm(false);
@@ -179,6 +185,24 @@ const ExamProcessView = () => {
       rotateY: dir === -1 ? 8 : 0,
       scale: 0.99,
     }),
+  };
+
+  const getAiText = () => {
+    if (!aiResponse) return "";
+    try {
+      const parsed = JSON.parse(aiResponse);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        "reply" in (parsed as Record<string, unknown>)
+      ) {
+        const r = (parsed as Record<string, unknown>)["reply"];
+        return typeof r === "string" ? r : JSON.stringify(r, null, 2);
+      }
+    } catch {
+      // not JSON, fall through
+    }
+    return aiResponse;
   };
 
   if (loading) return <div>Loading questions...</div>;
@@ -422,7 +446,50 @@ const ExamProcessView = () => {
                       {submitted &&
                       questionCorrect[questions[currentIdx].id] === false ? (
                         <Tooltip title="Ask AI for explanation">
-                          <IconButton size="small" color="default">
+                          <IconButton
+                            size="small"
+                            color="default"
+                            onClick={async () => {
+                              setAiLoading(true);
+                              setAiError(null);
+                              setAiResponse(null);
+                              setAiOpen(true);
+                              try {
+                                const parts: string[] = [];
+                                const q = questions[currentIdx];
+                                if (!q) {
+                                  setAiError("Question not available");
+                                  return;
+                                }
+                                parts.push(`Q${currentIdx + 1}: ${q.content}`);
+                                q.answers.forEach((a) => {
+                                  const selected = Array.isArray(q.selected)
+                                    ? q.selected.includes(a.id.toString())
+                                    : q.selected === a.id.toString();
+                                  parts.push(
+                                    `- ${a.content}${
+                                      selected ? " (selected)" : ""
+                                    }`
+                                  );
+                                });
+                                parts.push("Answer and explain in very short");
+                                const message = parts.join("\n");
+                                const res = await chatWithGemini(message);
+                                setAiResponse(
+                                  typeof res === "string"
+                                    ? res
+                                    : JSON.stringify(res)
+                                );
+                              } catch (e: unknown) {
+                                let msg: string;
+                                if (e instanceof Error) msg = e.message;
+                                else msg = String(e);
+                                setAiError(msg || "AI request failed");
+                              } finally {
+                                setAiLoading(false);
+                              }
+                            }}
+                          >
                             <SmartToyIcon />
                           </IconButton>
                         </Tooltip>
@@ -772,6 +839,53 @@ const ExamProcessView = () => {
                       sx={{ textTransform: "none", borderRadius: 2 }}
                     >
                       Submit
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                {/* AI response dialog */}
+                <Dialog
+                  open={aiOpen}
+                  onClose={() => setAiOpen(false)}
+                  fullWidth
+                  maxWidth="sm"
+                  PaperProps={{ sx: { borderRadius: 2 } }}
+                >
+                  <DialogTitle>AI Explanation</DialogTitle>
+                  <DialogContent dividers>
+                    {aiLoading ? (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                      >
+                        <CircularProgress size={24} />
+                        <Typography>Thinking...</Typography>
+                      </Box>
+                    ) : aiError ? (
+                      <DialogContentText sx={{ color: "error.main" }}>
+                        {aiError}
+                      </DialogContentText>
+                    ) : (
+                      <Box
+                        sx={{
+                          "& pre": {
+                            background: "#f3f4f6",
+                            p: 2,
+                            borderRadius: 1,
+                          },
+                          "& code": {
+                            background: "#eef2ff",
+                            p: "2px 6px",
+                            borderRadius: "6px",
+                          },
+                        }}
+                      >
+                        <ReactMarkdown>{getAiText()}</ReactMarkdown>
+                      </Box>
+                    )}
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setAiOpen(false)} color="primary">
+                      Close
                     </Button>
                   </DialogActions>
                 </Dialog>
