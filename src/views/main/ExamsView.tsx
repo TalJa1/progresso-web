@@ -1,4 +1,5 @@
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
+import React from "react";
 import {
   Box,
   Typography,
@@ -9,11 +10,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Slide
 } from "@mui/material";
+import type { TransitionProps } from '@mui/material/transitions';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllExams } from "../../apis/lessons/examAPI";
 import type { ExamModel } from "../../services/apiModel";
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & { children: React.ReactElement },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="left" ref={ref} {...props} />;
+});
 
 const ExamsView = () => {
   const [exams, setExams] = useState<ExamModel[]>([]);
@@ -21,6 +31,8 @@ const ExamsView = () => {
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamModel | null>(null);
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const [redirectText, setRedirectText] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,16 +56,28 @@ const ExamsView = () => {
   };
 
   const handleDialogClose = () => {
-    setOpenDialog(false);
-    setSelectedExam(null);
+    if (!dialogLoading) {
+      setOpenDialog(false);
+      setSelectedExam(null);
+      setRedirectText("");
+    }
   };
 
   const handleDialogConfirm = () => {
-    if (selectedExam) {
-      navigate(`/exam-process/${selectedExam.id}`);
-    }
-    setOpenDialog(false);
-    setSelectedExam(null);
+    setDialogLoading(true);
+    setRedirectText("");
+    setTimeout(() => {
+      setRedirectText("Redirecting to exam...");
+      setTimeout(() => {
+        if (selectedExam) {
+          navigate(`/exam-process/${selectedExam.id}`);
+        }
+        setDialogLoading(false);
+        setOpenDialog(false);
+        setSelectedExam(null);
+        setRedirectText("");
+      }, 2000);
+    }, 3000);
   };
 
   return (
@@ -291,23 +315,34 @@ const ExamsView = () => {
       </Box>
 
       {/* Confirmation Dialog */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>Take Exam</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        TransitionComponent={Transition}
+        keepMounted
+        aria-describedby="exam-confirmation-dialog"
+      >
+        <DialogTitle>Do you want to do this exam?</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to take the exam "{selectedExam?.name}"?
+          <DialogContentText id="exam-confirmation-dialog">
+            {selectedExam?.name}
           </DialogContentText>
+          {redirectText && (
+            <Typography sx={{ mt: 2, color: 'green', fontWeight: 500 }}>{redirectText}</Typography>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="inherit">
+          <Button onClick={handleDialogClose} color="inherit" disabled={dialogLoading}>
             Cancel
           </Button>
           <Button
             onClick={handleDialogConfirm}
             color="primary"
             variant="contained"
+            disabled={dialogLoading}
+            startIcon={dialogLoading ? <CircularProgress size={18} color="inherit" /> : null}
           >
-            Yes, Start
+            {dialogLoading ? "Loading..." : "Yes, Start"}
           </Button>
         </DialogActions>
       </Dialog>
