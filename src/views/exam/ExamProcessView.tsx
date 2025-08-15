@@ -13,7 +13,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ExamProcessView = () => {
   const { examId } = useParams<{ examId: string }>();
@@ -23,6 +23,8 @@ const ExamProcessView = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [direction, setDirection] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes in seconds
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [score, setScore] = useState<number | null>(null);
@@ -59,7 +61,6 @@ const ExamProcessView = () => {
     };
   }, []);
 
-  // compute score: single choice = 1 point for correct; multiple choice = sum(1/numCorrect per correct selected)
   const computeScore = useRef<() => void | null>(null);
   computeScore.current = () => {
     if (submitted) return;
@@ -97,7 +98,6 @@ const ExamProcessView = () => {
     setSubmitted(true);
   };
 
-  // When timer reaches 0, auto-submit and compute score
   useEffect(() => {
     if (timeLeft === 0 && !submitted && computeScore.current) {
       computeScore.current();
@@ -112,8 +112,39 @@ const ExamProcessView = () => {
     return `${m}:${s}`;
   };
 
+  const motionVariants = {
+    enter: (dir: number) => ({
+      x: dir === 1 ? 40 : -40,
+      opacity: 0,
+      filter: dir === 1 ? "blur(4px)" : "blur(0px)",
+      rotateY: dir === -1 ? -8 : 0,
+      scale: 0.99,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      rotateY: 0,
+      scale: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir === 1 ? -40 : 40,
+      opacity: 0,
+      filter: dir === 1 ? "blur(4px)" : "blur(0px)",
+      rotateY: dir === -1 ? 8 : 0,
+      scale: 0.99,
+    }),
+  };
+
   if (loading) return <div>Loading questions...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
+
+  const goToIndex = (newIdx: number, dir: number) => {
+    if (isAnimating) return;
+    setDirection(dir);
+    setIsAnimating(true);
+    setCurrentIdx(newIdx);
+  };
 
   return (
     <Box
@@ -128,7 +159,6 @@ const ExamProcessView = () => {
         height: "100vh",
       }}
     >
-      {/* Animated fixed score box (top-right) */}
       {submitted && (
         <motion.div
           initial={{ x: 200, opacity: 0 }}
@@ -317,205 +347,234 @@ const ExamProcessView = () => {
                 </Box>
               </Box>
               {/* Question */}
-              <Box sx={{ mb: 3, px: 15, widows: "100%" }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ color: "#a3a3a3", fontWeight: 600, mb: 1 }}
+              <AnimatePresence
+                mode="wait"
+                onExitComplete={() => setIsAnimating(false)}
+              >
+                <motion.div
+                  key={questions[currentIdx].id}
+                  custom={direction}
+                  variants={motionVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ width: "100%" }}
                 >
-                  Question {currentIdx + 1}
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{ mb: 3, color: "#222", fontWeight: 700 }}
-                >
-                  {questions[currentIdx].content}
-                </Typography>
-                <FormControl component="fieldset" sx={{ width: "100%" }}>
-                  {questions[currentIdx].type === "multiple" ? (
-                    <>
-                      {questions[currentIdx].answers.map((ans) => (
-                        <FormControlLabel
-                          key={ans.id}
-                          control={
-                            <Checkbox
-                              disabled={submitted}
-                              checked={
-                                Array.isArray(questions[currentIdx].selected) &&
-                                questions[currentIdx].selected.includes(
-                                  ans.id.toString()
-                                )
-                              }
-                              onChange={(_, checked) => {
-                                setQuestions((prev) =>
-                                  prev.map((q, idx) => {
-                                    if (idx !== currentIdx) return q;
-                                    let selectedArr = Array.isArray(q.selected)
-                                      ? [...q.selected]
-                                      : [];
-                                    if (checked) {
-                                      selectedArr.push(ans.id.toString());
-                                    } else {
-                                      selectedArr = selectedArr.filter(
-                                        (id) => id !== ans.id.toString()
-                                      );
-                                    }
-                                    return { ...q, selected: selectedArr };
-                                  })
-                                );
-                              }}
-                              sx={{
-                                color: "#a78bfa",
-                                "&.Mui-checked": { color: "#7c3aed" },
-                              }}
-                            />
-                          }
-                          label={
-                            <Box
-                              sx={{
-                                px: 2,
-                                py: 1,
-                                borderRadius: 2,
-                                bgcolor:
-                                  Array.isArray(
-                                    questions[currentIdx].selected
-                                  ) &&
-                                  questions[currentIdx].selected.includes(
-                                    ans.id.toString()
-                                  )
-                                    ? "#f5f3ff"
-                                    : "#fff",
-                                fontWeight: 600,
-                                color: "#4b5563",
-                                border:
-                                  Array.isArray(
-                                    questions[currentIdx].selected
-                                  ) &&
-                                  questions[currentIdx].selected.includes(
-                                    ans.id.toString()
-                                  )
-                                    ? "1.5px solid #a78bfa"
-                                    : "1.5px solid #e5e7eb",
-                                width: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Box component="span" sx={{ pr: 1, flex: 1 }}>
-                                {ans.content}
-                              </Box>
-                              {submitted &&
-                              Array.isArray(questions[currentIdx].selected) &&
-                              questions[currentIdx].selected.includes(
-                                ans.id.toString()
-                              ) ? (
-                                ans.is_correct ? (
-                                  <CheckCircleOutlineIcon
-                                    sx={{ color: "#16a34a", ml: 2 }}
-                                  />
-                                ) : (
-                                  <CancelOutlinedIcon
-                                    sx={{ color: "#ef4444", ml: 2 }}
-                                  />
-                                )
-                              ) : null}
-                            </Box>
-                          }
-                          sx={{
-                            mb: 1,
-                            width: "100%",
-                            mx: 0,
-                            display: "flex",
-                            alignItems: "center",
-                            px: 0,
-                            // make the label element take remaining width
-                            "& .MuiFormControlLabel-label": { width: "100%" },
-                          }}
-                        />
-                      ))}
-                    </>
-                  ) : (
-                    <RadioGroup
-                      name={`question-${questions[currentIdx].id}`}
-                      value={questions[currentIdx].selected || ""}
-                      onChange={(_, value) => {
-                        setQuestions((prev) =>
-                          prev.map((q, idx) =>
-                            idx === currentIdx ? { ...q, selected: value } : q
-                          )
-                        );
-                      }}
+                  <Box sx={{ mb: 3, px: 15, widows: "100%" }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: "#a3a3a3", fontWeight: 600, mb: 1 }}
                     >
-                      {questions[currentIdx].answers.map((ans) => (
-                        <FormControlLabel
-                          key={ans.id}
-                          value={ans.id.toString()}
-                          control={
-                            <Radio
-                              disabled={submitted}
+                      Question {currentIdx + 1}
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{ mb: 3, color: "#222", fontWeight: 700 }}
+                    >
+                      {questions[currentIdx].content}
+                    </Typography>
+                    <FormControl component="fieldset" sx={{ width: "100%" }}>
+                      {questions[currentIdx].type === "multiple" ? (
+                        <>
+                          {questions[currentIdx].answers.map((ans) => (
+                            <FormControlLabel
+                              key={ans.id}
+                              control={
+                                <Checkbox
+                                  disabled={submitted}
+                                  checked={
+                                    Array.isArray(
+                                      questions[currentIdx].selected
+                                    ) &&
+                                    questions[currentIdx].selected.includes(
+                                      ans.id.toString()
+                                    )
+                                  }
+                                  onChange={(_, checked) => {
+                                    setQuestions((prev) =>
+                                      prev.map((q, idx) => {
+                                        if (idx !== currentIdx) return q;
+                                        let selectedArr = Array.isArray(
+                                          q.selected
+                                        )
+                                          ? [...q.selected]
+                                          : [];
+                                        if (checked) {
+                                          selectedArr.push(ans.id.toString());
+                                        } else {
+                                          selectedArr = selectedArr.filter(
+                                            (id) => id !== ans.id.toString()
+                                          );
+                                        }
+                                        return { ...q, selected: selectedArr };
+                                      })
+                                    );
+                                  }}
+                                  sx={{
+                                    color: "#a78bfa",
+                                    "&.Mui-checked": { color: "#7c3aed" },
+                                  }}
+                                />
+                              }
+                              label={
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    bgcolor:
+                                      Array.isArray(
+                                        questions[currentIdx].selected
+                                      ) &&
+                                      questions[currentIdx].selected.includes(
+                                        ans.id.toString()
+                                      )
+                                        ? "#f5f3ff"
+                                        : "#fff",
+                                    fontWeight: 600,
+                                    color: "#4b5563",
+                                    border:
+                                      Array.isArray(
+                                        questions[currentIdx].selected
+                                      ) &&
+                                      questions[currentIdx].selected.includes(
+                                        ans.id.toString()
+                                      )
+                                        ? "1.5px solid #a78bfa"
+                                        : "1.5px solid #e5e7eb",
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                    {ans.content}
+                                  </Box>
+                                  {submitted &&
+                                  Array.isArray(
+                                    questions[currentIdx].selected
+                                  ) &&
+                                  questions[currentIdx].selected.includes(
+                                    ans.id.toString()
+                                  ) ? (
+                                    ans.is_correct ? (
+                                      <CheckCircleOutlineIcon
+                                        sx={{ color: "#16a34a", ml: 2 }}
+                                      />
+                                    ) : (
+                                      <CancelOutlinedIcon
+                                        sx={{ color: "#ef4444", ml: 2 }}
+                                      />
+                                    )
+                                  ) : null}
+                                </Box>
+                              }
                               sx={{
-                                color: "#a78bfa",
-                                "&.Mui-checked": { color: "#7c3aed" },
-                              }}
-                            />
-                          }
-                          label={
-                            <Box
-                              sx={{
-                                px: 2,
-                                py: 1,
-                                borderRadius: 2,
-                                bgcolor:
-                                  questions[currentIdx].selected ===
-                                  ans.id.toString()
-                                    ? "#f5f3ff"
-                                    : "#fff",
-                                fontWeight: 600,
-                                color: "#4b5563",
-                                border:
-                                  questions[currentIdx].selected ===
-                                  ans.id.toString()
-                                    ? "1.5px solid #a78bfa"
-                                    : "1.5px solid #e5e7eb",
+                                mb: 1,
                                 width: "100%",
+                                mx: 0,
                                 display: "flex",
                                 alignItems: "center",
-                                justifyContent: "space-between",
+                                px: 0,
+                                // make the label element take remaining width
+                                "& .MuiFormControlLabel-label": {
+                                  width: "100%",
+                                },
                               }}
-                            >
-                              <Box component="span" sx={{ pr: 1, flex: 1 }}>
-                                {ans.content}
-                              </Box>
-                              {submitted &&
-                              questions[currentIdx].selected ===
-                                ans.id.toString() ? (
-                                ans.is_correct ? (
-                                  <CheckCircleOutlineIcon
-                                    sx={{ color: "#16a34a", ml: 2 }}
-                                  />
-                                ) : (
-                                  <CancelOutlinedIcon
-                                    sx={{ color: "#ef4444", ml: 2 }}
-                                  />
-                                )
-                              ) : null}
-                            </Box>
-                          }
-                          sx={{
-                            mb: 1,
-                            width: "100%",
-                            mx: 0,
-                            display: "flex",
-                            alignItems: "center",
-                            px: 0,
-                            "& .MuiFormControlLabel-label": { width: "100%" },
+                            />
+                          ))}
+                        </>
+                      ) : (
+                        <RadioGroup
+                          name={`question-${questions[currentIdx].id}`}
+                          value={questions[currentIdx].selected || ""}
+                          onChange={(_, value) => {
+                            setQuestions((prev) =>
+                              prev.map((q, idx) =>
+                                idx === currentIdx
+                                  ? { ...q, selected: value }
+                                  : q
+                              )
+                            );
                           }}
-                        />
-                      ))}
-                    </RadioGroup>
-                  )}
-                </FormControl>
-              </Box>
+                        >
+                          {questions[currentIdx].answers.map((ans) => (
+                            <FormControlLabel
+                              key={ans.id}
+                              value={ans.id.toString()}
+                              control={
+                                <Radio
+                                  disabled={submitted}
+                                  sx={{
+                                    color: "#a78bfa",
+                                    "&.Mui-checked": { color: "#7c3aed" },
+                                  }}
+                                />
+                              }
+                              label={
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    bgcolor:
+                                      questions[currentIdx].selected ===
+                                      ans.id.toString()
+                                        ? "#f5f3ff"
+                                        : "#fff",
+                                    fontWeight: 600,
+                                    color: "#4b5563",
+                                    border:
+                                      questions[currentIdx].selected ===
+                                      ans.id.toString()
+                                        ? "1.5px solid #a78bfa"
+                                        : "1.5px solid #e5e7eb",
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                    {ans.content}
+                                  </Box>
+                                  {submitted &&
+                                  questions[currentIdx].selected ===
+                                    ans.id.toString() ? (
+                                    ans.is_correct ? (
+                                      <CheckCircleOutlineIcon
+                                        sx={{ color: "#16a34a", ml: 2 }}
+                                      />
+                                    ) : (
+                                      <CancelOutlinedIcon
+                                        sx={{ color: "#ef4444", ml: 2 }}
+                                      />
+                                    )
+                                  ) : null}
+                                </Box>
+                              }
+                              sx={{
+                                mb: 1,
+                                width: "100%",
+                                mx: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                px: 0,
+                                "& .MuiFormControlLabel-label": {
+                                  width: "100%",
+                                },
+                              }}
+                            />
+                          ))}
+                        </RadioGroup>
+                      )}
+                    </FormControl>
+                  </Box>
+                </motion.div>
+              </AnimatePresence>
+
               {/* Navigation */}
               <Box
                 sx={{
@@ -528,8 +587,8 @@ const ExamProcessView = () => {
                 <Box sx={{ display: "flex", gap: 2 }}>
                   <Button
                     variant="outlined"
-                    disabled={currentIdx === 0}
-                    onClick={() => setCurrentIdx((idx) => Math.max(0, idx - 1))}
+                    disabled={currentIdx === 0 || isAnimating}
+                    onClick={() => goToIndex(Math.max(0, currentIdx - 1), -1)}
                     sx={{
                       borderRadius: 20,
                       px: 4,
@@ -557,10 +616,13 @@ const ExamProcessView = () => {
                   </Button>
                   <Button
                     variant="outlined"
-                    disabled={currentIdx === questions.length - 1}
+                    disabled={
+                      currentIdx === questions.length - 1 || isAnimating
+                    }
                     onClick={() =>
-                      setCurrentIdx((idx) =>
-                        Math.min(questions.length - 1, idx + 1)
+                      goToIndex(
+                        Math.min(questions.length - 1, currentIdx + 1),
+                        1
                       )
                     }
                     sx={{
