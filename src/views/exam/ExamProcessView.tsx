@@ -13,6 +13,9 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -47,6 +50,9 @@ const ExamProcessView = () => {
   const [score, setScore] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [questionCorrect, setQuestionCorrect] = useState<
+    Record<number, boolean>
+  >({});
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -83,6 +89,7 @@ const ExamProcessView = () => {
   computeScore.current = () => {
     if (submitted) return;
     let total = 0;
+    const resultMap: Record<number, boolean> = {};
     questions.forEach((q) => {
       const answers = q.answers || [];
       if (q.type === "multiple") {
@@ -100,6 +107,11 @@ const ExamProcessView = () => {
           correctIds.includes(id)
         ).length;
         total += correctSelectedCount / numCorrect;
+        // fully correct if selected exactly matches correctIds (no extras) and lengths equal
+        const allCorrectSelected =
+          selectedArr.length === correctIds.length &&
+          correctIds.every((cid) => selectedArr.includes(cid));
+        resultMap[q.id] = allCorrectSelected;
       } else {
         const selected =
           typeof q.selected === "string"
@@ -107,12 +119,17 @@ const ExamProcessView = () => {
             : Array.isArray(q.selected) && q.selected.length
             ? q.selected[0]
             : "";
-        if (answers.some((a) => a.is_correct && a.id.toString() === selected)) {
+        const isCorrect = answers.some(
+          (a) => a.is_correct && a.id.toString() === selected
+        );
+        if (isCorrect) {
           total += 1;
         }
+        resultMap[q.id] = isCorrect;
       }
     });
     setScore(Number(total.toFixed(2)));
+    setQuestionCorrect(resultMap);
     setSubmitted(true);
   };
 
@@ -388,12 +405,29 @@ const ExamProcessView = () => {
                   style={{ width: "100%" }}
                 >
                   <Box sx={{ mb: 3, px: 15, widows: "100%" }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ color: "#a3a3a3", fontWeight: 600, mb: 1 }}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 1,
+                      }}
                     >
-                      Question {currentIdx + 1}
-                    </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "#a3a3a3", fontWeight: 600 }}
+                      >
+                        Question {currentIdx + 1}
+                      </Typography>
+                      {submitted &&
+                      questionCorrect[questions[currentIdx].id] === false ? (
+                        <Tooltip title="Ask AI for explanation">
+                          <IconButton size="small" color="default">
+                            <SmartToyIcon />
+                          </IconButton>
+                        </Tooltip>
+                      ) : null}
+                    </Box>
                     <Typography
                       variant="h6"
                       sx={{ mb: 3, color: "#222", fontWeight: 700 }}
