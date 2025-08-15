@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
-import { getExamsByExamID } from "../../apis/lessons/examAPI";
-import type { QuestionModel, ExamModel } from "../../services/apiModel";
+import type { QuestionModel } from "../../services/apiModel";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -17,11 +16,9 @@ const ExamProcessView = () => {
   const { examId } = useParams<{ examId: string }>();
   type QuestionWithSelected = QuestionModel & { selected?: string | string[] };
   const [questions, setQuestions] = useState<QuestionWithSelected[]>([]);
-  const [examInfo, setExamInfo] = useState<ExamModel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [infoLoading, setInfoLoading] = useState(true);
-  const [infoError, setInfoError] = useState<string | null>(null);
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes in seconds
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,23 +43,6 @@ const ExamProcessView = () => {
       setLoading(false);
     };
     fetchQuestions();
-  }, [examId]);
-
-  useEffect(() => {
-    const fetchExamInfo = async () => {
-      setInfoLoading(true);
-      setInfoError(null);
-      try {
-        if (examId) {
-          const data = await getExamsByExamID(Number(examId));
-          setExamInfo(data);
-        }
-      } catch {
-        setInfoError("Failed to load exam info.");
-      }
-      setInfoLoading(false);
-    };
-    fetchExamInfo();
   }, [examId]);
 
   useEffect(() => {
@@ -110,7 +90,7 @@ const ExamProcessView = () => {
           sx={{
             width: "100%",
             height: "100%",
-            bgcolor: "rgba(255, 255, 255, 0.5)",
+            bgcolor: "rgba(255, 255, 255, 0.45)",
             borderRadius: 3,
             p: 4,
             display: "flex",
@@ -338,7 +318,16 @@ const ExamProcessView = () => {
                               {ans.content}
                             </Box>
                           }
-                          sx={{ mb: 1, width: "100%", mx: 0 }}
+                          sx={{
+                            mb: 1,
+                            width: "100%",
+                            mx: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            px: 0,
+                            // make the label element take remaining width
+                            "& .MuiFormControlLabel-label": { width: "100%" },
+                          }}
                         />
                       ))}
                     </>
@@ -390,7 +379,15 @@ const ExamProcessView = () => {
                               {ans.content}
                             </Box>
                           }
-                          sx={{ mb: 1, width: "100%", mx: 0 }}
+                          sx={{
+                            mb: 1,
+                            width: "100%",
+                            mx: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            px: 0,
+                            "& .MuiFormControlLabel-label": { width: "100%" },
+                          }}
                         />
                       ))}
                     </RadioGroup>
