@@ -15,7 +15,6 @@ const SubmissionsView = () => {
       setLoading(true);
       setError(null);
       try {
-        // prefer googleUser (set at login), fallback to user
         const googleRaw = localStorage.getItem("googleUser");
         let email: string | null = null;
         if (googleRaw) {
