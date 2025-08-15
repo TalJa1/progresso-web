@@ -1,18 +1,17 @@
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Slide
-} from "@mui/material";
-import type { TransitionProps } from '@mui/material/transitions';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import Slide from "@mui/material/Slide";
+import Avatar from "@mui/material/Avatar";
+import type { TransitionProps } from "@mui/material/transitions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllExams } from "../../apis/lessons/examAPI";
@@ -20,7 +19,7 @@ import type { ExamModel } from "../../services/apiModel";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>,
+  ref: React.Ref<unknown>
 ) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -321,28 +320,111 @@ const ExamsView = () => {
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="exam-confirmation-dialog"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            minWidth: 340,
+            boxShadow: 3,
+          },
+        }}
       >
-        <DialogTitle>Do you want to do this exam?</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="exam-confirmation-dialog">
-            {selectedExam?.name}
-          </DialogContentText>
-          {redirectText && (
-            <Typography sx={{ mt: 2, color: 'green', fontWeight: 500 }}>{redirectText}</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="inherit" disabled={dialogLoading}>
-            Cancel
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            pt: 2,
+            px: 2,
+          }}
+        >
+          <Avatar sx={{ bgcolor: "#1976d2", width: 48, height: 48, mb: 1 }}>
+            <Typography variant="h4" sx={{ color: "#fff", fontWeight: 700 }}>
+              ?
+            </Typography>
+          </Avatar>
+          <DialogTitle
+            sx={{
+              textAlign: "center",
+              fontWeight: 700,
+              fontSize: 22,
+              p: 0,
+              mb: 0.5,
+              lineHeight: 1.2,
+            }}
+            component="div"
+          >
+            Do you want to take this exam?
+          </DialogTitle>
+          <DialogContent sx={{ p: 0, mt: 0.5, mb: 1 }}>
+            <DialogContentText
+              id="exam-confirmation-dialog"
+              sx={{
+                textAlign: "center",
+                color: "#757575",
+                fontSize: 18,
+                fontWeight: 500,
+                mb: 0,
+                letterSpacing: 0.1,
+              }}
+            >
+              {selectedExam?.name}
+            </DialogContentText>
+            {redirectText && (
+              <Typography
+                sx={{
+                  mt: 2,
+                  color: "green",
+                  fontWeight: 500,
+                  textAlign: "center",
+                }}
+              >
+                {redirectText}
+              </Typography>
+            )}
+          </DialogContent>
+        </Box>
+        <DialogActions sx={{ justifyContent: "center", pb: 2, pt: 0 }}>
+          <Button
+            onClick={handleDialogClose}
+            variant="outlined"
+            color="inherit"
+            disabled={dialogLoading}
+            sx={{
+              borderRadius: 2,
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              fontSize: 15,
+              mr: 1.5,
+              borderColor: "#d1d5db",
+              color: "#222",
+              "&:hover": { bgcolor: "#f3f4f6", borderColor: "#1e1b4b" },
+            }}
+          >
+            CANCEL
           </Button>
           <Button
             onClick={handleDialogConfirm}
             color="primary"
             variant="contained"
             disabled={dialogLoading}
-            startIcon={dialogLoading ? <CircularProgress size={18} color="inherit" /> : null}
+            startIcon={
+              dialogLoading ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : null
+            }
+            sx={{
+              borderRadius: 2,
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              fontSize: 15,
+              bgcolor: "#1976d2",
+              "&:hover": { bgcolor: "#1565c0" },
+            }}
           >
-            {dialogLoading ? "Loading..." : "Yes, Start"}
+            {dialogLoading ? "Loading..." : "YES, START"}
           </Button>
         </DialogActions>
       </Dialog>
