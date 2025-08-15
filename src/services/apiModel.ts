@@ -92,3 +92,12 @@ export interface AnswerModel {
   content: string
   is_correct: boolean
 }
+
+export interface SubmissionModel {
+  id: number
+  user_id: number
+  exam_id: number
+  upload_time: string
+  grade: number
+  feedback: string
+}
