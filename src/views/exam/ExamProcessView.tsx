@@ -22,6 +22,8 @@ const ExamProcessView = () => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes in seconds
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [score, setScore] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -53,6 +55,38 @@ const ExamProcessView = () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // compute score: single choice = 1 point for correct; multiple choice = sum(1/numCorrect per correct selected)
+  const computeScore = useRef<() => void | null>(null);
+  computeScore.current = () => {
+    if (submitted) return;
+    let total = 0;
+    questions.forEach((q) => {
+      const answers = q.answers || [];
+      if (q.type === "multiple") {
+        const correctIds = answers.filter((a) => a.is_correct).map((a) => a.id.toString());
+        const numCorrect = correctIds.length;
+        if (numCorrect === 0) return;
+        const selectedArr: string[] = Array.isArray(q.selected) ? q.selected : q.selected ? [q.selected as string] : [];
+        const correctSelectedCount = selectedArr.filter((id) => correctIds.includes(id)).length;
+        total += correctSelectedCount / numCorrect;
+      } else {
+        const selected = typeof q.selected === "string" ? q.selected : Array.isArray(q.selected) && q.selected.length ? q.selected[0] : "";
+        if (answers.some((a) => a.is_correct && a.id.toString() === selected)) {
+          total += 1;
+        }
+      }
+    });
+    setScore(Number(total.toFixed(2)));
+    setSubmitted(true);
+  };
+
+  // When timer reaches 0, auto-submit and compute score
+  useEffect(() => {
+    if (timeLeft === 0 && !submitted && computeScore.current) {
+      computeScore.current();
+    }
+  }, [timeLeft, submitted, computeScore]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60)
@@ -256,6 +290,7 @@ const ExamProcessView = () => {
                           key={ans.id}
                           control={
                             <Checkbox
+                              disabled={submitted}
                               checked={
                                 Array.isArray(questions[currentIdx].selected) &&
                                 questions[currentIdx].selected.includes(
@@ -349,6 +384,7 @@ const ExamProcessView = () => {
                           value={ans.id.toString()}
                           control={
                             <Radio
+                              disabled={submitted}
                               sx={{
                                 color: "#a78bfa",
                                 "&.Mui-checked": { color: "#7c3aed" },
@@ -470,6 +506,8 @@ const ExamProcessView = () => {
                 <Button
                   variant="contained"
                   color="primary"
+                  onClick={() => computeScore.current && computeScore.current()}
+                  disabled={submitted}
                   sx={{
                     borderRadius: 20,
                     px: 6,
@@ -482,6 +520,13 @@ const ExamProcessView = () => {
                 >
                   Finish
                 </Button>
+                {submitted && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                      Score: {score} / {questions.length}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </>
           )}
