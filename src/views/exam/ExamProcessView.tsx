@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, forwardRef } from "react";
 import { useParams } from "react-router-dom";
 import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
 import type { QuestionModel } from "../../services/apiModel";
@@ -13,6 +13,23 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Slide from "@mui/material/Slide";
+import type { SlideProps } from "@mui/material/Slide";
+import type { TransitionProps } from "@mui/material/transitions";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & { children?: React.ReactElement | undefined },
+  ref: React.ForwardedRef<unknown>
+) {
+  return (
+    <Slide direction="up" ref={ref} {...(props as unknown as SlideProps)} />
+  );
+});
 import { motion, AnimatePresence } from "framer-motion";
 
 const ExamProcessView = () => {
@@ -29,6 +46,7 @@ const ExamProcessView = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -104,6 +122,16 @@ const ExamProcessView = () => {
     }
   }, [timeLeft, submitted, computeScore]);
 
+  // close confirm dialog and clear timer when submitted
+  useEffect(() => {
+    if (submitted) {
+      setShowConfirm(false);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  }, [submitted]);
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60)
       .toString()
@@ -252,7 +280,6 @@ const ExamProcessView = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    // mb: 2,
                   }}
                 >
                   <Typography variant="body2" sx={{ color: "#6b6b6b" }}>
@@ -346,7 +373,6 @@ const ExamProcessView = () => {
                   </Typography>
                 </Box>
               </Box>
-              {/* Question */}
               <AnimatePresence
                 mode="wait"
                 onExitComplete={() => setIsAnimating(false)}
@@ -478,7 +504,6 @@ const ExamProcessView = () => {
                                 display: "flex",
                                 alignItems: "center",
                                 px: 0,
-                                // make the label element take remaining width
                                 "& .MuiFormControlLabel-label": {
                                   width: "100%",
                                 },
@@ -654,7 +679,7 @@ const ExamProcessView = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => computeScore.current && computeScore.current()}
+                  onClick={() => setShowConfirm(true)}
                   disabled={submitted}
                   sx={{
                     borderRadius: 20,
@@ -668,6 +693,54 @@ const ExamProcessView = () => {
                 >
                   Finish
                 </Button>
+                <Dialog
+                  open={showConfirm}
+                  onClose={() => setShowConfirm(false)}
+                  TransitionComponent={Transition}
+                  keepMounted
+                  fullWidth
+                  maxWidth="xs"
+                  PaperProps={{ sx: { borderRadius: 3, p: 1.5 } }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      px: 2,
+                      pt: 1,
+                    }}
+                  >
+                    <WarningAmberIcon color="warning" sx={{ fontSize: 40 }} />
+                    <DialogTitle sx={{ p: 0 }}>Confirm Submission</DialogTitle>
+                  </Box>
+                  <DialogContent sx={{ pt: 1 }}>
+                    <Typography sx={{ color: "#374151" }}>
+                      Are you sure you want to submit your answers? You won't be
+                      able to change them after submission.
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ px: 2, pb: 2 }}>
+                    <Button
+                      onClick={() => setShowConfirm(false)}
+                      color="inherit"
+                      sx={{ textTransform: "none" }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (computeScore.current) computeScore.current();
+                        setShowConfirm(false);
+                      }}
+                      color="primary"
+                      variant="contained"
+                      sx={{ textTransform: "none", borderRadius: 2 }}
+                    >
+                      Submit
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Box>
             </>
           )}
