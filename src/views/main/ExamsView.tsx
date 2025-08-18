@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllExams } from "../../apis/lessons/examAPI";
 import type { ExamModel } from "../../services/apiModel";
+import { Chip, Tooltip } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
@@ -273,14 +274,62 @@ const ExamsView = () => {
                     variant="body2"
                     sx={{ color: "#222", fontSize: 15 }}
                   >
-                    Student Attempted: {exam.student_attempt || 0}
+                    Student Attempted:{" "}
+                    <Chip color="default" label={exam.student_attempt || 0} />
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#222", fontSize: 15 }}
-                  >
-                    Correct Attempt: {exam.correct_attempt || 0}%
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {(() => {
+                      const pct = Math.max(
+                        0,
+                        Math.min(100, Number(exam.correct_attempt || 0))
+                      );
+                      const getColor = (p: number) => {
+                        if (p <= 50) return "#ef4444";
+                        if (p <= 70) return "#f59e0b";
+                        return "#16a34a";
+                      };
+                      const color = getColor(pct);
+                      return (
+                        <Tooltip title="attempt correct">
+                          <Box
+                            sx={{
+                              position: "relative",
+                              display: "inline-flex",
+                              width: 56,
+                              height: 56,
+                            }}
+                          >
+                            <CircularProgress
+                              variant="determinate"
+                              value={pct}
+                              size={56}
+                              thickness={6}
+                              sx={{ color }}
+                            />
+                            <Box
+                              sx={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                position: "absolute",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 700 }}
+                              >
+                                {pct}%
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Tooltip>
+                      );
+                    })()}
+                  </Box>
                   <Typography
                     variant="body2"
                     sx={{ color: "#222", fontSize: 15 }}
