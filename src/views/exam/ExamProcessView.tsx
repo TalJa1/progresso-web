@@ -813,24 +813,27 @@ const ExamProcessView = () => {
                           const email = parsed?.email;
                           if (!email) return;
                           const user = await getUserByEmail(email);
-                          const sc = Math.round(score ?? 0);
-                          let feedback = "";
-                          if (sc >= 1 && sc <= 4) {
-                            feedback =
-                              "Needs significant improvement. Review the fundamentals, revisit incorrect questions, and practice more.";
-                          } else if (sc >= 5 && sc <= 6) {
-                            feedback =
-                              "Fair understanding. You have some correct concepts but should focus on weak areas and practice regularly.";
-                          } else if (sc >= 7 && sc <= 8) {
-                            feedback =
-                              "Good job. You have a solid grasp of the material—refine accuracy and timing to improve further.";
-                          } else if (sc >= 9 && sc <= 10) {
-                            feedback =
-                              "Excellent performance. Strong mastery of the material—keep up the great work!";
-                          } else {
-                            feedback =
-                              "No answers submitted or score unavailable.";
-                          }
+                          const scFloat = Number(score ?? 0);
+                          const idx = Math.max(
+                            0,
+                            Math.min(10, Math.floor(scFloat))
+                          );
+                          const feedbackMessages: Record<number, string> = {
+                            0: "No correct answers — start with the basics. Revisit lecture notes and attempt simple practice problems to build confidence.",
+                            1: "Very early progress — focus on core definitions and simple examples. One-step problems first, then increase complexity.",
+                            2: "Basic understanding — continue practicing problem types you got wrong and review solution steps to identify common mistakes.",
+                            3: "Developing skills — you're getting there; target weak topics and do timed drills to build speed.",
+                            4: "Partial mastery — many concepts are understood but accuracy is inconsistent; practise mixed problem sets.",
+                            5: "Moderate competence — solid foundational skills; work on precision and handling edge-case questions.",
+                            6: "Above average — good performance; refine methods and practice under time pressure to raise consistency.",
+                            7: "Strong performance — you understand most material; polish techniques and review occasional mistakes for full mastery.",
+                            8: "Very strong — accurate and confident on many problems; focus on advanced problems and speed optimization.",
+                            9: "Excellent — near mastery. Keep revising tricky problems and maintain consistency under timed conditions.",
+                            10: "Outstanding — full mastery demonstrated. Consider mentoring peers or tackling extension/challenge problems to stay sharp.",
+                          };
+                          const feedback =
+                            feedbackMessages[idx] ??
+                            "No answers submitted or score unavailable.";
 
                           const payload = {
                             user_id: user.id,
