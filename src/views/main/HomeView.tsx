@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Typography,
@@ -66,6 +66,8 @@ const HomeView = () => {
     uid: "";
   } | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [loadingQuizletId, setLoadingQuizletId] = useState<number | null>(null);
+  const navigateTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const googleUser = localStorage.getItem("googleUser");
@@ -78,7 +80,6 @@ const HomeView = () => {
           photoURL: parsed.photoURL || "",
           uid: parsed.uid || "",
         });
-        // Fetch userId from DB and store globally
         (async () => {
           try {
             const dbUser: UserModel = await getUserByEmail(parsed.email);
@@ -121,6 +122,14 @@ const HomeView = () => {
     };
     fetchLessonsAndTopics();
   }, [userId]);
+
+  useEffect(() => {
+    return () => {
+      if (navigateTimeoutRef.current) {
+        window.clearTimeout(navigateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Box
@@ -307,9 +316,25 @@ const HomeView = () => {
                             bgcolor: "#e3f2fd",
                             "&:hover": { bgcolor: "#bbdefb" },
                           }}
-                          onClick={() => navigate(`/quizlet/${lesson.id}`)}
+                          onClick={() => {
+                            setLoadingQuizletId(lesson.id);
+                            if (navigateTimeoutRef.current) {
+                              window.clearTimeout(navigateTimeoutRef.current);
+                            }
+                            navigateTimeoutRef.current = window.setTimeout(
+                              () => {
+                                setLoadingQuizletId(null);
+                                navigate(`/quizlet/${lesson.id}`);
+                              },
+                              2500
+                            );
+                          }}
                         >
-                          <QuizIcon />
+                          {loadingQuizletId === lesson.id ? (
+                            <CircularProgress size={20} />
+                          ) : (
+                            <QuizIcon />
+                          )}
                         </IconButton>
                       </Box>
                     ) : (

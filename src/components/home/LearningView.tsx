@@ -1,12 +1,5 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
-import {
-  Box,
-  Typography,
-  Drawer,
-  Card,
-  IconButton,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Drawer, Card, IconButton } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -229,7 +222,7 @@ const LearningView = () => {
                 />
               )}
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -241,7 +234,7 @@ const LearningView = () => {
               <Button variant="contained" color="primary">
                 Test knowledge
               </Button>
-            </Box>
+            </Box> */}
           </>
         ) : (
           <Typography>Lesson not found.</Typography>
