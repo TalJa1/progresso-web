@@ -19,6 +19,9 @@ import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
 import { chatWithGemini } from "../../apis/aichatApi";
+import { createSubmission } from "../../apis/lessons/submissionAPI";
+import { getUserByEmail } from "../../apis/users/usersAPI";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -61,6 +64,7 @@ const ExamProcessView = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -777,23 +781,74 @@ const ExamProcessView = () => {
                     Next
                   </Button>
                 </Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setShowConfirm(true)}
-                  disabled={submitted}
-                  sx={{
-                    borderRadius: 20,
-                    px: 6,
-                    py: 1.2,
-                    fontWeight: 700,
-                    bgcolor: "#7c3aed",
-                    "&:hover": { bgcolor: "#6d28d9" },
-                    fontSize: 18,
-                  }}
-                >
-                  Finish
-                </Button>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setShowConfirm(true)}
+                    disabled={submitted}
+                    sx={{
+                      borderRadius: 20,
+                      px: 6,
+                      py: 1.2,
+                      fontWeight: 700,
+                      bgcolor: "#7c3aed",
+                      "&:hover": { bgcolor: "#6d28d9" },
+                      fontSize: 18,
+                    }}
+                  >
+                    Finish
+                  </Button>
+                  {submitted && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      sx={{ ml: 2, borderRadius: 20, px: 3, py: 1.2 }}
+                      onClick={async () => {
+                        // get user id from local storage email like other parts of app
+                        const raw = localStorage.getItem("googleUser");
+                        if (!raw) return;
+                        try {
+                          const parsed = JSON.parse(raw as string);
+                          const email = parsed?.email;
+                          if (!email) return;
+                          const user = await getUserByEmail(email);
+                          const sc = Math.round(score ?? 0);
+                          let feedback = "";
+                          if (sc >= 1 && sc <= 4) {
+                            feedback =
+                              "Needs significant improvement. Review the fundamentals, revisit incorrect questions, and practice more.";
+                          } else if (sc >= 5 && sc <= 6) {
+                            feedback =
+                              "Fair understanding. You have some correct concepts but should focus on weak areas and practice regularly.";
+                          } else if (sc >= 7 && sc <= 8) {
+                            feedback =
+                              "Good job. You have a solid grasp of the material—refine accuracy and timing to improve further.";
+                          } else if (sc >= 9 && sc <= 10) {
+                            feedback =
+                              "Excellent performance. Strong mastery of the material—keep up the great work!";
+                          } else {
+                            feedback =
+                              "No answers submitted or score unavailable.";
+                          }
+
+                          const payload = {
+                            user_id: user.id,
+                            exam_id: Number(examId) || 0,
+                            grade: score ?? 0,
+                            feedback,
+                          };
+                          await createSubmission(payload);
+                          navigate("/submissions");
+                        } catch (e) {
+                          console.error("Submit failed", e);
+                        }
+                      }}
+                    >
+                      Submit
+                    </Button>
+                  )}
+                </Box>
                 <Dialog
                   open={showConfirm}
                   onClose={() => setShowConfirm(false)}

@@ -101,3 +101,10 @@ export interface SubmissionModel {
   grade: number
   feedback: string
 }
+
+export interface SubmissionModelCreate {
+  user_id: number
+  exam_id: number
+  grade: number
+  feedback: string
+}
