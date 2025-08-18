@@ -1,5 +1,18 @@
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
-import { Box, Typography, Paper, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  CircularProgress,
+  Chip,
+  LinearProgress,
+  Stack,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import CommentIcon from "@mui/icons-material/Comment";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useEffect, useState } from "react";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import { getSubmissionsByUserId } from "../../apis/lessons/submissionAPI";
@@ -71,7 +84,7 @@ const SubmissionsView = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Typography variant="h4">Submissions</Typography>
+          <h2>Progresso Submissions</h2>
         </Box>
 
         {loading ? (
@@ -91,21 +104,137 @@ const SubmissionsView = () => {
           <Typography>No submissions found.</Typography>
         ) : (
           <Box sx={{ display: "grid", gap: 2, width: "100%" }}>
-            {submissions.map((s) => (
-              <Paper key={s.id} sx={{ p: 2 }}>
-                <Typography sx={{ fontWeight: 700 }}>
-                  Submission #{s.id}
-                </Typography>
-                <Typography>Exam ID: {s.exam_id}</Typography>
-                <Typography>Grade: {s.grade}</Typography>
-                <Typography>
-                  Uploaded: {new Date(s.upload_time).toLocaleString()}
-                </Typography>
-                <Typography sx={{ color: "#6b6b6b" }}>
-                  Feedback: {s.feedback || "-"}
-                </Typography>
-              </Paper>
-            ))}
+            {submissions.map((s) => {
+              const grade = Number(s.grade) || 0;
+              const pct = Math.max(0, Math.min(100, (grade / 10) * 100));
+              const getProgressColor = (g: number) => {
+                if (g <= 4.99) return "#ef4444"; // red
+                if (g <= 7) return "#f59e0b"; // amber
+                return "#16a34a"; // green
+              };
+              const upload = new Date(s.upload_time || "");
+              const dateStr = isNaN(upload.getTime())
+                ? "-"
+                : upload.toLocaleDateString();
+              const timeStr = isNaN(upload.getTime())
+                ? "-"
+                : upload.toLocaleTimeString();
+              return (
+                <Paper
+                  key={s.id}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    position: "relative",
+                    bgcolor: "transparent",
+                    background:
+                      "linear-gradient(135deg, hsla(0, 0%, 78%, 0.2), rgba(47, 47, 47, 0.3))",
+                    backdropFilter: "blur(6px)",
+                    boxShadow: "0 6px 20px rgba(16,24,40,0.06)",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 2,
+                    }}
+                  >
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Typography sx={{ fontWeight: 700 }}>
+                          Submission For
+                        </Typography>
+                        <Chip
+                          label={`Exam ${s.exam_id}`}
+                          size="small"
+                          color="success"
+                        />
+                      </Stack>
+
+                      <Box sx={{ mt: 1 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={pct}
+                              sx={{
+                                height: 12,
+                                borderRadius: 8,
+                                bgcolor: "rgba(0,0,0,0.06)",
+                                "& .MuiLinearProgress-bar": {
+                                  bgcolor: getProgressColor(grade),
+                                },
+                              }}
+                            />
+                          </Box>
+                          <Typography
+                            sx={{
+                              minWidth: 48,
+                              textAlign: "right",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {grade.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          mt: 1,
+                          boxShadow: "0 6px 18px rgba(13, 27, 62, 0.06)",
+                          borderRadius: 1,
+                          p: 1,
+                        }}
+                      >
+                        <Typography sx={{ color: "#374151", fontWeight: 600 }}>
+                          Feedback
+                        </Typography>
+                        <Typography
+                          sx={{ color: "#6b6b6b", whiteSpace: "pre-wrap" }}
+                        >
+                          {s.feedback || "-"}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                        <Tooltip title="View details">
+                          <IconButton size="small">
+                            <InsertDriveFileIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Comment">
+                          <IconButton size="small">
+                            <CommentIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Open">
+                          <IconButton size="small">
+                            <OpenInNewIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ width: 140, textAlign: "right", ml: 2 }}>
+                      <Typography variant="caption" sx={{ color: "#6b6b6b" }}>
+                        Uploaded
+                      </Typography>
+                      <Typography sx={{ fontWeight: 700 }}>
+                        {dateStr}
+                      </Typography>
+                      <Typography sx={{ color: "#6b6b6b" }}>
+                        {timeStr}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              );
+            })}
           </Box>
         )}
       </Box>
