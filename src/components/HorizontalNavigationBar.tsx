@@ -12,9 +12,10 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PersonIcon from "@mui/icons-material/Person";
+// PersonIcon removed (not used) to avoid lint warnings
 import LogoutIcon from "@mui/icons-material/Logout";
-import { useState } from "react";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useState, useEffect } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import SchoolIcon from "@mui/icons-material/School";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -24,6 +25,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 const HorizontalNavigationBar = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const isCompactTabs = useMediaQuery("(max-width:1320px)");
+  const isSmallOrMobile = useMediaQuery("(max-width:900px)");
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -33,35 +35,42 @@ const HorizontalNavigationBar = () => {
     setAnchorEl(null);
   };
 
+  // load google user after component mounts and keep in state
   let avatarEl;
-  const googleUser = localStorage.getItem("googleUser");
-  if (googleUser) {
+  const [parsedUser, setParsedUser] = useState<{
+    name?: string;
+    photoURL?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("googleUser");
+    if (!raw) return;
     try {
-      const parsed = JSON.parse(googleUser);
-      avatarEl = (
-        <Avatar
-          src={parsed.photoURL}
-          alt={parsed.name}
-          sx={{ width: 40, height: 40, cursor: "pointer" }}
-          onClick={handleMenuOpen}
-        />
-      );
+      const parsed = JSON.parse(raw);
+      setParsedUser(parsed);
     } catch {
-      avatarEl = (
-        <Avatar
-          sx={{
-            bgcolor: "#f5c6c6",
-            color: "#fff",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-          onClick={handleMenuOpen}
-        >
-          CT
-        </Avatar>
-      );
+      setParsedUser(null);
     }
+  }, []);
+
+  if (parsedUser && parsedUser.photoURL) {
+    avatarEl = (
+      <Avatar
+        src={parsedUser.photoURL}
+        alt={parsedUser.name}
+        sx={{ width: 40, height: 40, cursor: "pointer" }}
+        onClick={handleMenuOpen}
+      />
+    );
   } else {
+    const initials =
+      parsedUser && parsedUser.name
+        ? parsedUser.name
+            .split(" ")
+            .map((n) => n[0])
+            .slice(0, 2)
+            .join("")
+        : "CT";
     avatarEl = (
       <Avatar
         sx={{
@@ -72,7 +81,7 @@ const HorizontalNavigationBar = () => {
         }}
         onClick={handleMenuOpen}
       >
-        CT
+        {initials}
       </Avatar>
     );
   }
@@ -190,64 +199,90 @@ const HorizontalNavigationBar = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
                 keepMounted
+                PaperProps={{ sx: { minWidth: 220 } }}
               >
-                {isMobile && [
-                  <MenuItem
-                    key="home"
-                    onClick={() => {
-                      handleMenuClose();
-                      navigate("/home");
-                    }}
-                  >
-                    <HomeIcon sx={{ mr: 1 }} /> Home
-                  </MenuItem>,
-                  <MenuItem
-                    key="exams"
-                    onClick={() => {
-                      handleMenuClose();
-                      navigate("/exams");
-                    }}
-                  >
-                    <SchoolIcon sx={{ mr: 1 }} /> Exams
-                  </MenuItem>,
-                  <MenuItem
-                    key="submissions"
-                    onClick={() => {
-                      handleMenuClose();
-                      navigate("/submissions");
-                    }}
-                  >
-                    <WorkIcon sx={{ mr: 1 }} /> Submissions
-                  </MenuItem>,
-                  <MenuItem
-                    key="schedule"
-                    onClick={() => {
-                      handleMenuClose();
-                      navigate("/schedule");
-                    }}
-                  >
-                    <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
-                  </MenuItem>,
-                  <Divider key="div1" />,
-                  <MenuItem key="utc" onClick={handleMenuClose}>
-                    UTC+07:00
-                  </MenuItem>,
-                  <Divider key="div2" />,
-                ]}
+                {/* Header with user name */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    px: 2,
+                    py: 1.5,
+                  }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                      {parsedUser?.name ?? "User"}
+                    </Typography>
+                  </Box>
+                  <IconButton disabled size="small" onClick={handleMenuClose}>
+                    <ChevronRightIcon />
+                  </IconButton>
+                </Box>
+                <Divider sx={{ borderStyle: "dashed" }} />
+
+                {/* show navigation links in menu for small screens or mobile */}
+                {(isMobile || isSmallOrMobile) && (
+                  <>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/home");
+                      }}
+                    >
+                      <HomeIcon sx={{ mr: 1 }} /> Home
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/exams");
+                      }}
+                    >
+                      <SchoolIcon sx={{ mr: 1 }} /> Exams
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/submissions");
+                      }}
+                    >
+                      <WorkIcon sx={{ mr: 1 }} /> Submissions
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/schedule");
+                      }}
+                    >
+                      <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
+                    </MenuItem>
+                    <Divider key="div1" />
+                  </>
+                )}
+
                 <MenuItem
                   onClick={() => {
                     handleMenuClose();
                     navigate("/profile");
                   }}
                 >
-                  <PersonIcon sx={{ mr: 1 }} /> Profile
+                  My Profile
                 </MenuItem>
+                <MenuItem disabled onClick={handleMenuClose}>
+                  Help and Support
+                </MenuItem>
+                <MenuItem disabled onClick={handleMenuClose}>
+                  Refer & Earn
+                </MenuItem>
+                <Divider sx={{ borderStyle: "dashed" }} />
                 <MenuItem
                   onClick={() => {
                     handleMenuClose();
                     localStorage.removeItem("googleUser");
                     navigate("/");
                   }}
+                  sx={{ color: "error.main", fontWeight: 700 }}
                 >
                   <LogoutIcon sx={{ mr: 1 }} /> Logout
                 </MenuItem>
