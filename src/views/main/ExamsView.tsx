@@ -80,15 +80,24 @@ const ExamsView = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
+    <Box
+      sx={{
+        bgcolor: "#fafafa",
+        minHeight: "100vh",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <HorizontalNavigationBar />
       <Box
         sx={{
           width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1300px" },
           maxWidth: 1300,
           mx: "auto",
-          mt: 4,
-          mb: 4,
+          pt: 4,
+          pb: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",

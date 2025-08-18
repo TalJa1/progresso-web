@@ -123,7 +123,16 @@ const HomeView = () => {
   }, [userId]);
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
+    <Box
+      sx={{
+        bgcolor: "#fafafa",
+        minHeight: "100%",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <HorizontalNavigationBar />
       <Box
         sx={{
@@ -131,7 +140,6 @@ const HomeView = () => {
           maxWidth: 1300,
           mx: "auto",
           mt: 4,
-          mb: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",

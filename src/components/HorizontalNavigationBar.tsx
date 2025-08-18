@@ -83,8 +83,8 @@ const HorizontalNavigationBar = () => {
         width: "100%",
         display: "flex",
         justifyContent: "center",
-        mt: 3,
-        mb: 3,
+        pt: 3,
+        pb: 3,
       }}
     >
       <Box

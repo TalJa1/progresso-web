@@ -47,7 +47,16 @@ const SubmissionsView = () => {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
+    <Box
+      sx={{
+        bgcolor: "#fafafa",
+        minHeight: "100vh",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <HorizontalNavigationBar />
       <Box
         sx={{
