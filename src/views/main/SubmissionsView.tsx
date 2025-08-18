@@ -83,8 +83,17 @@ const SubmissionsView = () => {
           alignItems: "flex-start",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 2,
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
           <h2>Progresso Submissions</h2>
+          <Chip label={`${submissions.length ?? 0}`} color="default" size="medium" />
         </Box>
 
         {loading ? (
