@@ -35,7 +35,7 @@ import {
 } from "../../apis/schedules/scheduleApi";
 import type { ScheduleModel } from "../../services/apiModel";
 
-const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event"];
+const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event", "Learning"];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
