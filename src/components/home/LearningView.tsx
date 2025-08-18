@@ -1,5 +1,12 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
-import { Box, Typography, Drawer, Card, IconButton, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Drawer,
+  Card,
+  IconButton,
+  Button,
+} from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -50,7 +57,16 @@ const LearningView = () => {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "100%" }}>
+    <Box
+      sx={{
+        bgcolor: "#fafafa",
+        minHeight: "100vh",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <HorizontalNavigationBar />
       <Drawer
         anchor="left"
@@ -96,7 +112,7 @@ const LearningView = () => {
                   <SchoolIcon sx={{ color: "#fff", fontSize: 32 }} />
                 </Box>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, pb: 0.5 }}>
                     {l.title}
                   </Typography>
                   <Typography
@@ -151,8 +167,8 @@ const LearningView = () => {
           width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1300px" },
           maxWidth: 1300,
           mx: "auto",
-          mt: 4,
-          mb: 4,
+          pt: 4,
+          pb: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
@@ -213,7 +229,15 @@ const LearningView = () => {
                 />
               )}
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1, alignItems: "center", width: "100%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: 1,
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
               <Button variant="contained" color="primary">
                 Test knowledge
               </Button>

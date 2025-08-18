@@ -60,7 +60,16 @@ const QuizletView = () => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        bgcolor: "#fafafa",
+        minHeight: "100vh",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <HorizontalNavigationBar />
       <Box sx={{ maxWidth: 800, mx: "auto" }}>
         <Box sx={{ mb: 1 }}>
