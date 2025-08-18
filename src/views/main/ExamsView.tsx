@@ -136,8 +136,8 @@ const ExamsView = () => {
                 key={exam.id}
                 sx={{
                   width: "100%",
-                  bgcolor: "#fff",
-                  border: "1px solid #e5e7eb",
+                  background:
+                    "linear-gradient(135deg, hsla(0, 0%, 97%, 0.20), rgba(198, 177, 251, 0.25))",
                   borderRadius: 2,
                   boxShadow: "0 6px 24px 0 rgba(59,79,255,0.16)",
                   p: 2.5,

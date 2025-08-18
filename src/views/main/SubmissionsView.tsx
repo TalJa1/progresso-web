@@ -128,7 +128,7 @@ const SubmissionsView = () => {
                     position: "relative",
                     bgcolor: "transparent",
                     background:
-                      "linear-gradient(135deg, hsla(0, 0%, 78%, 0.2), rgba(47, 47, 47, 0.3))",
+                      "linear-gradient(135deg, hsla(0, 0%, 78%, 0.2), rgba(47, 47, 47, 0.25))",
                     backdropFilter: "blur(6px)",
                     boxShadow: "0 6px 20px rgba(16,24,40,0.06)",
                   }}
