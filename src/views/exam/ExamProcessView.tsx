@@ -48,6 +48,8 @@ const ExamProcessView = () => {
   const { examId } = useParams<{ examId: string }>();
   type QuestionWithSelected = QuestionModel & { selected?: string | string[] };
   const [questions, setQuestions] = useState<QuestionWithSelected[]>([]);
+  // map question_id -> ordered chosen answer ids
+  const [answerMap, setAnswerMap] = useState<Record<number, number[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -541,6 +543,16 @@ const ExamProcessView = () => {
                                             (id) => id !== ans.id.toString()
                                           );
                                         }
+
+                                        // update answerMap to match the new selectedArr (preserve order of appearance in selectedArr)
+                                        setAnswerMap((prevMap) => {
+                                          const qId = q.id;
+                                          const numeric = selectedArr.map((s) =>
+                                            Number(s)
+                                          );
+                                          return { ...prevMap, [qId]: numeric };
+                                        });
+
                                         return { ...q, selected: selectedArr };
                                       })
                                     );
@@ -631,6 +643,16 @@ const ExamProcessView = () => {
                                   : q
                               )
                             );
+                            // keep answerMap in sync for single choice
+                            const q = questions[currentIdx];
+                            if (q) {
+                              const qId = q.id;
+                              const num = Number(value);
+                              setAnswerMap((prev) => ({
+                                ...prev,
+                                [qId]: [num],
+                              }));
+                            }
                           }}
                         >
                           {questions[currentIdx].answers.map((ans) => (
@@ -844,51 +866,58 @@ const ExamProcessView = () => {
                             grade: score ?? 0,
                             feedback,
                           };
-                          // create submission first to get submission id
                           const created = await createSubmission(payload);
 
                           try {
-                            // build submission records from user selections
                             const records: SubmissionRecordModelCreate[] = [];
+
+                            // Debug: show current selected state and answerMap
+                            console.log(
+                              "Submitting - questions.selected:",
+                              questions.map((q) => ({
+                                id: q.id,
+                                selected: q.selected,
+                              }))
+                            );
+                            console.log("Submitting - answerMap:", answerMap);
+
                             questions.forEach((q) => {
-                              if (q.type === "multiple") {
-                                const selectedArr: string[] = Array.isArray(q.selected)
-                                  ? q.selected
+                              // prefer answerMap (we maintain it on each change), fall back to q.selected
+                              const am = answerMap[q.id];
+                              const chosenIds: number[] =
+                                am && am.length > 0
+                                  ? [...am]
+                                  : Array.isArray(q.selected)
+                                  ? (q.selected as string[]).map((s) =>
+                                      Number(s)
+                                    )
                                   : q.selected
-                                  ? [q.selected as string]
+                                  ? [Number(q.selected)]
                                   : [];
-                                selectedArr.forEach((sel) => {
-                                  const aid = Number(sel);
-                                  if (!Number.isNaN(aid)) {
-                                    records.push({
-                                      submission_id: created.id,
-                                      user_id: user.id,
-                                      question_id: q.id,
-                                      chosen_answer_id: aid,
-                                    });
-                                  }
+
+                              chosenIds.forEach((aid) => {
+                                records.push({
+                                  submission_id: created.id,
+                                  user_id: user.id,
+                                  question_id: q.id,
+                                  chosen_answer_id: aid,
                                 });
-                              } else {
-                                const sel = typeof q.selected === "string" ? q.selected : Array.isArray(q.selected) && q.selected.length ? q.selected[0] : "";
-                                const aid = Number(sel || 0);
-                                if (!Number.isNaN(aid) && aid !== 0) {
-                                  records.push({
-                                    submission_id: created.id,
-                                    user_id: user.id,
-                                    question_id: q.id,
-                                    chosen_answer_id: aid,
-                                  });
-                                }
-                              }
+                              });
                             });
 
+                            console.log(
+                              "Prepared submission records:",
+                              records
+                            );
+
                             if (records.length > 0) {
-                              // send batch records
                               await createSubmissionRecordBatch(records);
                             }
                           } catch (e) {
-                            // don't block navigation on record failure
-                            console.error("Failed to save submission records", e);
+                            console.error(
+                              "Failed to save submission records",
+                              e
+                            );
                           }
 
                           navigate("/submissions");
