@@ -108,3 +108,9 @@ export interface SubmissionModelCreate {
   grade: number
   feedback: string
 }
+
+export interface SubmissionRecordModel {
+  submission_id: number
+  question_id: number
+  chosen_answer_id: number
+}

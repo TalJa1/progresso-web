@@ -20,6 +20,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import DialogContentText from "@mui/material/DialogContentText";
 import { chatWithGemini } from "../../apis/aichatApi";
 import { createSubmission } from "../../apis/lessons/submissionAPI";
+import { createSubmissionRecordBatch } from "../../apis/lessons/submissionRecordAPI";
+import type { SubmissionRecordModel } from "../../services/apiModel";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -841,7 +843,51 @@ const ExamProcessView = () => {
                             grade: score ?? 0,
                             feedback,
                           };
-                          await createSubmission(payload);
+                          // create submission first to get submission id
+                          const created = await createSubmission(payload);
+
+                          try {
+                            // build submission records from user selections
+                            const records: SubmissionRecordModel[] = [];
+                            questions.forEach((q) => {
+                              if (q.type === "multiple") {
+                                const selectedArr: string[] = Array.isArray(q.selected)
+                                  ? q.selected
+                                  : q.selected
+                                  ? [q.selected as string]
+                                  : [];
+                                selectedArr.forEach((sel) => {
+                                  const aid = Number(sel);
+                                  if (!Number.isNaN(aid)) {
+                                    records.push({
+                                      submission_id: created.id,
+                                      question_id: q.id,
+                                      chosen_answer_id: aid,
+                                    });
+                                  }
+                                });
+                              } else {
+                                const sel = typeof q.selected === "string" ? q.selected : Array.isArray(q.selected) && q.selected.length ? q.selected[0] : "";
+                                const aid = Number(sel || 0);
+                                if (!Number.isNaN(aid) && aid !== 0) {
+                                  records.push({
+                                    submission_id: created.id,
+                                    question_id: q.id,
+                                    chosen_answer_id: aid,
+                                  });
+                                }
+                              }
+                            });
+
+                            if (records.length > 0) {
+                              // send batch records
+                              await createSubmissionRecordBatch(records);
+                            }
+                          } catch (e) {
+                            // don't block navigation on record failure
+                            console.error("Failed to save submission records", e);
+                          }
+
                           navigate("/submissions");
                         } catch (e) {
                           console.error("Submit failed", e);

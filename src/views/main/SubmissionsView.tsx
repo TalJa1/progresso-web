@@ -226,14 +226,18 @@ const SubmissionsView = () => {
 
                       <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                         <Tooltip title="View details">
-                          <IconButton size="small" disabled>
-                            <InsertDriveFileIcon fontSize="small" />
-                          </IconButton>
+                          <span style={{ display: "inline-block" }}>
+                            <IconButton size="small" disabled>
+                              <InsertDriveFileIcon fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                         <Tooltip title="Comment">
-                          <IconButton size="small" disabled>
-                            <CommentIcon fontSize="small" />
-                          </IconButton>
+                          <span style={{ display: "inline-block" }}>
+                            <IconButton size="small" disabled>
+                              <CommentIcon fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                         <Tooltip title="Review">
                           <IconButton

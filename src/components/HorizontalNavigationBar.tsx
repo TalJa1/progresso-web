@@ -224,7 +224,7 @@ const HorizontalNavigationBar = () => {
 
                 {/* show navigation links in menu for small screens or mobile */}
                 {(isMobile || isSmallOrMobile) && (
-                  <>
+                  <Box key="mobile-links" sx={{ display: "block" }}>
                     <MenuItem
                       onClick={() => {
                         handleMenuClose();
@@ -258,7 +258,7 @@ const HorizontalNavigationBar = () => {
                       <CalendarTodayIcon sx={{ mr: 1 }} /> Schedule
                     </MenuItem>
                     <Divider key="div1" />
-                  </>
+                  </Box>
                 )}
 
                 <MenuItem
