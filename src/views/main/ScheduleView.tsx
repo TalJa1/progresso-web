@@ -10,9 +10,13 @@ import {
   DialogContent,
   TextField,
   Button,
+  Snackbar,
+  Alert,
+  Slide,
   InputAdornment,
   MenuItem,
 } from "@mui/material";
+// TransitionProps import removed - using a simple SlideTransition function
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -35,7 +39,13 @@ import {
 } from "../../apis/schedules/scheduleApi";
 import type { ScheduleModel } from "../../services/apiModel";
 
-const SCHEDULE_TYPES = ["Homework", "Exam", "Group Meeting", "Event", "Learning"];
+const SCHEDULE_TYPES = [
+  "Homework",
+  "Exam",
+  "Group Meeting",
+  "Event",
+  "Learning",
+];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -84,6 +94,24 @@ const ScheduleView = () => {
   const [scheduleCountByDate, setScheduleCountByDate] = useState<{
     [date: string]: number;
   }>({});
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
+
+  const handleSnackbarClose = (
+    _?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setSnackbar((s) => ({ ...s, open: false }));
+  };
+
+  // Slide transition that makes the snackbar slide in from the right
+  const SlideTransition = (props: React.ComponentProps<typeof Slide>) => {
+    return <Slide {...props} direction="left" />;
+  };
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -179,7 +207,14 @@ const ScheduleView = () => {
     setInfoDate(null);
   };
   const handleCreateSubmit = async () => {
-    if (!userId) return;
+    if (!userId) {
+      setSnackbar({
+        open: true,
+        message: "Failed to create schedule: user not found.",
+        severity: "error",
+      });
+      return;
+    }
     try {
       await createSchedule({
         user_id: userId,
@@ -202,8 +237,18 @@ const ScheduleView = () => {
       });
       setScheduleCountByDate(count);
       setEventsByDate(events);
-    } catch {
-      alert("Failed to create schedule. Please try again later.");
+      setSnackbar({
+        open: true,
+        message: "Event added successfully.",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error(err);
+      setSnackbar({
+        open: true,
+        message: "Failed to create schedule. Please try again later.",
+        severity: "error",
+      });
     }
   };
 
@@ -675,6 +720,21 @@ const ScheduleView = () => {
           </DialogContent>
         </Dialog>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        TransitionComponent={SlideTransition}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
