@@ -8,6 +8,7 @@ import ProfileView from "./views/user/ProfileView";
 import LearningView from "./components/home/LearningView";
 import QuizletView from "./components/home/QuizletView";
 import ExamProcessView from "./views/exam/ExamProcessView";
+import ExamRecordView from "./views/exam/ExamRecordView";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/quizlet/:lessonId" element={<QuizletView />} />
       <Route path="/learning/:id" element={<LearningView />} />
       <Route path="/exam-process/:examId" element={<ExamProcessView />} />
+      <Route path="/exam-record/:submissionId/:examId" element={<ExamRecordView />} />
     </Routes>
   );
 }

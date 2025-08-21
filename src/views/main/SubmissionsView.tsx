@@ -14,6 +14,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import { getSubmissionsByUserId } from "../../apis/lessons/submissionAPI";
 import type { SubmissionModel } from "../../services/apiModel";
@@ -22,6 +23,7 @@ const SubmissionsView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionModel[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -93,7 +95,11 @@ const SubmissionsView = () => {
           }}
         >
           <h2>Progresso Submissions</h2>
-          <Chip label={`${submissions.length ?? 0}`} color="default" size="medium" />
+          <Chip
+            label={`${submissions.length ?? 0}`}
+            color="default"
+            size="medium"
+          />
         </Box>
 
         {loading ? (
@@ -222,7 +228,12 @@ const SubmissionsView = () => {
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Open">
-                          <IconButton size="small">
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              navigate(`/exam-record/${s.id}/${s.exam_id}`)
+                            }
+                          >
                             <OpenInNewIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
