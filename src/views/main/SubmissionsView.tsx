@@ -13,7 +13,7 @@ import {
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import { getSubmissionsByUserId } from "../../apis/lessons/submissionAPI";
@@ -24,6 +24,8 @@ const SubmissionsView = () => {
   const [error, setError] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionModel[]>([]);
   const navigate = useNavigate();
+  const [finishingId, setFinishingId] = useState<number | null>(null);
+  const finishTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -59,6 +61,12 @@ const SubmissionsView = () => {
       setLoading(false);
     };
     load();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeout.current) clearTimeout(finishTimeout.current);
+    };
   }, []);
 
   return (
@@ -227,14 +235,23 @@ const SubmissionsView = () => {
                             <CommentIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Open">
+                        <Tooltip title="Review">
                           <IconButton
                             size="small"
-                            onClick={() =>
-                              navigate(`/exam-record/${s.id}/${s.exam_id}`)
-                            }
+                            disabled={finishingId !== null}
+                            onClick={() => {
+                              if (finishingId) return;
+                              setFinishingId(s.id);
+                              finishTimeout.current = window.setTimeout(() => {
+                                navigate(`/exam-record/${s.id}/${s.exam_id}`);
+                              }, 3000);
+                            }}
                           >
-                            <OpenInNewIcon fontSize="small" />
+                            {finishingId === s.id ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <OpenInNewIcon fontSize="small" />
+                            )}
                           </IconButton>
                         </Tooltip>
                       </Box>
