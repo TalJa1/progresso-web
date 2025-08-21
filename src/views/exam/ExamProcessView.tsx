@@ -21,7 +21,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import { chatWithGemini } from "../../apis/aichatApi";
 import { createSubmission } from "../../apis/lessons/submissionAPI";
 import { createSubmissionRecordBatch } from "../../apis/lessons/submissionRecordAPI";
-import type { SubmissionRecordModel } from "../../services/apiModel";
+import type { SubmissionRecordModelCreate } from "../../services/apiModel";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -849,7 +849,7 @@ const ExamProcessView = () => {
 
                           try {
                             // build submission records from user selections
-                            const records: SubmissionRecordModel[] = [];
+                            const records: SubmissionRecordModelCreate[] = [];
                             questions.forEach((q) => {
                               if (q.type === "multiple") {
                                 const selectedArr: string[] = Array.isArray(q.selected)

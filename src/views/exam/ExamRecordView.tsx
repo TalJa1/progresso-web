@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
-import type { QuestionModel } from "../../services/apiModel";
+import { getSubmissionRecordsBySubmissionAndUser } from "../../apis/lessons/submissionRecordAPI";
+import { getUserByEmail } from "../../apis/users/usersAPI";
+import type {
+  QuestionModel,
+  SubmissionRecordModel,
+} from "../../services/apiModel";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -11,7 +16,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+// ...existing imports
 import { motion, AnimatePresence } from "framer-motion";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -29,6 +34,9 @@ const ExamRecordView = () => {
 
   type QuestionWithSelected = QuestionModel & { selected?: string | string[] };
   const [questions, setQuestions] = useState<QuestionWithSelected[]>([]);
+  const [submissionRecords, setSubmissionRecords] = useState<
+    SubmissionRecordModel[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,19 +53,76 @@ const ExamRecordView = () => {
       try {
         if (examId) {
           const data = await getQuestionsWithAnswersByExamId(Number(examId));
-          setQuestions(
-            data.map((q: QuestionModel) => ({
+
+          // initialize selections
+          const initQuestions: QuestionWithSelected[] = data.map(
+            (q: QuestionModel) => ({
               ...q,
               selected: q.type === "multiple" ? [] : "",
-            }))
+            })
           );
+
+          // if submissionId and user info available, fetch user's submission records
+          const submissionIdParam = params.submissionId ?? null;
+          if (submissionIdParam) {
+            const raw = localStorage.getItem("googleUser");
+            let userId: number | null = null;
+            if (raw) {
+              try {
+                const parsed = JSON.parse(raw as string);
+                const email = parsed?.email;
+                if (email) {
+                  const user = await getUserByEmail(email);
+                  userId = user.id;
+                }
+              } catch {
+                // ignore parse errors
+              }
+            }
+
+            if (userId) {
+              try {
+                const records = await getSubmissionRecordsBySubmissionAndUser(
+                  Number(submissionIdParam),
+                  userId
+                );
+
+                // keep records in state for rendering decisions
+                setSubmissionRecords(records);
+
+                // map question id -> chosen answer ids (allow multiple records per question)
+                const map: Record<number, number[]> = {};
+                records.forEach((r) => {
+                  if (!map[r.question_id]) map[r.question_id] = [];
+                  map[r.question_id].push(r.chosen_answer_id);
+                });
+
+                // apply selections to questions
+                initQuestions.forEach((q) => {
+                  const chosen = map[q.id] || [];
+                  if (q.type === "multiple") {
+                    q.selected = chosen.map((c) => c.toString());
+                  } else {
+                    q.selected = chosen.length ? String(chosen[0]) : "";
+                  }
+                });
+              } catch (e) {
+                // if records fetch fails, fall back to blank selections
+                console.error("Failed to load submission records", e);
+              }
+            }
+          }
+
+          setQuestions(initQuestions);
         }
-      } catch {
+      } catch (err) {
+        console.error(err);
         setError("Failed to load questions.");
       }
       setLoading(false);
     };
     fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
 
   useEffect(() => {
@@ -312,12 +377,19 @@ const ExamRecordView = () => {
                                 <Checkbox
                                   disabled
                                   checked={
-                                    Array.isArray(
+                                    // if submissionRecords available, use them
+                                    submissionRecords.some(
+                                      (r) =>
+                                        r.question_id ===
+                                          questions[currentIdx].id &&
+                                        r.chosen_answer_id === ans.id
+                                    ) ||
+                                    (Array.isArray(
                                       questions[currentIdx].selected
                                     ) &&
-                                    questions[currentIdx].selected.includes(
-                                      ans.id.toString()
-                                    )
+                                      questions[currentIdx].selected.includes(
+                                        ans.id.toString()
+                                      ))
                                   }
                                   sx={{
                                     color: "#a78bfa",
@@ -360,11 +432,7 @@ const ExamRecordView = () => {
                                   <Box component="span" sx={{ pr: 1, flex: 1 }}>
                                     {ans.content}
                                   </Box>
-                                  {ans.is_correct ? (
-                                    <CheckCircleOutlineIcon
-                                      sx={{ color: "#16a34a", ml: 2 }}
-                                    />
-                                  ) : null}
+                                  {null}
                                 </Box>
                               }
                               sx={{
@@ -393,6 +461,16 @@ const ExamRecordView = () => {
                               control={
                                 <Radio
                                   disabled
+                                  checked={
+                                    submissionRecords.some(
+                                      (r) =>
+                                        r.question_id ===
+                                          questions[currentIdx].id &&
+                                        r.chosen_answer_id === ans.id
+                                    ) ||
+                                    questions[currentIdx].selected ===
+                                      ans.id.toString()
+                                  }
                                   sx={{
                                     color: "#a78bfa",
                                     "&.Mui-checked": { color: "#7c3aed" },
@@ -426,11 +504,7 @@ const ExamRecordView = () => {
                                   <Box component="span" sx={{ pr: 1, flex: 1 }}>
                                     {ans.content}
                                   </Box>
-                                  {ans.is_correct ? (
-                                    <CheckCircleOutlineIcon
-                                      sx={{ color: "#16a34a", ml: 2 }}
-                                    />
-                                  ) : null}
+                                  {null}
                                 </Box>
                               }
                               sx={{

@@ -109,7 +109,15 @@ export interface SubmissionModelCreate {
   feedback: string
 }
 
+export interface SubmissionRecordModelCreate {
+  submission_id: number
+  user_id: number
+  question_id: number
+  chosen_answer_id: number
+}
+
 export interface SubmissionRecordModel {
+  id: number
   submission_id: number
   user_id: number
   question_id: number

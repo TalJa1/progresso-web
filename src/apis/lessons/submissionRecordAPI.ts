@@ -1,14 +1,27 @@
 import apiClient from "../../apis/apiClient";
-import type { SubmissionRecordModel } from "../../services/apiModel";
+import type {
+  SubmissionRecordModelCreate,
+  SubmissionRecordModel,
+} from "../../services/apiModel";
 
 export async function createSubmissionRecord(
-  record: SubmissionRecordModel
+  record: SubmissionRecordModelCreate
 ): Promise<void> {
   await apiClient.post(`/submission_record`, record);
 }
 
 export async function createSubmissionRecordBatch(
-  records: SubmissionRecordModel[]
+  records: SubmissionRecordModelCreate[]
 ): Promise<void> {
   await apiClient.post(`/submission_record/batch`, records);
+}
+
+export async function getSubmissionRecordsBySubmissionAndUser(
+  submissionId: number,
+  userId: number
+): Promise<SubmissionRecordModel[]> {
+  const resp = await apiClient.get<SubmissionRecordModel[]>(
+    `/submission_record/by_submission/${submissionId}/user/${userId}`
+  );
+  return resp.data;
 }
