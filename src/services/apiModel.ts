@@ -111,6 +111,7 @@ export interface SubmissionModelCreate {
 
 export interface SubmissionRecordModel {
   submission_id: number
+  user_id: number
   question_id: number
   chosen_answer_id: number
 }

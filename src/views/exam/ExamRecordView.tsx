@@ -220,6 +220,7 @@ const ExamRecordView = () => {
                     </Button>
                   </Box>
                   <Typography
+                    component="div"
                     variant="body2"
                     sx={{
                       color: "#6b6b6b",

@@ -377,6 +377,7 @@ const ExamProcessView = () => {
                     </Button>
                   </Box>
                   <Typography
+                    component="div"
                     variant="body2"
                     sx={{
                       color: "#6b6b6b",
@@ -861,6 +862,7 @@ const ExamProcessView = () => {
                                   if (!Number.isNaN(aid)) {
                                     records.push({
                                       submission_id: created.id,
+                                      user_id: user.id,
                                       question_id: q.id,
                                       chosen_answer_id: aid,
                                     });
@@ -872,6 +874,7 @@ const ExamProcessView = () => {
                                 if (!Number.isNaN(aid) && aid !== 0) {
                                   records.push({
                                     submission_id: created.id,
+                                    user_id: user.id,
                                     question_id: q.id,
                                     chosen_answer_id: aid,
                                   });
