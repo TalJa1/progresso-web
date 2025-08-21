@@ -1,4 +1,19 @@
+import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
+import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
+import type { QuestionModel } from "../../services/apiModel";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+// ...existing imports
+import { motion, AnimatePresence } from "framer-motion";
 
 const ExamRecordView = () => {
   const params = useParams();
@@ -9,18 +24,525 @@ const ExamRecordView = () => {
     queryParams[key] = value;
   });
 
-  const submissionId = params.submissionId ?? null;
-  const examId = params.examId ?? null;
-  const submissionIdNum = submissionId ? Number(submissionId) : null;
-  const examIdNum = examId ? Number(examId) : null;
+  const examId = params.examId ?? queryParams.examId ?? null;
+
+  type QuestionWithSelected = QuestionModel & { selected?: string | string[] };
+  const [questions, setQuestions] = useState<QuestionWithSelected[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [direction, setDirection] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (examId) {
+          const data = await getQuestionsWithAnswersByExamId(Number(examId));
+          setQuestions(
+            data.map((q: QuestionModel) => ({
+              ...q,
+              selected: q.type === "multiple" ? [] : "",
+            }))
+          );
+        }
+      } catch {
+        setError("Failed to load questions.");
+      }
+      setLoading(false);
+    };
+    fetchQuestions();
+  }, [examId]);
+
+  if (loading) return <div>Loading questions...</div>;
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
+
+  const goToIndex = (newIdx: number, dir: number) => {
+    if (isAnimating) return;
+    setDirection(dir);
+    setIsAnimating(true);
+    setCurrentIdx(newIdx);
+  };
+
+  const motionVariants = {
+    enter: (dir: number) => ({
+      x: dir === 1 ? 40 : -40,
+      opacity: 0,
+      filter: dir === 1 ? "blur(4px)" : "blur(0px)",
+      rotateY: dir === -1 ? -8 : 0,
+      scale: 0.99,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      rotateY: 0,
+      scale: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir === 1 ? -40 : 40,
+      opacity: 0,
+      filter: dir === 1 ? "blur(4px)" : "blur(0px)",
+      rotateY: dir === -1 ? 8 : 0,
+      scale: 0.99,
+    }),
+  };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Exam Record</h2>
-      <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-        {JSON.stringify({ submissionId, examId, submissionIdNum, examIdNum, queryParams }, null, 2)}
-      </pre>
-    </div>
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: "100vh",
+      }}
+    >
+      <Box sx={{ flexDirection: "row", width: "60%", pt: 5, height: "70%" }}>
+        {questions.length === 0 ? (
+          <Typography>No questions found for this exam.</Typography>
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              bgcolor: "rgba(255, 255, 255, 0.45)",
+              borderRadius: 3,
+              p: 4,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <>
+              {/* Progress Bar and Header */}
+              <Box sx={{ mb: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#6b6b6b" }}
+                  >
+                    MCT Mock Tests
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "#6b6b6b", fontWeight: 500 }}
+                  >
+                    {Math.round(((currentIdx + 1) / questions.length) * 100)}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={((currentIdx + 1) / questions.length) * 100}
+                  sx={{
+                    height: 8,
+                    borderRadius: 5,
+                    mb: 2,
+                    bgcolor: "#ede7f6",
+                    "& .MuiLinearProgress-bar": { bgcolor: "#7c3aed" },
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: "#6b6b6b" }}>
+                    Session 1
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Button
+                      disabled
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: "none",
+                        px: 2,
+                        py: 0.5,
+                        minWidth: 80,
+                        borderColor: "#c7d2fe",
+                        color: "#6366f1",
+                        bgcolor: "#f5f3ff",
+                        "&:hover": {
+                          bgcolor: "#ede9fe",
+                          borderColor: "#6366f1",
+                        },
+                      }}
+                    >
+                      review
+                    </Button>
+                    <Button
+                      disabled
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: "none",
+                        px: 2,
+                        py: 0.5,
+                        minWidth: 120,
+                        borderColor: "#c7d2fe",
+                        color: "#6366f1",
+                        bgcolor: "#f5f3ff",
+                        "&:hover": {
+                          bgcolor: "#ede9fe",
+                          borderColor: "#6366f1",
+                        },
+                      }}
+                    >
+                      Mark as review
+                    </Button>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#6b6b6b",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        mr: 0.5,
+                      }}
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="#a78bfa"
+                          strokeWidth="2"
+                          fill="none"
+                        />
+                        <path
+                          d="M12 7v5l3 3"
+                          stroke="#a78bfa"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Box>
+                    {/* {formatTime(timeLeft)} Min */}
+                    30:00 Min
+                  </Typography>
+                </Box>
+              </Box>
+
+              <AnimatePresence
+                mode="wait"
+                onExitComplete={() => setIsAnimating(false)}
+              >
+                <motion.div
+                  key={questions[currentIdx].id}
+                  custom={direction}
+                  variants={motionVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ width: "100%" }}
+                >
+                  <Box sx={{ mb: 3, px: 15, widows: "100%" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "#a3a3a3", fontWeight: 600 }}
+                      >
+                        Question {currentIdx + 1}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="h6"
+                      sx={{ mb: 3, color: "#222", fontWeight: 700 }}
+                    >
+                      {questions[currentIdx].content}
+                    </Typography>
+                    <FormControl component="fieldset" sx={{ width: "100%" }}>
+                      {questions[currentIdx].type === "multiple" ? (
+                        <>
+                          {questions[currentIdx].answers.map((ans) => (
+                            <FormControlLabel
+                              key={ans.id}
+                              control={
+                                <Checkbox
+                                  disabled
+                                  checked={
+                                    Array.isArray(
+                                      questions[currentIdx].selected
+                                    ) &&
+                                    questions[currentIdx].selected.includes(
+                                      ans.id.toString()
+                                    )
+                                  }
+                                  sx={{
+                                    color: "#a78bfa",
+                                    "&.Mui-checked": { color: "#7c3aed" },
+                                  }}
+                                />
+                              }
+                              label={
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    bgcolor:
+                                      Array.isArray(
+                                        questions[currentIdx].selected
+                                      ) &&
+                                      questions[currentIdx].selected.includes(
+                                        ans.id.toString()
+                                      )
+                                        ? "#f5f3ff"
+                                        : "#fff",
+                                    fontWeight: 600,
+                                    color: "#4b5563",
+                                    border:
+                                      Array.isArray(
+                                        questions[currentIdx].selected
+                                      ) &&
+                                      questions[currentIdx].selected.includes(
+                                        ans.id.toString()
+                                      )
+                                        ? "1.5px solid #a78bfa"
+                                        : "1.5px solid #e5e7eb",
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                    {ans.content}
+                                  </Box>
+                                  {ans.is_correct ? (
+                                    <CheckCircleOutlineIcon
+                                      sx={{ color: "#16a34a", ml: 2 }}
+                                    />
+                                  ) : null}
+                                </Box>
+                              }
+                              sx={{
+                                mb: 1,
+                                width: "100%",
+                                mx: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                px: 0,
+                                "& .MuiFormControlLabel-label": {
+                                  width: "100%",
+                                },
+                              }}
+                            />
+                          ))}
+                        </>
+                      ) : (
+                        <RadioGroup
+                          name={`question-${questions[currentIdx].id}`}
+                          value={questions[currentIdx].selected || ""}
+                        >
+                          {questions[currentIdx].answers.map((ans) => (
+                            <FormControlLabel
+                              key={ans.id}
+                              value={ans.id.toString()}
+                              control={
+                                <Radio
+                                  disabled
+                                  sx={{
+                                    color: "#a78bfa",
+                                    "&.Mui-checked": { color: "#7c3aed" },
+                                  }}
+                                />
+                              }
+                              label={
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    bgcolor:
+                                      questions[currentIdx].selected ===
+                                      ans.id.toString()
+                                        ? "#f5f3ff"
+                                        : "#fff",
+                                    fontWeight: 600,
+                                    color: "#4b5563",
+                                    border:
+                                      questions[currentIdx].selected ===
+                                      ans.id.toString()
+                                        ? "1.5px solid #a78bfa"
+                                        : "1.5px solid #e5e7eb",
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box component="span" sx={{ pr: 1, flex: 1 }}>
+                                    {ans.content}
+                                  </Box>
+                                  {ans.is_correct ? (
+                                    <CheckCircleOutlineIcon
+                                      sx={{ color: "#16a34a", ml: 2 }}
+                                    />
+                                  ) : null}
+                                </Box>
+                              }
+                              sx={{
+                                mb: 1,
+                                width: "100%",
+                                mx: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                px: 0,
+                                "& .MuiFormControlLabel-label": {
+                                  width: "100%",
+                                },
+                              }}
+                            />
+                          ))}
+                        </RadioGroup>
+                      )}
+                    </FormControl>
+                  </Box>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 4,
+                }}
+              >
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Button
+                    variant="outlined"
+                    disabled={currentIdx === 0 || isAnimating}
+                    onClick={() => goToIndex(Math.max(0, currentIdx - 1), -1)}
+                    sx={{
+                      borderRadius: 20,
+                      px: 4,
+                      py: 1.2,
+                      fontWeight: 600,
+                      width: "170px",
+                      color: "#6b6b6b",
+                      borderColor: "#e5e7eb",
+                      bgcolor: "#f3f4f6",
+                      "&:hover": { bgcolor: "#ede9fe", borderColor: "#a78bfa" },
+                    }}
+                    startIcon={
+                      <span
+                        style={{
+                          fontSize: 18,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        ⟵
+                      </span>
+                    }
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    disabled={
+                      currentIdx === questions.length - 1 || isAnimating
+                    }
+                    onClick={() =>
+                      goToIndex(
+                        Math.min(questions.length - 1, currentIdx + 1),
+                        1
+                      )
+                    }
+                    sx={{
+                      borderRadius: 20,
+                      px: 4,
+                      py: 1.2,
+                      width: "170px",
+                      fontWeight: 600,
+                      color: "#6b6b6b",
+                      borderColor: "#e5e7eb",
+                      bgcolor: "#f3f4f6",
+                      "&:hover": { bgcolor: "#ede9fe", borderColor: "#a78bfa" },
+                    }}
+                    endIcon={
+                      <span
+                        style={{
+                          fontSize: 18,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        ⟶
+                      </span>
+                    }
+                  >
+                    Next
+                  </Button>
+                </Box>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled
+                    sx={{
+                      borderRadius: 20,
+                      px: 6,
+                      py: 1.2,
+                      fontWeight: 700,
+                      bgcolor: "#7c3aed",
+                      "&:hover": { bgcolor: "#6d28d9" },
+                      fontSize: 18,
+                    }}
+                  >
+                    Finish
+                  </Button>
+                </Box>
+              </Box>
+            </>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 };
 
