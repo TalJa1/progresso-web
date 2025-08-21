@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
 import type { QuestionModel } from "../../services/apiModel";
 import Box from "@mui/material/Box";
@@ -14,8 +14,10 @@ import FormControl from "@mui/material/FormControl";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 // ...existing imports
 import { motion, AnimatePresence } from "framer-motion";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const ExamRecordView = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
   const search = new URLSearchParams(location.search);
@@ -34,6 +36,8 @@ const ExamRecordView = () => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [direction, setDirection] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const finishTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -56,6 +60,12 @@ const ExamRecordView = () => {
     };
     fetchQuestions();
   }, [examId]);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeout.current) clearTimeout(finishTimeout.current);
+    };
+  }, []);
 
   if (loading) return <div>Loading questions...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
@@ -523,7 +533,14 @@ const ExamRecordView = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    disabled
+                    onClick={() => {
+                      if (finishing) return;
+                      setFinishing(true);
+                      finishTimeout.current = window.setTimeout(() => {
+                        navigate(-1);
+                      }, 3000);
+                    }}
+                    disabled={finishing}
                     sx={{
                       borderRadius: 20,
                       px: 6,
@@ -534,7 +551,20 @@ const ExamRecordView = () => {
                       fontSize: 18,
                     }}
                   >
-                    Finish
+                    {finishing ? (
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <CircularProgress size={18} sx={{ color: "#fff" }} />
+                        Finishing...
+                      </Box>
+                    ) : (
+                      "Finish"
+                    )}
                   </Button>
                 </Box>
               </Box>
