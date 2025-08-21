@@ -101,7 +101,7 @@ const QuizletView = () => {
               gap: 1,
             }}
           >
-            📝 Thẻ ghi nhớ
+            📝 Memo card
           </Button>
           <Button
             variant="contained"
@@ -119,7 +119,7 @@ const QuizletView = () => {
               gap: 1,
             }}
           >
-            🔄 Tự học
+            🔄 Self-study
           </Button>
           <Button
             variant="contained"
@@ -138,7 +138,7 @@ const QuizletView = () => {
               gap: 1,
             }}
           >
-            📊 Kiểm tra
+            📊 Test
           </Button>
           <Button
             variant="contained"
