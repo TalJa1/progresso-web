@@ -302,9 +302,16 @@ const ScheduleView = () => {
           </Box>
           <Button
             variant="contained"
-            color="primary"
             onClick={handleCreateOpen}
-            sx={{ fontWeight: 700 }}
+            sx={{
+              fontWeight: 700,
+              bgcolor: "#4f46e5",
+              color: "#fff",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              "&:hover": { bgcolor: "#4338ca" },
+            }}
           >
             Add Event
           </Button>
@@ -386,7 +393,8 @@ const ScheduleView = () => {
                       display: "flex",
                       alignItems: "flex-start",
                       gap: 2,
-                      boxShadow: "0 2px 8px 0 rgba(60,72,100,0.06)",
+                      boxShadow: "0 6px 18px rgba(79,70,229,0.06)",
+                      border: "1px solid rgba(79,70,229,0.03)",
                     }}
                   >
                     <Box sx={{ mt: 0.5 }}>{icon}</Box>
@@ -424,11 +432,12 @@ const ScheduleView = () => {
           sx={{
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
-            gap: 0,
+            gap: 0.3,
             width: "100%",
-            border: "1px solid #ddd",
+            border: "1px solid rgba(79,70,229,0.06)",
             borderRadius: 2,
             overflow: "hidden",
+            background: "rgba(79,70,229,0.04)",
           }}
         >
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((w) => (
@@ -436,11 +445,11 @@ const ScheduleView = () => {
               key={w}
               align="center"
               fontWeight={600}
-              color="#888"
+              color="#4f46e5"
               sx={{
                 mb: 1,
-                borderBottom: "1px solid #ddd",
-                bgcolor: "#f5f5f5",
+                borderBottom: "1px solid rgba(79,70,229,0.04)",
+                bgcolor: "rgba(79,70,229,0.02)",
                 py: 1,
               }}
             >
@@ -466,18 +475,20 @@ const ScheduleView = () => {
                   key={wi + "-" + di}
                   sx={{
                     minHeight: 64,
-                    bgcolor: isToday ? "#336de122" : day ? "#fff" : "#f5f5f5",
-                    borderRight: di < 6 ? "1px solid #ddd" : "none",
-                    borderBottom: "1px solid #ddd",
-                    borderTop: wi === 0 ? "none" : undefined,
-                    borderLeft: di === 0 ? "none" : undefined,
+                    bgcolor: isToday
+                      ? "rgba(79,70,229,0.06)"
+                      : day
+                      ? "#fff"
+                      : "#fafafa",
                     display: "flex",
                     alignItems: "flex-start",
                     justifyContent: "flex-start",
                     p: 1,
                     position: "relative",
-                    boxShadow: isToday ? 3 : 0,
-                    border: isToday ? "1px solid #336de122" : undefined,
+                    boxShadow: isToday ? "0 6px 18px rgba(79,70,229,0.06)" : 0,
+                    border: isToday
+                      ? "1px solid rgba(79,70,229,0.12)"
+                      : undefined,
                     cursor: day ? "pointer" : "default",
                   }}
                   onClick={() => handleDateClick(day)}
@@ -485,7 +496,7 @@ const ScheduleView = () => {
                   <Typography
                     variant="body1"
                     fontWeight={isToday ? 700 : 500}
-                    color={isToday ? "#e1333b" : "#222"}
+                    color={isToday ? "#4027cfff" : "#222"}
                   >
                     {day || ""}
                   </Typography>
@@ -515,7 +526,7 @@ const ScheduleView = () => {
                                 width: 14,
                                 height: 14,
                                 borderRadius: 3,
-                                boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                                boxShadow: "0 4px 10px rgba(79,70,229,0.08)",
                               }}
                             />
                           );
@@ -533,7 +544,7 @@ const ScheduleView = () => {
                               width: 14,
                               height: 14,
                               borderRadius: 3,
-                              boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                              boxShadow: "0 4px 10px rgba(79,70,229,0.08)",
                             }}
                           />
                           <Box
@@ -542,15 +553,15 @@ const ScheduleView = () => {
                               px: 0.5,
                               minWidth: 16,
                               height: 16,
-                              bgcolor: "#eee",
+                              bgcolor: "rgba(79,70,229,0.06)",
                               borderRadius: 8,
                               fontSize: 11,
                               fontWeight: 700,
-                              color: "#444",
+                              color: "#4f46e5",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              boxShadow: "0 1px 2px rgba(47, 40, 40, 0.13)",
+                              boxShadow: "0 4px 10px rgba(79,70,229,0.08)",
                             }}
                           >
                             {iconCount}
@@ -591,7 +602,7 @@ const ScheduleView = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <CalendarTodayIcon sx={{ color: "#888" }} />
+                    <CalendarTodayIcon sx={{ color: "#4f46e5" }} />
                   </InputAdornment>
                 ),
               }}
@@ -609,7 +620,7 @@ const ScheduleView = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <DescriptionIcon sx={{ color: "#888" }} />
+                    <DescriptionIcon sx={{ color: "#4f46e5" }} />
                   </InputAdornment>
                 ),
               }}
@@ -624,7 +635,7 @@ const ScheduleView = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LocalOfferIcon sx={{ color: "#888" }} />
+                    <LocalOfferIcon sx={{ color: "#4f46e5" }} />
                   </InputAdornment>
                 ),
               }}
@@ -661,7 +672,7 @@ const ScheduleView = () => {
                       InputProps: {
                         startAdornment: (
                           <InputAdornment position="start">
-                            <AccessTimeIcon sx={{ color: "#1976d2" }} />
+                            <AccessTimeIcon sx={{ color: "#4f46e5" }} />
                           </InputAdornment>
                         ),
                       },
@@ -690,7 +701,7 @@ const ScheduleView = () => {
                         InputProps: {
                           startAdornment: (
                             <InputAdornment position="start">
-                              <AccessTimeIcon sx={{ color: "#1976d2" }} />
+                              <AccessTimeIcon sx={{ color: "#4f46e5" }} />
                             </InputAdornment>
                           ),
                         },
@@ -704,7 +715,12 @@ const ScheduleView = () => {
             <Box mt={3} display="flex" justifyContent="flex-end">
               <Button
                 variant="contained"
-                sx={{ minWidth: 100, fontWeight: 700 }}
+                sx={{
+                  minWidth: 100,
+                  fontWeight: 700,
+                  bgcolor: "#4f46e5",
+                  "&:hover": { bgcolor: "#4338ca" },
+                }}
                 onClick={handleCreateSubmit}
                 disabled={
                   !form.title ||
