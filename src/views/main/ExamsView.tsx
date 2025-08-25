@@ -137,9 +137,9 @@ const ExamsView = () => {
                 sx={{
                   width: "100%",
                   background:
-                    "linear-gradient(135deg, hsla(0, 0%, 97%, 0.20), rgba(198, 177, 251, 0.25))",
-                  borderRadius: 2,
-                  boxShadow: "0 6px 24px 0 rgba(59,79,255,0.16)",
+                    "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(167,139,250,0.06))",
+                  borderRadius: 8,
+                  boxShadow: "0 8px 28px 0 rgba(79,70,229,0.10)",
                   p: 2.5,
                   mb: 1,
                   display: "flex",
@@ -232,7 +232,7 @@ const ExamsView = () => {
                   variant="h6"
                   sx={{
                     fontWeight: 700,
-                    color: "#3b4fff",
+                    color: "#4f46e5",
                     fontSize: 20,
                     mb: 1,
                   }}
@@ -338,27 +338,27 @@ const ExamsView = () => {
                   </Typography>
                 </Box>
                 {/* Action Row */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    mt: 1,
-                  }}
-                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      mt: 1,
+                    }}
+                  >
                   <Button
                     variant="outlined"
                     sx={{
-                      borderColor: "#3b4fff",
-                      color: "#3b4fff",
-                      borderRadius: 2,
+                      borderColor: "#4f46e5",
+                      color: "#4f46e5",
+                      borderRadius: 6,
                       fontWeight: 700,
                       px: 3,
-                      py: 1.2,
+                      py: 1.1,
                       textTransform: "none",
                       boxShadow: "none",
                       fontSize: 15,
-                      "&:hover": { bgcolor: "#f3f4f6", borderColor: "#1e1b4b" },
+                      "&:hover": { bgcolor: "rgba(79,70,229,0.06)", borderColor: "#4f46e5" },
                     }}
                     onClick={() => handleTakeExam(exam)}
                   >

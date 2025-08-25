@@ -147,13 +147,17 @@ const SubmissionsView = () => {
                   key={s.id}
                   sx={{
                     p: 2,
-                    borderRadius: 2,
+                    borderRadius: 8,
                     position: "relative",
                     bgcolor: "transparent",
                     background:
-                      "linear-gradient(135deg, hsla(0, 0%, 78%, 0.1), rgba(81, 81, 81, 0.2))",
+                      "linear-gradient(135deg, rgba(99,102,241,0.04), rgba(167,139,250,0.04))",
                     backdropFilter: "blur(6px)",
-                    boxShadow: "0 6px 20px rgba(16,24,40,0.06)",
+                    boxShadow: "0 8px 24px rgba(79,70,229,0.06)",
+                    transition: "box-shadow 0.2s",
+                    "&:hover": {
+                      boxShadow: "0 12px 32px 0 rgba(15, 36, 227, 0.2)",
+                    },
                   }}
                 >
                   <Box
@@ -172,7 +176,11 @@ const SubmissionsView = () => {
                         <Chip
                           label={`Exam ${s.exam_id}`}
                           size="small"
-                          color="success"
+                          sx={{
+                            bgcolor: "rgba(79,70,229,0.08)",
+                            color: "#4f46e5",
+                            fontWeight: 700,
+                          }}
                         />
                       </Stack>
 
@@ -187,7 +195,7 @@ const SubmissionsView = () => {
                               sx={{
                                 height: 12,
                                 borderRadius: 8,
-                                bgcolor: "rgba(0,0,0,0.06)",
+                                bgcolor: "rgba(99,102,241,0.08)",
                                 "& .MuiLinearProgress-bar": {
                                   bgcolor: getProgressColor(grade),
                                 },
