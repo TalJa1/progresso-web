@@ -233,7 +233,7 @@ const ExamProcessView = () => {
           'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: "100vh",
+        minHeight: "100vh",
       }}
     >
       {submitted && (
@@ -272,13 +272,13 @@ const ExamProcessView = () => {
           flexDirection: "row",
           width: "60%",
           pt: 5,
-          height: "70%",
+          minHeight: "70vh",
         }}
       >
         <Box
           sx={{
             width: "100%",
-            height: "100%",
+            minHeight: "70vh",
             bgcolor: "rgba(255, 255, 255, 0.45)",
             borderRadius: 3,
             p: 4,

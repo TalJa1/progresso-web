@@ -175,17 +175,24 @@ const ExamRecordView = () => {
           'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: "100vh",
+        minHeight: "100vh",
       }}
     >
-      <Box sx={{ flexDirection: "row", width: "60%", pt: 5, height: "70%" }}>
+      <Box
+        sx={{
+          flexDirection: "row",
+          width: "60%",
+          pt: 5,
+          minHeight: "70vh",
+        }}
+      >
         {questions.length === 0 ? (
           <Typography>No questions found for this exam.</Typography>
         ) : (
           <Box
             sx={{
               width: "100%",
-              height: "100%",
+              minHeight: "70vh",
               bgcolor: "rgba(255, 255, 255, 0.45)",
               borderRadius: 3,
               p: 4,
@@ -195,7 +202,6 @@ const ExamRecordView = () => {
             }}
           >
             <>
-              {/* Progress Bar and Header */}
               <Box sx={{ mb: 3 }}>
                 <Box
                   sx={{
