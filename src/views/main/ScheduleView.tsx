@@ -321,7 +321,7 @@ const ScheduleView = () => {
           open={infoOpen}
           onClose={handleInfoClose}
           PaperProps={{
-            sx: { borderRadius: 4, minWidth: 340, p: 0, overflow: "visible" },
+            sx: { borderRadius: 4, minWidth: 680, p: 0, overflow: "visible" },
             component: motion.div,
             initial: (() => {
               switch (dialogDirection) {
@@ -351,73 +351,204 @@ const ScheduleView = () => {
             eventsByDate[infoDate] &&
             eventsByDate[infoDate].length > 0 ? (
               eventsByDate[infoDate].map((event, idx) => {
-                // Icon and color mapping per event type
+                // Map event types to color styles (keeps parity with calendar icon colors)
+                const typeStyles: {
+                  [k: string]: {
+                    color: string;
+                    gradFrom: string;
+                    gradTo: string;
+                    lightBg: string;
+                  };
+                } = {
+                  Homework: {
+                    color: "#1976d2",
+                    gradFrom: "#1976d2",
+                    gradTo: "#1357a6",
+                    lightBg: "rgba(25,118,210,0.06)",
+                  },
+                  Exam: {
+                    color: "#ff9800",
+                    gradFrom: "#ff9800",
+                    gradTo: "#f57c00",
+                    lightBg: "rgba(255,152,0,0.06)",
+                  },
+                  Meeting: {
+                    color: "#43a047",
+                    gradFrom: "#43a047",
+                    gradTo: "#2e7d32",
+                    lightBg: "rgba(67,160,71,0.06)",
+                  },
+                  "Group Meeting": {
+                    color: "#43a047",
+                    gradFrom: "#43a047",
+                    gradTo: "#2e7d32",
+                    lightBg: "rgba(67,160,71,0.06)",
+                  },
+                  Event: {
+                    color: "#7c3aed",
+                    gradFrom: "#7c3aed",
+                    gradTo: "#5b21b6",
+                    lightBg: "rgba(124,58,237,0.06)",
+                  },
+                  Learning: {
+                    color: "#06b6d4",
+                    gradFrom: "#06b6d4",
+                    gradTo: "#0e7490",
+                    lightBg: "rgba(6,182,212,0.06)",
+                  },
+                  default: {
+                    color: "#90a4ae",
+                    gradFrom: "#90a4ae",
+                    gradTo: "#6b7280",
+                    lightBg: "rgba(144,164,174,0.06)",
+                  },
+                };
+                const styleForType =
+                  typeStyles[event.type] || typeStyles.default;
+                const typeColor = styleForType.color;
+                const gradFrom = styleForType.gradFrom;
+                const gradTo = styleForType.gradTo;
+                const lightBg = styleForType.lightBg;
+                // icon rendered white so it contrasts with the colored badge
                 let icon = null;
-                let cardColor = "#f5f7ff";
-                let titleColor = "#222";
                 switch (event.type) {
                   case "Homework":
                     icon = (
-                      <MenuBookIcon sx={{ fontSize: 32, color: "#1976d2" }} />
+                      <MenuBookIcon sx={{ fontSize: 20, color: "#fff" }} />
                     );
-                    cardColor = "#f5f7ff";
-                    titleColor = "#1976d2";
                     break;
                   case "Exam":
-                    icon = (
-                      <EventIcon sx={{ fontSize: 32, color: "#ff9800" }} />
-                    );
-                    cardColor = "#fff7ed";
-                    titleColor = "#ff9800";
+                    icon = <EventIcon sx={{ fontSize: 20, color: "#fff" }} />;
                     break;
                   case "Meeting":
-                    icon = (
-                      <GroupsIcon sx={{ fontSize: 32, color: "#43a047" }} />
-                    );
-                    cardColor = "#f3f9f4";
-                    titleColor = "#43a047";
+                  case "Group Meeting":
+                    icon = <GroupsIcon sx={{ fontSize: 20, color: "#fff" }} />;
                     break;
                   default:
-                    icon = <InfoIcon sx={{ fontSize: 32, color: "#90a4ae" }} />;
-                    cardColor = "#f5f5f5";
-                    titleColor = "#222";
+                    icon = <InfoIcon sx={{ fontSize: 20, color: "#fff" }} />;
                 }
                 return (
-                  <Box
-                    key={idx}
-                    sx={{
-                      mb: 2,
-                      p: 2,
-                      borderRadius: 3,
-                      bgcolor: cardColor,
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 2,
-                      boxShadow: "0 6px 18px rgba(79,70,229,0.06)",
-                      border: "1px solid rgba(79,70,229,0.03)",
-                    }}
-                  >
-                    <Box sx={{ mt: 0.5 }}>{icon}</Box>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        fontWeight={700}
-                        fontSize={18}
-                        color={titleColor}
-                        sx={{ mb: 0.5 }}
+                  <Box key={idx} sx={{ mb: 2 }}>
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 3,
+                        background: "#fff",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 2,
+                        boxShadow: "0 6px 18px rgba(15,23,42,0.04)",
+                        border: "1px solid rgba(15,23,42,0.04)",
+                        borderLeft: `4px solid ${typeColor}`,
+                        transition:
+                          "transform 120ms ease, box-shadow 120ms ease",
+                        "&:hover": {
+                          transform: "translateY(-4px)",
+                          boxShadow: "0 12px 30px rgba(15,23,42,0.08)",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: "50%",
+                          background: `linear-gradient(90deg, ${gradFrom}, ${gradTo})`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                          boxShadow: `0 6px 16px ${lightBg.replace(
+                            "0.06",
+                            "0.12"
+                          )}`,
+                        }}
                       >
-                        {event.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ fontWeight: 500, mb: 0.5 }}
-                      >
-                        {event.type} | {event.start_time}
-                      </Typography>
-                      <Typography variant="body2" color="#444">
-                        {event.description}
-                      </Typography>
+                        {icon}
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <Typography
+                            fontWeight={800}
+                            fontSize={18}
+                            color={typeColor}
+                            sx={{ flex: 1 }}
+                          >
+                            {event.title}
+                          </Typography>
+                          <Box
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              bgcolor: lightBg,
+                              color: typeColor,
+                              borderRadius: 1,
+                              fontWeight: 700,
+                              fontSize: 12,
+                            }}
+                          >
+                            {event.type}
+                          </Box>
+                        </Box>
+
+                        {/* Time box with icon */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              px: 1.25,
+                              py: 0.5,
+                              bgcolor: lightBg,
+                              borderRadius: 1.5,
+                              color: typeColor,
+                              fontWeight: 700,
+                              fontSize: 13,
+                            }}
+                          >
+                            <AccessTimeIcon
+                              sx={{ fontSize: 16, color: typeColor }}
+                            />
+                            <Box component="span">
+                              {event.start_time || "—"}
+                            </Box>
+                          </Box>
+                        </Box>
+
+                        <Typography
+                          variant="body2"
+                          color="#444"
+                          sx={{ lineHeight: 1.45 }}
+                        >
+                          {`status: ${event.description || "No description"}`}
+                        </Typography>
+                      </Box>
                     </Box>
+                    {/* subtle divider between events */}
+                    {idx < eventsByDate[infoDate].length - 1 && (
+                      <Box
+                        sx={{
+                          height: 1,
+                          bgcolor: "rgba(79,70,229,0.02)",
+                          mt: 2,
+                        }}
+                      />
+                    )}
                   </Box>
                 );
               })
