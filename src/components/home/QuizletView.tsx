@@ -63,23 +63,23 @@ const QuizletView = () => {
   return (
     <Box
       sx={{
-        bgcolor: "#fafafa",
         minHeight: "100vh",
-        backgroundImage:
-          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundImage:
+          'url("https://res.cloudinary.com/dyhnzac8w/image/upload/v1754451247/paper1_wallpaper_avqflu.jpg")',
       }}
     >
       <HorizontalNavigationBar />
       <Box sx={{ maxWidth: 800, mx: "auto" }}>
-        <Box sx={{ mb: 1 }}>
+        <Box sx={{ mb: 2 }}>
           <Typography
             variant="h3"
             sx={{
               fontWeight: 900,
               mb: 2,
-              color: "#000000ff",
+              color: "#0f172a",
+              letterSpacing: "-0.5px",
             }}
           >
             {lesson?.title} quizlet
@@ -91,15 +91,15 @@ const QuizletView = () => {
             sx={{
               color: "#fff",
               fontWeight: 700,
-              borderRadius: 2,
+              borderRadius: 99,
               px: 3,
-              py: 1.5,
-              boxShadow: "none",
+              boxShadow: "0 6px 18px rgba(59, 52, 255, 0.12)",
               textTransform: "none",
               fontSize: "14px",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              background: "linear-gradient(90deg,#5b8cff,#7c5cff)",
             }}
           >
             📝 Memo card
@@ -107,74 +107,75 @@ const QuizletView = () => {
           <Button
             variant="contained"
             sx={{
-              color: "#fff",
+              color: "#0f172a",
               fontWeight: 700,
-              borderRadius: 2,
+              borderRadius: 99,
               px: 3,
-              py: 1.5,
+              py: 1.25,
               boxShadow: "none",
               textTransform: "none",
               fontSize: "14px",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              background: "linear-gradient(90deg,#dbeafe,#bfdbfe)",
             }}
           >
             🔄 Self-study
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
             sx={{
-              bgcolor: "#374151",
-              color: "#9ca3af",
+              color: "#94a3b8",
               fontWeight: 700,
-              borderRadius: 2,
+              borderRadius: 99,
               px: 3,
-              py: 1.5,
-              boxShadow: "none",
+              py: 1.25,
               textTransform: "none",
               fontSize: "14px",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              borderColor: "rgba(15,23,42,0.06)",
+              bgcolor: "rgba(255,255,255,0.02)",
             }}
           >
             📊 Test
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
             sx={{
-              bgcolor: "#374151",
-              color: "#9ca3af",
+              color: "#94a3b8",
               fontWeight: 700,
-              borderRadius: 2,
+              borderRadius: 99,
               px: 3,
-              py: 1.5,
-              boxShadow: "none",
+              py: 1.25,
               textTransform: "none",
               fontSize: "14px",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              borderColor: "rgba(15,23,42,0.06)",
+              bgcolor: "rgba(255,255,255,0.02)",
             }}
           >
             🧩 Blocks
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
             sx={{
-              bgcolor: "#374151",
-              color: "#9ca3af",
+              color: "#94a3b8",
               fontWeight: 700,
-              borderRadius: 2,
+              borderRadius: 99,
               px: 3,
-              py: 1.5,
-              boxShadow: "none",
+              py: 1.25,
               textTransform: "none",
               fontSize: "14px",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              borderColor: "rgba(15,23,42,0.06)",
+              bgcolor: "rgba(255,255,255,0.02)",
             }}
           >
             💥 Blast
@@ -183,20 +184,21 @@ const QuizletView = () => {
 
         {/* Quiz Card Section */}
         <Paper
-          elevation={0}
+          elevation={1}
           sx={{
-            borderRadius: 3,
-            p: 4,
+            borderRadius: 12,
+            p: { xs: 4, md: 6 },
             mb: 3,
-            bgcolor: "#374151",
-            border: "1px solid #4b5563",
-            minHeight: 320,
+            // light card so content is clearly visible
+            background: "linear-gradient(180deg,#ffffff 0%, #f8fafc 100%)",
+            border: "1px solid rgba(15,23,42,0.04)",
+            minHeight: 360,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            // keep layout stable during animations
             position: "relative",
             overflow: "hidden",
+            boxShadow: "0 8px 28px rgba(2,6,23,0.08)",
           }}
         >
           {loading ? (
@@ -241,15 +243,16 @@ const QuizletView = () => {
                 <Typography
                   variant="h4"
                   sx={{
-                    color: "#fff",
-                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontWeight: 800,
                     mb: 4,
-                    fontSize: { xs: 22, sm: 28, md: 32 },
-                    minHeight: 60,
+                    fontSize: { xs: 22, sm: 28, md: 34 },
+                    minHeight: 70,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     textAlign: "center",
+                    lineHeight: 1.15,
                   }}
                 >
                   {quizlets[currentIdx].question}
@@ -258,15 +261,23 @@ const QuizletView = () => {
                 {!showAnswer ? (
                   <Box sx={{ textAlign: "center", mb: 3 }}>
                     <Button
-                      variant="text"
-                      sx={{
-                        color: "#6366f1",
-                        fontWeight: 600,
-                        fontSize: "16px",
-                        textTransform: "none",
-                        borderRadius: 2,
-                      }}
+                      variant="contained"
                       onClick={() => setShowAnswer(true)}
+                      sx={{
+                        color: "#0f172a",
+                        bgcolor: "#eef2ff",
+                        fontWeight: 700,
+                        fontSize: "15px",
+                        textTransform: "none",
+                        borderRadius: 999,
+                        px: 3,
+                        py: 1,
+                        border: "1px solid rgba(59,130,246,0.12)",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 8px 18px rgba(59,130,246,0.08)",
+                        },
+                      }}
                     >
                       Do you know?
                     </Button>
@@ -276,14 +287,17 @@ const QuizletView = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        color: "#22d3ee",
-                        fontWeight: 600,
-                        fontSize: "20px",
-                        border: "1px solid #22d3ee",
-                        borderRadius: 2,
-                        p: 2,
+                        color: "#ffffff",
+                        fontWeight: 800,
+                        fontSize: "18px",
+                        borderRadius: 6,
+                        px: 4,
+                        py: 1.5,
                         display: "inline-block",
-                        bgcolor: "#1e293b",
+                        // colorful gradient background
+                        background: "linear-gradient(90deg, #60a5fa 0%, #7c3aed 60%, #ef6aa3 100%)",
+                        boxShadow: "0 10px 24px rgba(124,58,237,0.14)",
+                        textAlign: 'center'
                       }}
                     >
                       {quizlets[currentIdx].answer}
@@ -300,35 +314,39 @@ const QuizletView = () => {
                   }}
                 >
                   <Button
-                    variant="outlined"
+                    variant="text"
                     disabled={currentIdx === 0}
                     onClick={handleBack}
                     sx={{
-                      color: "#9ca3af",
-                      borderColor: "#4b5563",
-                      "&:hover": {
-                        borderColor: "#6b7280",
-                      },
+                      color: "#64748b",
+                      borderRadius: 3,
+                      px: 2.5,
+                      py: 1.25,
+                      background: "transparent",
+                      textTransform: "none",
                     }}
                   >
                     <ArrowBackIcon sx={{ mr: 1 }} />
                     Back
                   </Button>
 
-                  <Typography variant="body2" sx={{ color: "#9ca3af" }}>
+                  <Typography variant="body2" sx={{ color: "#64748b" }}>
                     {currentIdx + 1} / {quizlets.length}
                   </Typography>
 
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     disabled={currentIdx === quizlets.length - 1}
                     onClick={handleNext}
                     sx={{
-                      color: "#9ca3af",
-                      borderColor: "#4b5563",
-                      "&:hover": {
-                        borderColor: "#6b7280",
-                      },
+                      color: "#ffffff",
+                      bgcolor: "#0f172a",
+                      borderRadius: 8,
+                      px: 2.5,
+                      py: 1.25,
+                      fontWeight: 700,
+                      textTransform: "none",
+                      "&:hover": { bgcolor: "#0b1220" },
                     }}
                   >
                     Next
