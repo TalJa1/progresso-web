@@ -269,8 +269,8 @@ const ScheduleView = () => {
           width: { xs: "98%", sm: "90%", md: "80%", lg: "70%", xl: "1300px" },
           maxWidth: 1300,
           mx: "auto",
-          mt: 4,
-          mb: 4,
+          pt: 4,
+          pb: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
@@ -281,7 +281,7 @@ const ScheduleView = () => {
           sx={{
             display: "flex",
             alignItems: "center",
-            mb: 2,
+            pb: 2,
             justifyContent: "space-between",
             width: "100%",
           }}
@@ -428,7 +428,7 @@ const ScheduleView = () => {
                     icon = <InfoIcon sx={{ fontSize: 20, color: "#fff" }} />;
                 }
                 return (
-                  <Box key={idx} sx={{ mb: 2 }}>
+                  <Box key={idx} sx={{ pb: 2 }}>
                     <Box
                       sx={{
                         p: 2,
@@ -472,7 +472,7 @@ const ScheduleView = () => {
                             display: "flex",
                             alignItems: "center",
                             gap: 1,
-                            mb: 1,
+                            pb: 1,
                           }}
                         >
                           <Typography
@@ -504,7 +504,7 @@ const ScheduleView = () => {
                             display: "flex",
                             alignItems: "center",
                             gap: 1,
-                            mb: 1,
+                            pb: 1,
                           }}
                         >
                           <Box
@@ -578,7 +578,7 @@ const ScheduleView = () => {
               fontWeight={600}
               color="#4f46e5"
               sx={{
-                mb: 1,
+                pb: 1,
                 borderBottom: "1px solid rgba(79,70,229,0.04)",
                 bgcolor: "rgba(79,70,229,0.02)",
                 py: 1,
