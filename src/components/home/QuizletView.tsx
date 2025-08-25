@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
+import { AnimatePresence, motion } from "framer-motion";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
@@ -193,6 +194,9 @@ const QuizletView = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
+            // keep layout stable during animations
+            position: "relative",
+            overflow: "hidden",
           }}
         >
           {loading ? (
@@ -215,115 +219,124 @@ const QuizletView = () => {
               No quiz questions found for this lesson.
             </Typography>
           ) : (
-            <>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "#9ca3af",
-                  mb: 2,
-                  fontSize: "16px",
-                }}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIdx}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.45, ease: "easeInOut" }}
+                style={{ width: "100%" }}
               >
-                Answer these questions to test your knowledge
-              </Typography>
-              <Typography
-                variant="h4"
-                sx={{
-                  color: "#fff",
-                  fontWeight: 700,
-                  mb: 4,
-                  fontSize: { xs: 22, sm: 28, md: 32 },
-                  minHeight: 60,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                }}
-              >
-                {quizlets[currentIdx].question}
-              </Typography>
-
-              {!showAnswer ? (
-                <Box sx={{ textAlign: "center", mb: 3 }}>
-                  <Button
-                    variant="text"
-                    sx={{
-                      color: "#6366f1",
-                      fontWeight: 600,
-                      fontSize: "16px",
-                      textTransform: "none",
-                      borderRadius: 2,
-                    }}
-                    onClick={() => setShowAnswer(true)}
-                  >
-                    Do you know?
-                  </Button>
-                </Box>
-              ) : (
-                <Box sx={{ textAlign: "center", mb: 3 }}>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: "#22d3ee",
-                      fontWeight: 600,
-                      fontSize: "20px",
-                      border: "1px solid #22d3ee",
-                      borderRadius: 2,
-                      p: 2,
-                      display: "inline-block",
-                      bgcolor: "#1e293b",
-                    }}
-                  >
-                    {quizlets[currentIdx].answer}
-                  </Typography>
-                </Box>
-              )}
-
-              {/* Navigation */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  disabled={currentIdx === 0}
-                  onClick={handleBack}
+                <Typography
+                  variant="body1"
                   sx={{
                     color: "#9ca3af",
-                    borderColor: "#4b5563",
-                    "&:hover": {
-                      borderColor: "#6b7280",
-                    },
+                    mb: 2,
+                    fontSize: "16px",
                   }}
                 >
-                  <ArrowBackIcon sx={{ mr: 1 }} />
-                  Back
-                </Button>
-
-                <Typography variant="body2" sx={{ color: "#9ca3af" }}>
-                  {currentIdx + 1} / {quizlets.length}
+                  Answer these questions to test your knowledge
+                </Typography>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    mb: 4,
+                    fontSize: { xs: 22, sm: 28, md: 32 },
+                    minHeight: 60,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                  }}
+                >
+                  {quizlets[currentIdx].question}
                 </Typography>
 
-                <Button
-                  variant="outlined"
-                  disabled={currentIdx === quizlets.length - 1}
-                  onClick={handleNext}
+                {!showAnswer ? (
+                  <Box sx={{ textAlign: "center", mb: 3 }}>
+                    <Button
+                      variant="text"
+                      sx={{
+                        color: "#6366f1",
+                        fontWeight: 600,
+                        fontSize: "16px",
+                        textTransform: "none",
+                        borderRadius: 2,
+                      }}
+                      onClick={() => setShowAnswer(true)}
+                    >
+                      Do you know?
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box sx={{ textAlign: "center", mb: 3 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: "#22d3ee",
+                        fontWeight: 600,
+                        fontSize: "20px",
+                        border: "1px solid #22d3ee",
+                        borderRadius: 2,
+                        p: 2,
+                        display: "inline-block",
+                        bgcolor: "#1e293b",
+                      }}
+                    >
+                      {quizlets[currentIdx].answer}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Navigation */}
+                <Box
                   sx={{
-                    color: "#9ca3af",
-                    borderColor: "#4b5563",
-                    "&:hover": {
-                      borderColor: "#6b7280",
-                    },
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  Next
-                  <ArrowForwardIcon sx={{ ml: 1 }} />
-                </Button>
-              </Box>
-            </>
+                  <Button
+                    variant="outlined"
+                    disabled={currentIdx === 0}
+                    onClick={handleBack}
+                    sx={{
+                      color: "#9ca3af",
+                      borderColor: "#4b5563",
+                      "&:hover": {
+                        borderColor: "#6b7280",
+                      },
+                    }}
+                  >
+                    <ArrowBackIcon sx={{ mr: 1 }} />
+                    Back
+                  </Button>
+
+                  <Typography variant="body2" sx={{ color: "#9ca3af" }}>
+                    {currentIdx + 1} / {quizlets.length}
+                  </Typography>
+
+                  <Button
+                    variant="outlined"
+                    disabled={currentIdx === quizlets.length - 1}
+                    onClick={handleNext}
+                    sx={{
+                      color: "#9ca3af",
+                      borderColor: "#4b5563",
+                      "&:hover": {
+                        borderColor: "#6b7280",
+                      },
+                    }}
+                  >
+                    Next
+                    <ArrowForwardIcon sx={{ ml: 1 }} />
+                  </Button>
+                </Box>
+              </motion.div>
+            </AnimatePresence>
           )}
         </Paper>
       </Box>
