@@ -42,6 +42,7 @@ const WelcomeNewUser: React.FC<WelcomeNewUserProps> = ({ displayName, email, pho
       avatar_url: photoURL || '',
       class_: className,
       school,
+      self_description: "",
     };
     try {
       await createUser(user);
