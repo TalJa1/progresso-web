@@ -72,12 +72,12 @@ const QuizletView = () => {
     >
       <HorizontalNavigationBar />
       <Box sx={{ maxWidth: 800, mx: "auto" }}>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ pb: 2 }}>
           <Typography
             variant="h3"
             sx={{
               fontWeight: 900,
-              mb: 2,
+              pb: 2,
               color: "#0f172a",
               letterSpacing: "-0.5px",
             }}
@@ -85,7 +85,7 @@ const QuizletView = () => {
             {lesson?.title} quizlet
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1.5, mb: 4, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 1.5, pb: 4, flexWrap: "wrap" }}>
           <Button
             variant="contained"
             sx={{
@@ -182,14 +182,12 @@ const QuizletView = () => {
           </Button>
         </Box>
 
-        {/* Quiz Card Section */}
         <Paper
           elevation={1}
           sx={{
             borderRadius: 12,
             p: { xs: 4, md: 6 },
-            mb: 3,
-            // light card so content is clearly visible
+            pb: 3,
             background: "linear-gradient(180deg,#ffffff 0%, #f8fafc 100%)",
             border: "1px solid rgba(15,23,42,0.04)",
             minHeight: 360,
@@ -197,7 +195,7 @@ const QuizletView = () => {
             flexDirection: "column",
             justifyContent: "center",
             position: "relative",
-            overflow: "hidden",
+            overflow: "visible",
             boxShadow: "0 8px 28px rgba(2,6,23,0.08)",
           }}
         >
@@ -234,7 +232,7 @@ const QuizletView = () => {
                   variant="body1"
                   sx={{
                     color: "#9ca3af",
-                    mb: 2,
+                    pb: 2,
                     fontSize: "16px",
                   }}
                 >
@@ -245,7 +243,7 @@ const QuizletView = () => {
                   sx={{
                     color: "#0f172a",
                     fontWeight: 800,
-                    mb: 4,
+                    pb: 4,
                     fontSize: { xs: 22, sm: 28, md: 34 },
                     minHeight: 70,
                     display: "flex",
@@ -259,7 +257,7 @@ const QuizletView = () => {
                 </Typography>
 
                 {!showAnswer ? (
-                  <Box sx={{ textAlign: "center", mb: 3 }}>
+                  <Box sx={{ textAlign: "center", pb: 3 }}>
                     <Button
                       variant="contained"
                       onClick={() => setShowAnswer(true)}
@@ -283,7 +281,7 @@ const QuizletView = () => {
                     </Button>
                   </Box>
                 ) : (
-                  <Box sx={{ textAlign: "center", mb: 3 }}>
+                  <Box sx={{ textAlign: "center", pb: 3 }}>
                     <Typography
                       variant="body1"
                       sx={{
@@ -295,9 +293,10 @@ const QuizletView = () => {
                         py: 1.5,
                         display: "inline-block",
                         // colorful gradient background
-                        background: "linear-gradient(90deg, #60a5fa 0%, #7c3aed 60%, #ef6aa3 100%)",
+                        background:
+                          "linear-gradient(90deg, #60a5fa 0%, #7c3aed 60%, #ef6aa3 100%)",
                         boxShadow: "0 10px 24px rgba(124,58,237,0.14)",
-                        textAlign: 'center'
+                        textAlign: "center",
                       }}
                     >
                       {quizlets[currentIdx].answer}
