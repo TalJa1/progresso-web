@@ -72,7 +72,7 @@ const ProfileView = () => {
           maxWidth: 1300,
           mx: "auto",
           mt: 4,
-          mb: 4,
+          pb: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -87,7 +87,7 @@ const ProfileView = () => {
             borderRadius: 3,
             boxShadow: 2,
             width: "100%",
-            mb: 3,
+            pb: 3,
             flexDirection: { xs: "column", sm: "column", md: "row" },
             textAlign: { xs: "center", sm: "center", md: "left" },
             alignItems: { xs: "center", sm: "center", md: "center" },
@@ -179,7 +179,7 @@ const ProfileView = () => {
           sx={{
             fontWeight: 700,
             mt: 3,
-            mb: 2,
+            pb: 2,
             textAlign: "left",
             width: "100%",
           }}
@@ -193,7 +193,7 @@ const ProfileView = () => {
             boxShadow: 2,
             p: 3,
             width: "100%",
-            mb: 3,
+            pb: 3,
           }}
         >
           <Typography
@@ -201,7 +201,7 @@ const ProfileView = () => {
             sx={{
               fontWeight: 700,
               mt: 3,
-              mb: 2,
+              pb: 2,
               textAlign: "left",
               width: "100%",
             }}
@@ -217,11 +217,11 @@ const ProfileView = () => {
               value={descValue}
               onChange={(e) => setDescValue(e.target.value)}
               disabled={loading}
-              sx={{ mb: 2 }}
+              sx={{ pb: 2 }}
               placeholder="Enter your self description..."
             />
           ) : (
-            <Typography variant="body1" sx={{ color: "grey.800", mb: 2 }}>
+            <Typography variant="body1" sx={{ color: "grey.800", pb: 2 }}>
               {user?.self_description || "No description provided."}
             </Typography>
           )}
@@ -291,7 +291,7 @@ const ProfileView = () => {
           sx={{
             fontWeight: 700,
             mt: 3,
-            mb: 2,
+            pb: 2,
             textAlign: "left",
             width: "100%",
           }}
@@ -305,7 +305,7 @@ const ProfileView = () => {
             boxShadow: 2,
             p: 3,
             width: "100%",
-            mb: 3,
+            pb: 3,
           }}
         >
           <Box
@@ -329,6 +329,7 @@ const ProfileView = () => {
           </Typography>
         </Box>
       </Box>
+      <Box sx={{ height: "50px", width: "100%" }} />
     </Box>
   );
 };
