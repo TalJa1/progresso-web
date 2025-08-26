@@ -356,6 +356,7 @@ const QuizletView = () => {
             </AnimatePresence>
           )}
         </Paper>
+        <Box sx={{ height: "50px", width: "100%" }} />
       </Box>
     </Box>
   );
