@@ -56,9 +56,12 @@ const HomeView = () => {
   const [allLessons, setAllLessons] = useState<LessonModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const limit = 3;
+  const [itemsPerPage, setItemsPerPage] = useState(3);
   const [mockPage, setMockPage] = useState(0);
-  const mockLimit = 3;
+  const [mockItemsPerPage, setMockItemsPerPage] = useState(3);
+  // Refs for measuring available width
+  const lessonsContainerRef = useRef<HTMLDivElement | null>(null);
+  const mockContainerRef = useRef<HTMLDivElement | null>(null);
   const [user, setUser] = useState<{
     displayName: "";
     email: "";
@@ -68,6 +71,24 @@ const HomeView = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [loadingQuizletId, setLoadingQuizletId] = useState<number | null>(null);
   const navigateTimeoutRef = useRef<number | null>(null);
+
+  // Card sizing assumptions (kept small and adjustable)
+  const LESSON_CARD_MIN_WIDTH = 320; // px
+  const MOCK_CARD_MIN_WIDTH = 320; // px
+  const GAP_PX = 24; // matches `gap: 3` (3 * 8px theme spacing)
+
+  const computeItemsPerPage = (
+    containerWidth: number,
+    cardMinWidth: number,
+    gap: number
+  ) => {
+    if (!containerWidth || containerWidth <= cardMinWidth) return 1;
+    // formula: floor((containerWidth + gap) / (cardMinWidth + gap))
+    return Math.max(
+      1,
+      Math.floor((containerWidth + gap) / (cardMinWidth + gap))
+    );
+  };
 
   useEffect(() => {
     const googleUser = localStorage.getItem("googleUser");
@@ -122,6 +143,74 @@ const HomeView = () => {
     };
     fetchLessonsAndTopics();
   }, [userId]);
+
+  // Update itemsPerPage for lessons and mock tests when containers resize
+  useEffect(() => {
+    const lessonEl = lessonsContainerRef.current;
+    const mockEl = mockContainerRef.current;
+
+    const resizeLesson = () => {
+      if (lessonEl) {
+        const w = lessonEl.clientWidth;
+        const n = computeItemsPerPage(w, LESSON_CARD_MIN_WIDTH, GAP_PX);
+        setItemsPerPage(n);
+        // ensure page is within bounds
+        setPage((p) =>
+          Math.min(
+            p,
+            Math.max(0, Math.ceil(allLessons.length / Math.max(1, n)) - 1)
+          )
+        );
+      }
+    };
+
+    const resizeMock = () => {
+      if (mockEl) {
+        const w = mockEl.clientWidth;
+        const n = computeItemsPerPage(w, MOCK_CARD_MIN_WIDTH, GAP_PX);
+        setMockItemsPerPage(n);
+        setMockPage((p) =>
+          Math.min(
+            p,
+            Math.max(0, Math.ceil(mocktestData.length / Math.max(1, n)) - 1)
+          )
+        );
+      }
+    };
+
+    // Initial measure
+    resizeLesson();
+    resizeMock();
+
+    // Use ResizeObserver if available for smoother updates
+    let roLesson: ResizeObserver | null = null;
+    let roMock: ResizeObserver | null = null;
+    // Use ResizeObserver if available
+    const RObserver = (
+      window as unknown as { ResizeObserver?: typeof ResizeObserver }
+    ).ResizeObserver;
+    if (RObserver) {
+      if (lessonEl) {
+        roLesson = new RObserver(resizeLesson);
+        if (roLesson) roLesson.observe(lessonEl);
+      }
+      if (mockEl) {
+        roMock = new RObserver(resizeMock);
+        if (roMock) roMock.observe(mockEl);
+      }
+    }
+
+    // fallback: window resize
+    window.addEventListener("resize", resizeLesson);
+    window.addEventListener("resize", resizeMock);
+
+    return () => {
+      window.removeEventListener("resize", resizeLesson);
+      window.removeEventListener("resize", resizeMock);
+      if (roLesson && lessonEl) roLesson.unobserve(lessonEl);
+      if (roMock && mockEl) roMock.unobserve(mockEl);
+    };
+  }, [allLessons.length]);
 
   useEffect(() => {
     return () => {
@@ -189,7 +278,7 @@ const HomeView = () => {
           </IconButton>
           <IconButton
             onClick={() => setPage(page + 1)}
-            disabled={loading || (page + 1) * limit >= allLessons.length}
+            disabled={loading || (page + 1) * itemsPerPage >= allLessons.length}
             sx={{ ml: 1 }}
           >
             <ArrowForwardIcon />
@@ -203,6 +292,7 @@ const HomeView = () => {
             justifyContent: "flex-start",
             width: "100%",
           }}
+          ref={lessonsContainerRef}
         >
           {loading ? (
             <CircularProgress />
@@ -210,7 +300,7 @@ const HomeView = () => {
             <Typography>No lessons found.</Typography>
           ) : (
             allLessons
-              .slice(page * limit, page * limit + limit)
+              .slice(page * itemsPerPage, page * itemsPerPage + itemsPerPage)
               .map((lesson) => (
                 <Paper
                   key={lesson.id}
@@ -652,7 +742,9 @@ const HomeView = () => {
               </IconButton>
               <IconButton
                 onClick={() => setMockPage(mockPage + 1)}
-                disabled={(mockPage + 1) * mockLimit >= mocktestData.length}
+                disabled={
+                  (mockPage + 1) * mockItemsPerPage >= mocktestData.length
+                }
                 sx={{ ml: 1 }}
               >
                 <ArrowForwardIcon />
@@ -667,9 +759,13 @@ const HomeView = () => {
               justifyContent: "flex-start",
               width: "100%",
             }}
+            ref={mockContainerRef}
           >
             {mocktestData
-              .slice(mockPage * mockLimit, mockPage * mockLimit + mockLimit)
+              .slice(
+                mockPage * mockItemsPerPage,
+                mockPage * mockItemsPerPage + mockItemsPerPage
+              )
               .map((mock) => (
                 <Paper
                   key={mock.url}
