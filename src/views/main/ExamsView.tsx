@@ -33,6 +33,9 @@ const ExamsView = () => {
   const [selectedExam, setSelectedExam] = useState<ExamModel | null>(null);
   const [dialogLoading, setDialogLoading] = useState(false);
   const [redirectText, setRedirectText] = useState("");
+  // Animation states
+  const [animatedCards, setAnimatedCards] = useState<Set<number>>(new Set());
+  const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +51,46 @@ const ExamsView = () => {
       setLoading(false);
     };
     fetchExams();
+  }, []);
+
+  // Staggered animation effect
+  useEffect(() => {
+    if (!loading && exams.length > 0 && !isAnimationComplete) {
+      // Reset animated cards
+      setAnimatedCards(new Set());
+      
+      // Start staggered animation with a small initial delay
+      const timeouts: NodeJS.Timeout[] = [];
+      
+      const initialTimeout = setTimeout(() => {
+        exams.forEach((exam, index) => {
+          const cardTimeout = setTimeout(() => {
+            setAnimatedCards(prev => new Set([...prev, exam.id]));
+            
+            // Mark animation as complete when last card is animated
+            if (index === exams.length - 1) {
+              const completeTimeout = setTimeout(() => {
+                setIsAnimationComplete(true);
+              }, 600); // Match animation duration
+              timeouts.push(completeTimeout);
+            }
+          }, index * 150); // 150ms delay between each card
+          timeouts.push(cardTimeout);
+        });
+      }, 300); // Initial delay before starting animations
+      timeouts.push(initialTimeout);
+      
+      // Cleanup function
+      return () => {
+        timeouts.forEach(timeout => clearTimeout(timeout));
+      };
+    }
+  }, [loading, exams, isAnimationComplete]);
+
+  // Reset animation when component mounts
+  useEffect(() => {
+    setAnimatedCards(new Set());
+    setIsAnimationComplete(false);
   }, []);
 
   const handleTakeExam = (exam: ExamModel) => {
@@ -134,6 +177,13 @@ const ExamsView = () => {
             {exams.map((exam) => (
               <Box
                 key={exam.id}
+                className={
+                  isAnimationComplete
+                    ? 'exam-card-visible'
+                    : animatedCards.has(exam.id)
+                    ? 'exam-card-animate'
+                    : 'exam-card-hidden'
+                }
                 sx={{
                   width: "100%",
                   background:
@@ -486,6 +536,39 @@ const ExamsView = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes blurToNormal {
+          0% {
+            filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          100% {
+            filter: blur(0px);
+            opacity: 1;
+            transform: translateY(0px) scale(1);
+          }
+        }
+        
+        .exam-card-hidden {
+          filter: blur(10px);
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        
+        .exam-card-animate {
+          animation: blurToNormal 0.6s ease-out forwards;
+        }
+        
+        .exam-card-visible {
+          filter: blur(0px);
+          opacity: 1;
+          transform: translateY(0px) scale(1);
+          transition: all 0.2s ease;
+        }
+      `}</style>
     </Box>
   );
 };
