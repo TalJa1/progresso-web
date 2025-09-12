@@ -59,6 +59,11 @@ const HomeView = () => {
   const [itemsPerPage, setItemsPerPage] = useState(3);
   const [mockPage, setMockPage] = useState(0);
   const [mockItemsPerPage, setMockItemsPerPage] = useState(3);
+  // Animation states
+  const [isLessonsAnimating, setIsLessonsAnimating] = useState(false);
+  const [lessonsAnimationDirection, setLessonsAnimationDirection] = useState<'left' | 'right'>('left');
+  const [isMockAnimating, setIsMockAnimating] = useState(false);
+  const [mockAnimationDirection, setMockAnimationDirection] = useState<'left' | 'right'>('left');
   // Refs for measuring available width
   const lessonsContainerRef = useRef<HTMLDivElement | null>(null);
   const mockContainerRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +93,48 @@ const HomeView = () => {
       1,
       Math.floor((containerWidth + gap) / (cardMinWidth + gap))
     );
+  };
+
+  // Animation handlers for lessons
+  const handleLessonsNavigation = (direction: 'next' | 'prev') => {
+    if (isLessonsAnimating) return;
+    
+    const newDirection = direction === 'next' ? 'left' : 'right';
+    setLessonsAnimationDirection(newDirection);
+    setIsLessonsAnimating(true);
+    
+    setTimeout(() => {
+      if (direction === 'next') {
+        setPage(page + 1);
+      } else {
+        setPage(Math.max(0, page - 1));
+      }
+      
+      setTimeout(() => {
+        setIsLessonsAnimating(false);
+      }, 400); // Match animation duration
+    }, 200); // Half animation for smooth transition
+  };
+
+  // Animation handlers for mock tests
+  const handleMockNavigation = (direction: 'next' | 'prev') => {
+    if (isMockAnimating) return;
+    
+    const newDirection = direction === 'next' ? 'left' : 'right';
+    setMockAnimationDirection(newDirection);
+    setIsMockAnimating(true);
+    
+    setTimeout(() => {
+      if (direction === 'next') {
+        setMockPage(mockPage + 1);
+      } else {
+        setMockPage(Math.max(0, mockPage - 1));
+      }
+      
+      setTimeout(() => {
+        setIsMockAnimating(false);
+      }, 400); // Match animation duration
+    }, 200); // Half animation for smooth transition
   };
 
   useEffect(() => {
@@ -270,15 +317,15 @@ const HomeView = () => {
             My Lessons
           </Typography>
           <IconButton
-            onClick={() => setPage(Math.max(0, page - 1))}
-            disabled={page === 0 || loading}
+            onClick={() => handleLessonsNavigation('prev')}
+            disabled={page === 0 || loading || isLessonsAnimating}
             sx={{ ml: 1 }}
           >
             <ArrowBackIcon />
           </IconButton>
           <IconButton
-            onClick={() => setPage(page + 1)}
-            disabled={loading || (page + 1) * itemsPerPage >= allLessons.length}
+            onClick={() => handleLessonsNavigation('next')}
+            disabled={loading || isLessonsAnimating || (page + 1) * itemsPerPage >= allLessons.length}
             sx={{ ml: 1 }}
           >
             <ArrowForwardIcon />
@@ -293,6 +340,13 @@ const HomeView = () => {
             width: "100%",
           }}
           ref={lessonsContainerRef}
+          className={
+            isLessonsAnimating
+              ? lessonsAnimationDirection === 'left'
+                ? 'slide-enter-left'
+                : 'slide-enter-right'
+              : ''
+          }
         >
           {loading ? (
             <CircularProgress />
@@ -467,6 +521,42 @@ const HomeView = () => {
         @keyframes moveUpCenter {
           0% { transform: translateY(100%); opacity: 0; }
           100% { transform: translateY(0%); opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+          0% { transform: translateX(-100%); opacity: 0; }
+          100% { transform: translateX(0%); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+          0% { transform: translateX(100%); opacity: 0; }
+          100% { transform: translateX(0%); opacity: 1; }
+        }
+        
+        @keyframes slideOutLeft {
+          0% { transform: translateX(0%); opacity: 1; }
+          100% { transform: translateX(-100%); opacity: 0; }
+        }
+        
+        @keyframes slideOutRight {
+          0% { transform: translateX(0%); opacity: 1; }
+          100% { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .slide-enter-left {
+          animation: slideInRight 0.4s ease-out forwards;
+        }
+        
+        .slide-enter-right {
+          animation: slideInLeft 0.4s ease-out forwards;
+        }
+        
+        .slide-exit-left {
+          animation: slideOutLeft 0.4s ease-out forwards;
+        }
+        
+        .slide-exit-right {
+          animation: slideOutRight 0.4s ease-out forwards;
         }
       `}</style>
                   </Box>
@@ -734,16 +824,16 @@ const HomeView = () => {
               }}
             >
               <IconButton
-                onClick={() => setMockPage(Math.max(0, mockPage - 1))}
-                disabled={mockPage === 0}
+                onClick={() => handleMockNavigation('prev')}
+                disabled={mockPage === 0 || isMockAnimating}
                 sx={{ ml: 1 }}
               >
                 <ArrowBackIcon />
               </IconButton>
               <IconButton
-                onClick={() => setMockPage(mockPage + 1)}
+                onClick={() => handleMockNavigation('next')}
                 disabled={
-                  (mockPage + 1) * mockItemsPerPage >= mocktestData.length
+                  isMockAnimating || (mockPage + 1) * mockItemsPerPage >= mocktestData.length
                 }
                 sx={{ ml: 1 }}
               >
@@ -760,6 +850,13 @@ const HomeView = () => {
               width: "100%",
             }}
             ref={mockContainerRef}
+            className={
+              isMockAnimating
+                ? mockAnimationDirection === 'left'
+                  ? 'slide-enter-left'
+                  : 'slide-enter-right'
+                : ''
+            }
           >
             {mocktestData
               .slice(
