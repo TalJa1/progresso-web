@@ -100,6 +100,10 @@ const ScheduleView = () => {
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
 
+  // Calendar animation states
+  const [animatedDates, setAnimatedDates] = useState<Set<number>>(new Set());
+  const [isCalendarAnimationComplete, setIsCalendarAnimationComplete] = useState(false);
+
   const handleSnackbarClose = (
     _?: React.SyntheticEvent | Event,
     reason?: string
@@ -150,6 +154,68 @@ const ScheduleView = () => {
     };
     fetchSchedules();
   }, [userId]);
+
+  // Calendar animation effect - triggers when month/year changes
+  useEffect(() => {
+    // Always run animation when view changes OR when component first mounts
+    setIsCalendarAnimationComplete(false);
+    setAnimatedDates(new Set());
+    
+    // Start quick staggered animation for date cells
+    const timeouts: NodeJS.Timeout[] = [];
+    
+    // Get all valid dates in the month (excluding null values for empty cells)
+    const validDates: number[] = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      validDates.push(d);
+    }
+    
+    const initialTimeout = setTimeout(() => {
+      // Create a wave-like animation pattern - dates appear from center outward
+      const centerDate = Math.ceil(daysInMonth / 2);
+      const animationOrder: number[] = [];
+      
+      // Add center date first
+      animationOrder.push(centerDate);
+      
+      // Add dates radiating outward from center
+      for (let offset = 1; offset < daysInMonth; offset++) {
+        if (centerDate - offset >= 1) {
+          animationOrder.push(centerDate - offset);
+        }
+        if (centerDate + offset <= daysInMonth) {
+          animationOrder.push(centerDate + offset);
+        }
+      }
+      
+      animationOrder.forEach((date, index) => {
+        const dateTimeout = setTimeout(() => {
+          setAnimatedDates(prev => new Set([...prev, date]));
+          
+          // Mark animation as complete when last date is animated
+          if (index === animationOrder.length - 1) {
+            const completeTimeout = setTimeout(() => {
+              setIsCalendarAnimationComplete(true);
+            }, 200); // Quick completion
+            timeouts.push(completeTimeout);
+          }
+        }, index * 30); // Very quick 30ms delay between each date
+        timeouts.push(dateTimeout);
+      });
+    }, 150); // Short initial delay
+    timeouts.push(initialTimeout);
+    
+    // Cleanup function
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
+  }, [viewYear, viewMonth, daysInMonth]); // Removed currentViewKey dependency
+
+  // Reset animation when component mounts
+  useEffect(() => {
+    setAnimatedDates(new Set());
+    setIsCalendarAnimationComplete(false);
+  }, []);
 
   const calendarCells: (number | null)[] = [];
   for (let i = 0; i < firstDayOfWeek; i++) {
@@ -604,6 +670,17 @@ const ScheduleView = () => {
               return (
                 <Box
                   key={wi + "-" + di}
+                  className={
+                    day ? (
+                      isCalendarAnimationComplete
+                        ? 'calendar-date-visible'
+                        : animatedDates.has(day)
+                        ? 'calendar-date-animate'
+                        : animatedDates.size === 0 && isCalendarAnimationComplete === false
+                        ? 'calendar-date-visible' // Fallback: show immediately if animation hasn't started
+                        : 'calendar-date-hidden'
+                    ) : undefined
+                  }
                   sx={{
                     minHeight: 64,
                     bgcolor: isToday
@@ -621,6 +698,8 @@ const ScheduleView = () => {
                       ? "1px solid rgba(79,70,229,0.12)"
                       : undefined,
                     cursor: day ? "pointer" : "default",
+                    // Ensure visibility as fallback
+                    opacity: day ? 1 : undefined,
                   }}
                   onClick={() => handleDateClick(day)}
                 >
@@ -882,6 +961,66 @@ const ScheduleView = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* CSS Animations for Calendar */}
+      <style>{`
+        @keyframes dateReveal {
+          0% {
+            opacity: 0;
+            transform: scale(0.1) rotateY(180deg) translateZ(-100px);
+            filter: blur(8px);
+            box-shadow: 0 0 20px rgba(79,70,229,0.3);
+          }
+          30% {
+            opacity: 0.4;
+            transform: scale(0.8) rotateY(120deg) translateZ(-50px);
+            filter: blur(4px);
+            box-shadow: 0 4px 15px rgba(79,70,229,0.2);
+          }
+          70% {
+            opacity: 0.8;
+            transform: scale(1.05) rotateY(45deg) translateZ(-10px);
+            filter: blur(1px);
+            box-shadow: 0 6px 20px rgba(79,70,229,0.1);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotateY(0deg) translateZ(0px);
+            filter: blur(0px);
+            box-shadow: none;
+          }
+        }
+        
+        .calendar-date-hidden {
+          opacity: 0;
+          transform: scale(0.1) rotateY(180deg) translateZ(-100px);
+          filter: blur(8px);
+        }
+        
+        .calendar-date-animate {
+          animation: dateReveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        .calendar-date-visible {
+          opacity: 1 !important;
+          transform: scale(1) rotateY(0deg) translateZ(0px) !important;
+          filter: blur(0px) !important;
+          transition: all 0.2s ease;
+        }
+        
+        /* Fallback: ensure all calendar cells are visible by default */
+        [role="gridcell"], .MuiBox-root {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+        
+        /* Add a subtle hover effect that works with the animation */
+        .calendar-date-visible:hover {
+          transform: scale(1.02) translateZ(2px) !important;
+          box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+        }
+      `}</style>
     </Box>
   );
 };
