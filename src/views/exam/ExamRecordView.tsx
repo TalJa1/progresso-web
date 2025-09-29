@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { getQuestionsWithAnswersByExamId } from "../../apis/lessons/QuestionAnswerAPI";
 import { getSubmissionRecordsBySubmissionAndUser } from "../../apis/lessons/submissionRecordAPI";
@@ -130,6 +130,29 @@ const ExamRecordView = () => {
       if (finishTimeout.current) clearTimeout(finishTimeout.current);
     };
   }, []);
+
+  // Render text containing caret-based superscript notation into React nodes
+  // Supports: x^2, x^{10}, x^(10) and multiple occurrences per string
+  const renderWithSuperscript = (text?: string | null) => {
+    if (!text) return null;
+    const nodes: React.ReactNode[] = [];
+    const regex = /\^(?:\{([^}]+)\}|\(([^)]+)\)|([^\s^{}()]+))/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+      const idx = match.index;
+      if (idx > lastIndex) {
+        nodes.push(text.substring(lastIndex, idx));
+      }
+      const content = match[1] ?? match[2] ?? match[3] ?? "";
+      nodes.push(
+        <sup key={`${idx}-${content}`}>{content}</sup>
+      );
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < text.length) nodes.push(text.substring(lastIndex));
+    return nodes;
+  };
 
   if (loading) return <div>Loading questions...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
@@ -371,7 +394,9 @@ const ExamRecordView = () => {
                       variant="h6"
                       sx={{ mb: 3, color: "#222", fontWeight: 700 }}
                     >
-                      {questions[currentIdx].content}
+                      {renderWithSuperscript(
+                        questions[currentIdx].content as string
+                      )}
                     </Typography>
                     <FormControl component="fieldset" sx={{ width: "100%" }}>
                       {questions[currentIdx].type === "multiple" ? (
@@ -436,7 +461,7 @@ const ExamRecordView = () => {
                                   }}
                                 >
                                   <Box component="span" sx={{ pr: 1, flex: 1 }}>
-                                    {ans.content}
+                                    {renderWithSuperscript(ans.content)}
                                   </Box>
                                   {null}
                                 </Box>
