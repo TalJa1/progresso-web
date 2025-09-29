@@ -61,9 +61,13 @@ const HomeView = () => {
   const [mockItemsPerPage, setMockItemsPerPage] = useState(3);
   // Animation states
   const [isLessonsAnimating, setIsLessonsAnimating] = useState(false);
-  const [lessonsAnimationDirection, setLessonsAnimationDirection] = useState<'left' | 'right'>('left');
+  const [lessonsAnimationDirection, setLessonsAnimationDirection] = useState<
+    "left" | "right"
+  >("left");
   const [isMockAnimating, setIsMockAnimating] = useState(false);
-  const [mockAnimationDirection, setMockAnimationDirection] = useState<'left' | 'right'>('left');
+  const [mockAnimationDirection, setMockAnimationDirection] = useState<
+    "left" | "right"
+  >("left");
   // Refs for measuring available width
   const lessonsContainerRef = useRef<HTMLDivElement | null>(null);
   const mockContainerRef = useRef<HTMLDivElement | null>(null);
@@ -96,20 +100,20 @@ const HomeView = () => {
   };
 
   // Animation handlers for lessons
-  const handleLessonsNavigation = (direction: 'next' | 'prev') => {
+  const handleLessonsNavigation = (direction: "next" | "prev") => {
     if (isLessonsAnimating) return;
-    
-    const newDirection = direction === 'next' ? 'left' : 'right';
+
+    const newDirection = direction === "next" ? "left" : "right";
     setLessonsAnimationDirection(newDirection);
     setIsLessonsAnimating(true);
-    
+
     setTimeout(() => {
-      if (direction === 'next') {
+      if (direction === "next") {
         setPage(page + 1);
       } else {
         setPage(Math.max(0, page - 1));
       }
-      
+
       setTimeout(() => {
         setIsLessonsAnimating(false);
       }, 400); // Match animation duration
@@ -117,20 +121,20 @@ const HomeView = () => {
   };
 
   // Animation handlers for mock tests
-  const handleMockNavigation = (direction: 'next' | 'prev') => {
+  const handleMockNavigation = (direction: "next" | "prev") => {
     if (isMockAnimating) return;
-    
-    const newDirection = direction === 'next' ? 'left' : 'right';
+
+    const newDirection = direction === "next" ? "left" : "right";
     setMockAnimationDirection(newDirection);
     setIsMockAnimating(true);
-    
+
     setTimeout(() => {
-      if (direction === 'next') {
+      if (direction === "next") {
         setMockPage(mockPage + 1);
       } else {
         setMockPage(Math.max(0, mockPage - 1));
       }
-      
+
       setTimeout(() => {
         setIsMockAnimating(false);
       }, 400); // Match animation duration
@@ -317,15 +321,19 @@ const HomeView = () => {
             My Lessons
           </Typography>
           <IconButton
-            onClick={() => handleLessonsNavigation('prev')}
+            onClick={() => handleLessonsNavigation("prev")}
             disabled={page === 0 || loading || isLessonsAnimating}
             sx={{ ml: 1 }}
           >
             <ArrowBackIcon />
           </IconButton>
           <IconButton
-            onClick={() => handleLessonsNavigation('next')}
-            disabled={loading || isLessonsAnimating || (page + 1) * itemsPerPage >= allLessons.length}
+            onClick={() => handleLessonsNavigation("next")}
+            disabled={
+              loading ||
+              isLessonsAnimating ||
+              (page + 1) * itemsPerPage >= allLessons.length
+            }
             sx={{ ml: 1 }}
           >
             <ArrowForwardIcon />
@@ -342,10 +350,10 @@ const HomeView = () => {
           ref={lessonsContainerRef}
           className={
             isLessonsAnimating
-              ? lessonsAnimationDirection === 'left'
-                ? 'slide-enter-left'
-                : 'slide-enter-right'
-              : ''
+              ? lessonsAnimationDirection === "left"
+                ? "slide-enter-left"
+                : "slide-enter-right"
+              : ""
           }
         >
           {loading ? (
@@ -665,70 +673,7 @@ const HomeView = () => {
               Join Now
             </Button>
           </Paper>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              borderRadius: 4,
-              boxShadow: "0 4px 24px 0 rgba(0,0,0,0.08)",
-              background: "linear-gradient(135deg, #eaffea 80%, #f6fff6 100%)",
-              minWidth: 320,
-              maxWidth: 340,
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{ color: "grey.700", mb: 1, display: "block" }}
-            >
-              Daily Doubt Resolution
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-              DDR 1 - {getDateStr(2)}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "grey.800", mb: 1 }}>
-              Progresso community
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Typography
-                variant="body2"
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <span role="img" aria-label="calendar">
-                  🗓️
-                </span>{" "}
-                {getDateStr(2)}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "error.main", fontWeight: 700 }}
-              >
-                •
-              </Typography>
-              <Typography variant="body2">04:00 PM - 05:00 PM</Typography>
-            </Box>
-            <Box sx={{ flexGrow: 1 }} />
-            <Button
-              variant="contained"
-              disabled
-              fullWidth
-              sx={{
-                bgcolor: "grey.300",
-                color: "grey.600",
-                fontWeight: 700,
-                borderRadius: 2,
-                fontSize: 16,
-                py: 1.2,
-                boxShadow: 0,
-                alignSelf: "flex-end",
-              }}
-            >
-              Join Now
-            </Button>
-          </Paper>
+
           <Paper
             elevation={0}
             sx={{
@@ -824,16 +769,17 @@ const HomeView = () => {
               }}
             >
               <IconButton
-                onClick={() => handleMockNavigation('prev')}
+                onClick={() => handleMockNavigation("prev")}
                 disabled={mockPage === 0 || isMockAnimating}
                 sx={{ ml: 1 }}
               >
                 <ArrowBackIcon />
               </IconButton>
               <IconButton
-                onClick={() => handleMockNavigation('next')}
+                onClick={() => handleMockNavigation("next")}
                 disabled={
-                  isMockAnimating || (mockPage + 1) * mockItemsPerPage >= mocktestData.length
+                  isMockAnimating ||
+                  (mockPage + 1) * mockItemsPerPage >= mocktestData.length
                 }
                 sx={{ ml: 1 }}
               >
@@ -852,10 +798,10 @@ const HomeView = () => {
             ref={mockContainerRef}
             className={
               isMockAnimating
-                ? mockAnimationDirection === 'left'
-                  ? 'slide-enter-left'
-                  : 'slide-enter-right'
-                : ''
+                ? mockAnimationDirection === "left"
+                  ? "slide-enter-left"
+                  : "slide-enter-right"
+                : ""
             }
           >
             {mocktestData
