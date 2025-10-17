@@ -11,14 +11,16 @@ import {
 import QuizIcon from "@mui/icons-material/Quiz";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AddIcon from "@mui/icons-material/Add";
 import HorizontalNavigationBar from "../../components/HorizontalNavigationBar";
-import { getAllLessons } from "../../apis/lessons/lessonAPI";
+import { getAllLessons, createBulkLessons } from "../../apis/lessons/lessonAPI";
 import { getAllTopics } from "../../apis/topics/topicAPI";
 import type {
   LessonModel,
   TopicModel,
   UserModel,
 } from "../../services/apiModel";
+import type { BulkLessonCreate } from "../../apis/lessons/lessonAPI";
 import { useNavigate } from "react-router-dom";
 import { mocktestData } from "../../services/mocktest";
 import {
@@ -27,6 +29,7 @@ import {
 } from "../../apis/lessons/lessonCompletedAPI";
 import { getUserByEmail } from "../../apis/users/usersAPI";
 import FloatingChatBot from "../../components/FloatingChatBot";
+import BulkLessonModal from "../../components/home/BulkLessonModal";
 
 const HomeView = () => {
   const navigate = useNavigate();
@@ -80,6 +83,20 @@ const HomeView = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [loadingQuizletId, setLoadingQuizletId] = useState<number | null>(null);
   const navigateTimeoutRef = useRef<number | null>(null);
+  
+  // Admin bulk lesson states
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [openBulkModal, setOpenBulkModal] = useState(false);
+  const [bulkLessons, setBulkLessons] = useState<BulkLessonCreate[]>([
+    {
+      topic_id: 1,
+      title: "",
+      content: "",
+      video_url: null,
+      short_describe: "",
+    },
+  ]);
+  const [isSubmittingBulk, setIsSubmittingBulk] = useState(false);
 
   // Card sizing assumptions (kept small and adjustable)
   const LESSON_CARD_MIN_WIDTH = 320; // px
@@ -152,6 +169,13 @@ const HomeView = () => {
           photoURL: parsed.photoURL || "",
           uid: parsed.uid || "",
         });
+        
+        // Check if user is admin
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+        if (parsed.email === adminEmail) {
+          setIsAdmin(true);
+        }
+        
         (async () => {
           try {
             const dbUser: UserModel = await getUserByEmail(parsed.email);
@@ -271,6 +295,41 @@ const HomeView = () => {
     };
   }, []);
 
+  // Admin bulk lesson handlers
+  const handleOpenBulkModal = () => {
+    setOpenBulkModal(true);
+  };
+
+  const handleCloseBulkModal = () => {
+    setOpenBulkModal(false);
+    setBulkLessons([
+      {
+        topic_id: 1,
+        title: "",
+        content: "",
+        video_url: null,
+        short_describe: "",
+      },
+    ]);
+  };
+
+  const handleSubmitBulkLessons = async () => {
+    try {
+      setIsSubmittingBulk(true);
+      await createBulkLessons(bulkLessons);
+      alert("Lessons added successfully!");
+      handleCloseBulkModal();
+      // Refresh lessons
+      const lessonsData = await getAllLessons();
+      setAllLessons(lessonsData);
+    } catch (error) {
+      console.error("Error adding bulk lessons:", error);
+      alert("Error adding lessons. Please try again.");
+    } finally {
+      setIsSubmittingBulk(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -320,6 +379,22 @@ const HomeView = () => {
           >
             My Lessons
           </Typography>
+          {isAdmin && (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<AddIcon />}
+              onClick={handleOpenBulkModal}
+              sx={{
+                mr: 2,
+                borderRadius: 2,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              Add Lessons
+            </Button>
+          )}
           <IconButton
             onClick={() => handleLessonsNavigation("prev")}
             disabled={page === 0 || loading || isLessonsAnimating}
@@ -986,6 +1061,17 @@ const HomeView = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Admin Bulk Lesson Modal */}
+      <BulkLessonModal
+        open={openBulkModal}
+        onClose={handleCloseBulkModal}
+        bulkLessons={bulkLessons}
+        setBulkLessons={setBulkLessons}
+        onSubmit={handleSubmitBulkLessons}
+        isSubmitting={isSubmittingBulk}
+      />
+
       {/* Ensure FloatingChatBot is rendered outside main content for visibility */}
       <FloatingChatBot />
     </Box>
