@@ -1,7 +1,7 @@
 import HorizontalNavigationBar from "../HorizontalNavigationBar";
 import { Box, Typography, Drawer, Card, IconButton } from "@mui/material";
 import ReactMarkdown from "react-markdown";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getLessonById } from "../../apis/lessons/lessonAPI";
 import type { LessonModel } from "../../services/apiModel";
@@ -18,6 +18,7 @@ const LearningView = () => {
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [allLessons, setAllLessons] = useState<LessonModel[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -87,7 +88,8 @@ const LearningView = () => {
               }}
               onClick={() => {
                 setDrawerOpen(false);
-                window.location.href = `/learning/${l.id}`;
+                // window.location.href = `/learning/${l.id}`;
+                navigate(`/learning/${l.id}`);
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
