@@ -24,6 +24,7 @@ RUN npm install -g serve
 
 # Copy built files from build stage
 COPY --from=build /app/dist /app/dist
+COPY --from=build /app/serve.json /app/serve.json
 
 EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "dist", "-l", "3000", "-c", "/app/serve.json"]

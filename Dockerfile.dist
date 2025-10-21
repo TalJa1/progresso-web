@@ -9,6 +9,7 @@ RUN npm install -g serve
 # with the local `dist` directory as the build context so the container
 # contains exactly the locally-built files).
 COPY . /app/dist
+COPY serve.json /app/serve.json
 
 EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "dist", "-l", "3000", "-c", "/app/serve.json"]
