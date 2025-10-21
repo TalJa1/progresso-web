@@ -1,13 +1,14 @@
-FROM nginx:stable-alpine
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install serve globally to serve static files
+RUN npm install -g serve
 
 # Copy the pre-built static site from the build context (we will build
 # with the local `dist` directory as the build context so the container
 # contains exactly the locally-built files).
-COPY . /usr/share/nginx/html
+COPY . /app/dist
 
-# Use default nginx config. If you need custom headers/gzip, copy your
-# `nginx.conf` into the image instead by changing the build context or
-# copying the file here.
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+CMD ["serve", "-s", "dist", "-l", "3000"]

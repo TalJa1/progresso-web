@@ -44,9 +44,18 @@ const ExamsView = () => {
       setError(null);
       try {
         const data = await getAllExams();
-        setExams(data);
-      } catch {
+        // Ensure data is an array before setting
+        if (Array.isArray(data)) {
+          setExams(data);
+        } else {
+          console.error("API returned non-array data:", data);
+          setError("Failed to load exams. Invalid data format.");
+          setExams([]);
+        }
+      } catch (err) {
+        console.error("Error fetching exams:", err);
         setError("Failed to load exams.");
+        setExams([]);
       }
       setLoading(false);
     };
@@ -55,7 +64,7 @@ const ExamsView = () => {
 
   // Staggered animation effect
   useEffect(() => {
-    if (!loading && exams.length > 0 && !isAnimationComplete) {
+    if (!loading && Array.isArray(exams) && exams.length > 0 && !isAnimationComplete) {
       // Reset animated cards
       setAnimatedCards(new Set());
       
@@ -164,6 +173,10 @@ const ExamsView = () => {
         ) : error ? (
           <Typography color="error" sx={{ mt: 4 }}>
             {error}
+          </Typography>
+        ) : !Array.isArray(exams) || exams.length === 0 ? (
+          <Typography sx={{ mt: 4, color: "#666" }}>
+            No exams available at the moment.
           </Typography>
         ) : (
           <Box

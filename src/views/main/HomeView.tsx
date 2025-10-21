@@ -196,20 +196,26 @@ const HomeView = () => {
           getAllLessons(),
           getAllTopics(),
         ]);
-        setAllLessons(lessonsData);
-        setTopics(topicsData);
+        // Ensure data is arrays before setting
+        setAllLessons(Array.isArray(lessonsData) ? lessonsData : []);
+        setTopics(Array.isArray(topicsData) ? topicsData : []);
         if (userId) {
           try {
             const completed = await getLessonsCompletedByUser(userId);
             type CompletedLesson = { lesson_id: number };
-            setCompletedLessons(
-              completed.map((c: CompletedLesson) => c.lesson_id)
-            );
+            if (Array.isArray(completed)) {
+              setCompletedLessons(
+                completed.map((c: CompletedLesson) => c.lesson_id)
+              );
+            } else {
+              setCompletedLessons([]);
+            }
           } catch {
             setCompletedLessons([]);
           }
         }
-      } catch {
+      } catch (err) {
+        console.error("Error fetching lessons and topics:", err);
         setAllLessons([]);
         setTopics([]);
         setCompletedLessons([]);
