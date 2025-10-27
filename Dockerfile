@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Build arguments for Vite environment variables
 ARG VITE_API_BASE_URL
-ARG VITE_ADMIN_EMAIL
+ARG VITE_ADMIN_EMAILS
 
 # Install dependencies based on lockfile for reproducible builds
 COPY package.json package-lock.json ./

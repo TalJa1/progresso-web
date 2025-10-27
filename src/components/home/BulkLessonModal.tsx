@@ -2,28 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Button,
   CircularProgress,
-  IconButton,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DownloadIcon from "@mui/icons-material/Download";
 import * as XLSX from "xlsx";
 import type { BulkLessonCreate } from "../../apis/lessons/lessonAPI";
 import { getAllTopics } from "../../apis/topics/topicAPI";
 import type { TopicModel } from "../../services/apiModel";
+import BulkLessonCard from "./BulkLessonCard";
 
 interface BulkLessonModalProps {
   open: boolean;
@@ -32,6 +25,7 @@ interface BulkLessonModalProps {
   setBulkLessons: React.Dispatch<React.SetStateAction<BulkLessonCreate[]>>;
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
+  onError: (message: string) => void;
 }
 
 const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
@@ -41,6 +35,7 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
   setBulkLessons,
   onSubmit,
   isSubmitting,
+  onError,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [topics, setTopics] = useState<TopicModel[]>([]);
@@ -119,7 +114,7 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
         const lessons: BulkLessonCreate[] = jsonData.map((row: any) => {
           // Convert topic name to topic_id
           let topicId = 1; // default
-          
+
           // Check if row has 'topic' (name) or 'topic_id' (legacy support)
           if (row.topic) {
             const topicName = String(row.topic).trim();
@@ -129,7 +124,9 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
             if (foundTopic) {
               topicId = foundTopic.id;
             } else {
-              console.warn(`Topic "${topicName}" not found, using default ID 1`);
+              console.warn(
+                `Topic "${topicName}" not found, using default ID 1`
+              );
             }
           } else if (row.topic_id) {
             topicId = Number(row.topic_id);
@@ -147,7 +144,7 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
         setBulkLessons(lessons);
       } catch (error) {
         console.error("Error parsing Excel file:", error);
-        alert("Error parsing Excel file. Please check the format.");
+        onError("Error parsing Excel file. Please check the format.");
       }
     };
     reader.readAsBinaryString(file);
@@ -165,12 +162,12 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
   const handleSubmit = async () => {
     // Enable validation display
     setShowValidation(true);
-    
+
     // Check if all lessons are valid
     if (!validateLessons()) {
       return; // Don't submit if validation fails
     }
-    
+
     // Proceed with submission
     await onSubmit();
   };
@@ -178,21 +175,22 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
   const handleDownloadTemplate = () => {
     // Get sample topic name or use a default
     const sampleTopicName = topics.length > 0 ? topics[0].name : "Sample Topic";
-    
+
     // Create sample data with topic names (not IDs)
     const templateData = [
       {
         topic: sampleTopicName,
         title: "Sample Lesson Title 1",
-        content: "This is the lesson content. Provide detailed information here...",
-        video_url: "https://youtube.com/watch?v=example1",
+        content:
+          "This is the lesson content. Provide detailed information here...",
+        video_url: "https://res.cloudinary.com/dyhnzac8w/video/upload/v1754558644/System_Of_Linear_Equations_efgzsw.mp4",
         short_describe: "Brief description of the lesson",
       },
       {
         topic: sampleTopicName,
         title: "Sample Lesson Title 2",
         content: "Another lesson content example. Add your lesson details...",
-        video_url: "",
+        video_url: "https://res.cloudinary.com/dyhnzac8w/video/upload/v1754558637/Inscribed_Angle_Theorem_fzpckg.mp4",
         short_describe: "Another brief description",
       },
     ];
@@ -217,7 +215,9 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
     }
 
     // Generate file and trigger download
-    const fileName = `bulk_lessons_template_${new Date().toISOString().split("T")[0]}.xlsx`;
+    const fileName = `bulk_lessons_template_${
+      new Date().toISOString().split("T")[0]
+    }.xlsx`;
     XLSX.writeFile(workbook, fileName);
   };
 
@@ -234,49 +234,72 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: 700, fontSize: 24, pb: 1 }}>
+      <DialogTitle
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: 20, sm: 24 },
+          py: 1.5,
+          mb: 1,
+          px: { xs: 2, sm: 3 },
+          background: "linear-gradient(135deg, #667eea44 0%, #764ba244 100%)",
+          color: "black",
+          borderRadius: "12px 12px 0 0",
+        }}
+      >
         Add Bulk Lessons
       </DialogTitle>
-      <DialogContent>
-        <Box sx={{ mb: 2, display: "flex", gap: 2, mt: 1, justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<UploadFileIcon />}
-              component="label"
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-              }}
-            >
-              Import from Excel
-              <input
-                type="file"
-                hidden
-                accept=".xlsx,.xls"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-              />
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddLesson}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-              }}
-            >
-              Add Lesson Row
-            </Button>
-          </Box>
+      <DialogContent
+        sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+      >
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            gap: { xs: 1, sm: 2 },
+            mt: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-start",
+            flexShrink: 0,
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddLesson}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              flex: { xs: 1, sm: "none" },
+            }}
+          >
+            Add Lesson
+          </Button>
           <Button
             variant="outlined"
-            color="success"
+            startIcon={<UploadFileIcon />}
+            component="label"
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              flex: { xs: 1, sm: "none" },
+            }}
+          >
+            Import Excel
+            <input
+              type="file"
+              hidden
+              accept=".xlsx,.xls"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
+          </Button>
+          <Button
+            variant="text"
             startIcon={<DownloadIcon />}
             onClick={handleDownloadTemplate}
+            disabled={loadingTopics}
             sx={{
               borderRadius: 2,
               textTransform: "none",
@@ -287,135 +310,94 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
           </Button>
         </Box>
 
-        <Typography
-          variant="caption"
-          sx={{ color: "grey.600", mb: 2, display: "block" }}
+        <Box
+          sx={{
+            bgcolor: "#e3f2fd",
+            border: "1px solid #90caf9",
+            borderRadius: 2,
+            p: 1.5,
+            mb: 2,
+            flexShrink: 0,
+          }}
         >
-          Excel format: columns should be - topic (name), title, content,
-          video_url, short_describe
-        </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: "primary.dark", fontWeight: 600, display: "block" }}
+          >
+            💡 Excel format: columns should be - <strong>topic</strong> (name),{" "}
+            <strong>title</strong>, <strong>content</strong>,{" "}
+            <strong>video_url</strong>, <strong>short_describe</strong>
+          </Typography>
+        </Box>
 
-        <Box sx={{ maxHeight: "50vh", overflowY: "auto", mt: 2 }}>
-          {bulkLessons.map((lesson, index) => (
-            <Paper
-              key={index}
-              elevation={2}
+        <Box
+          sx={{
+            overflowY: "auto",
+            flex: 1,
+            pr: 1,
+            "&::-webkit-scrollbar": {
+              width: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              bgcolor: "grey.200",
+              borderRadius: 2,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              bgcolor: "grey.400",
+              borderRadius: 2,
+              "&:hover": {
+                bgcolor: "grey.500",
+              },
+            },
+          }}
+        >
+          {loadingTopics ? (
+            <Box
               sx={{
-                p: 2,
-                mb: 2,
-                borderRadius: 2,
-                border: "1px solid #ccc",
-                position: "relative",
+                textAlign: "center",
+                py: 8,
               }}
             >
-              <IconButton
-                onClick={() => handleRemoveLesson(index)}
-                sx={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  color: "error.main",
-                }}
-                size="small"
-              >
-                <DeleteIcon />
-              </IconButton>
-
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>
-                Lesson {index + 1}
+              <CircularProgress />
+              <Typography variant="body2" sx={{ mt: 2, color: "grey.600" }}>
+                Loading topics...
               </Typography>
-
-              <FormControl fullWidth sx={{ mb: 1.5 }} size="small">
-                <InputLabel id={`topic-label-${index}`}>Topic</InputLabel>
-                <Select
-                  labelId={`topic-label-${index}`}
-                  id={`topic-select-${index}`}
-                  value={lesson.topic_id}
-                  label="Topic"
-                  onChange={(e) =>
-                    handleLessonChange(index, "topic_id", e.target.value)
-                  }
-                  disabled={loadingTopics}
-                >
-                  {topics.length === 0 && !loadingTopics ? (
-                    <MenuItem value="">
-                      <em>No topics available</em>
-                    </MenuItem>
-                  ) : (
-                    topics.map((topic) => (
-                      <MenuItem key={topic.id} value={topic.id}>
-                        {topic.name}
-                      </MenuItem>
-                    ))
-                  )}
-                </Select>
-              </FormControl>
-
-              <TextField
-                fullWidth
-                label="Title"
-                value={lesson.title}
-                onChange={(e) =>
-                  handleLessonChange(index, "title", e.target.value)
-                }
-                sx={{ mb: 1.5 }}
-                size="small"
-                required
-                error={showValidation && lesson.title.trim() === ""}
-                helperText={showValidation && lesson.title.trim() === "" ? "Title is required" : ""}
+            </Box>
+          ) : bulkLessons.length === 0 ? (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 8,
+                color: "grey.500",
+              }}
+            >
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                No lessons added yet
+              </Typography>
+              <Typography variant="body2">
+                Click "Add Lesson" to create a new lesson or import from Excel
+              </Typography>
+            </Box>
+          ) : (
+            bulkLessons.map((lesson, index) => (
+              <BulkLessonCard
+                key={index}
+                lesson={lesson}
+                index={index}
+                topics={topics}
+                showValidation={showValidation}
+                loadingTopics={loadingTopics}
+                onLessonChange={handleLessonChange}
+                onRemove={handleRemoveLesson}
               />
-
-              <TextField
-                fullWidth
-                label="Short Description"
-                value={lesson.short_describe}
-                onChange={(e) =>
-                  handleLessonChange(index, "short_describe", e.target.value)
-                }
-                sx={{ mb: 1.5 }}
-                size="small"
-                required
-                error={showValidation && lesson.short_describe.trim() === ""}
-                helperText={showValidation && lesson.short_describe.trim() === "" ? "Short description is required" : ""}
-              />
-
-              <TextField
-                fullWidth
-                label="Content"
-                value={lesson.content}
-                onChange={(e) =>
-                  handleLessonChange(index, "content", e.target.value)
-                }
-                multiline
-                rows={3}
-                sx={{ mb: 1.5 }}
-                size="small"
-                required
-                error={showValidation && lesson.content.trim() === ""}
-                helperText={showValidation && lesson.content.trim() === "" ? "Content is required" : ""}
-              />
-
-              <TextField
-                fullWidth
-                label="Video URL (optional)"
-                value={lesson.video_url || ""}
-                onChange={(e) =>
-                  handleLessonChange(
-                    index,
-                    "video_url",
-                    e.target.value || null
-                  )
-                }
-                sx={{ mb: 1 }}
-                size="small"
-              />
-            </Paper>
-          ))}
+            ))
+          )}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ p: 2, pt: 1 }}>
+      <DialogActions sx={{ p: 2, pt: 0 }}>
         <Button
           onClick={onClose}
+          disabled={isSubmitting}
           sx={{
             borderRadius: 2,
             textTransform: "none",
@@ -427,7 +409,7 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={isSubmitting || bulkLessons.length === 0 || loadingTopics}
           sx={{
             borderRadius: 2,
             textTransform: "none",
@@ -435,9 +417,14 @@ const BulkLessonModal: React.FC<BulkLessonModalProps> = ({
           }}
         >
           {isSubmitting ? (
-            <CircularProgress size={20} color="inherit" />
+            <>
+              <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+              Submitting...
+            </>
           ) : (
-            "Submit All Lessons"
+            `Submit ${bulkLessons.length} Lesson${
+              bulkLessons.length !== 1 ? "s" : ""
+            }`
           )}
         </Button>
       </DialogActions>

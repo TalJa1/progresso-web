@@ -7,7 +7,9 @@ import {
   Avatar,
   CircularProgress,
   IconButton,
+  Snackbar,
 } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import QuizIcon from "@mui/icons-material/Quiz";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -35,85 +37,52 @@ const HomeView = () => {
   const navigate = useNavigate();
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
   const [topics, setTopics] = useState<TopicModel[]>([]);
-  const today = new Date();
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const getDateStr = (offset: number) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + offset);
-    return `${months[d.getMonth()]} ${pad(d.getDate())}, ${d.getFullYear()}`;
-  };
   const [allLessons, setAllLessons] = useState<LessonModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
   const [mockPage, setMockPage] = useState(0);
   const [mockItemsPerPage, setMockItemsPerPage] = useState(3);
-  // Animation states
   const [isLessonsAnimating, setIsLessonsAnimating] = useState(false);
-  const [lessonsAnimationDirection, setLessonsAnimationDirection] = useState<
-    "left" | "right"
-  >("left");
+  const [lessonsAnimationDirection, setLessonsAnimationDirection] = useState<"left" | "right">("left");
   const [isMockAnimating, setIsMockAnimating] = useState(false);
-  const [mockAnimationDirection, setMockAnimationDirection] = useState<
-    "left" | "right"
-  >("left");
-  // Refs for measuring available width
-  const lessonsContainerRef = useRef<HTMLDivElement | null>(null);
-  const mockContainerRef = useRef<HTMLDivElement | null>(null);
-  const [user, setUser] = useState<{
-    displayName: "";
-    email: "";
-    photoURL: "";
-    uid: "";
-  } | null>(null);
+  const [mockAnimationDirection, setMockAnimationDirection] = useState<"left" | "right">("left");
+  const [user, setUser] = useState<{ displayName: ""; email: ""; photoURL: ""; uid: "" } | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [loadingQuizletId, setLoadingQuizletId] = useState<number | null>(null);
-  const navigateTimeoutRef = useRef<number | null>(null);
-  
-  // Admin bulk lesson states
   const [isAdmin, setIsAdmin] = useState(false);
   const [openBulkModal, setOpenBulkModal] = useState(false);
   const [bulkLessons, setBulkLessons] = useState<BulkLessonCreate[]>([
-    {
-      topic_id: 1,
-      title: "",
-      content: "",
-      video_url: null,
-      short_describe: "",
-    },
+    { topic_id: 1, title: "", content: "", video_url: null, short_describe: "" },
   ]);
   const [isSubmittingBulk, setIsSubmittingBulk] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
-  // Card sizing assumptions (kept small and adjustable)
-  const LESSON_CARD_MIN_WIDTH = 320; // px
-  const MOCK_CARD_MIN_WIDTH = 320; // px
-  const GAP_PX = 24; // matches `gap: 3` (3 * 8px theme spacing)
+  const lessonsContainerRef = useRef<HTMLDivElement | null>(null);
+  const mockContainerRef = useRef<HTMLDivElement | null>(null);
+  const navigateTimeoutRef = useRef<number | null>(null);
 
-  const computeItemsPerPage = (
-    containerWidth: number,
-    cardMinWidth: number,
-    gap: number
-  ) => {
+  const LESSON_CARD_MIN_WIDTH = 320;
+  const MOCK_CARD_MIN_WIDTH = 320;
+  const GAP_PX = 24;
+
+  const today = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  const getDateStr = (offset: number) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + offset);
+    return `${months[d.getMonth()]} ${pad(d.getDate())}, ${d.getFullYear()}`;
+  };
+
+  const computeItemsPerPage = (containerWidth: number, cardMinWidth: number, gap: number) => {
     if (!containerWidth || containerWidth <= cardMinWidth) return 1;
-    // formula: floor((containerWidth + gap) / (cardMinWidth + gap))
-    return Math.max(
-      1,
-      Math.floor((containerWidth + gap) / (cardMinWidth + gap))
-    );
+    return Math.max(1, Math.floor((containerWidth + gap) / (cardMinWidth + gap)));
   };
 
   // Animation handlers for lessons
@@ -171,8 +140,8 @@ const HomeView = () => {
         });
         
         // Check if user is admin
-        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-        if (parsed.email === adminEmail) {
+        const adminEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(',').map((email: string) => email.trim()) || [];
+        if (adminEmails.includes(parsed.email)) {
           setIsAdmin(true);
         }
         
@@ -308,29 +277,29 @@ const HomeView = () => {
 
   const handleCloseBulkModal = () => {
     setOpenBulkModal(false);
-    setBulkLessons([
-      {
-        topic_id: 1,
-        title: "",
-        content: "",
-        video_url: null,
-        short_describe: "",
-      },
-    ]);
+    setBulkLessons([{ topic_id: 1, title: "", content: "", video_url: null, short_describe: "" }]);
   };
 
   const handleSubmitBulkLessons = async () => {
     try {
       setIsSubmittingBulk(true);
       await createBulkLessons(bulkLessons);
-      alert("Lessons added successfully!");
+      setSnackbar({
+        open: true,
+        message: "Lessons added successfully!",
+        severity: "success",
+      });
       handleCloseBulkModal();
       // Refresh lessons
       const lessonsData = await getAllLessons();
       setAllLessons(lessonsData);
     } catch (error) {
       console.error("Error adding bulk lessons:", error);
-      alert("Error adding lessons. Please try again.");
+      setSnackbar({
+        open: true,
+        message: "Error adding lessons. Please try again.",
+        severity: "error",
+      });
     } finally {
       setIsSubmittingBulk(false);
     }
@@ -1076,10 +1045,23 @@ const HomeView = () => {
         setBulkLessons={setBulkLessons}
         onSubmit={handleSubmitBulkLessons}
         isSubmitting={isSubmittingBulk}
+        onError={(message) => setSnackbar({ open: true, message, severity: "error" })}
       />
 
       {/* Ensure FloatingChatBot is rendered outside main content for visibility */}
       <FloatingChatBot />
+      
+      {/* Snackbar for notifications */}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+      >
+        <MuiAlert elevation={6} variant="filled" severity={snackbar.severity}>
+          {snackbar.message}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };
